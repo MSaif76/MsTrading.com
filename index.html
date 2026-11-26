@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pipscopetrade1 — Institutional TradingView Terminal & Cloud Journal</title>
+  <title>pipscopetrade1 — Institutional Trading Terminal & Cloud Journal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,194 +44,153 @@
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: #131722; }
     ::-webkit-scrollbar-thumb { background: #2a2e39; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #363a45; }
-    .active-study { background-color: rgba(41, 98, 255, 0.2); border-color: #2962ff; color: #ffffff; }
+    .active-study { background-color: rgba(41, 98, 255, 0.22); border-color: #2962ff; color: #ffffff; }
     .tool-active { background-color: #2962ff; color: #ffffff; }
   </style>
 </head>
 <body class="h-screen w-screen flex flex-col bg-tv-bg text-tv-text">
 
-  <!-- TOP INSTITUTIONAL HEADER BAR -->
+  <!-- TOP BAR -->
   <header class="h-12 bg-tv-panel border-b border-tv-border px-2.5 flex items-center justify-between gap-2 shrink-0 z-30">
-    <!-- Left: Brand + Quick Pairs + Search -->
     <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
       <div class="flex items-center gap-2 pr-2 border-r border-tv-border shrink-0">
-        <div class="w-7 h-7 rounded bg-gradient-to-br from-emerald-500 to-tv-blue flex items-center justify-center font-mono font-bold text-white text-xs shadow">
-          PS
-        </div>
-        <span class="font-bold text-white tracking-tight text-sm">pipscopetrade1</span>
+        <div class="w-7 h-7 rounded bg-gradient-to-br from-emerald-500 to-tv-blue flex items-center justify-center font-mono font-bold text-white text-xs">PS</div>
+        <span class="font-bold text-white text-sm">pipscopetrade1</span>
         <span id="planStatusBadge" class="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded">FREE</span>
       </div>
 
-      <!-- Quick Symbol Pills -->
       <div id="symbolPills" class="flex items-center gap-1 shrink-0">
-        <button data-symbol="OANDA:XAUUSD" class="sym-btn px-2 py-1 text-xs font-mono font-semibold rounded bg-tv-blue text-white transition">XAUUSD</button>
-        <button data-symbol="FX:EURUSD" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">EURUSD</button>
-        <button data-symbol="FX:GBPUSD" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">GBPUSD</button>
-        <button data-symbol="FX:USDJPY" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">USDJPY</button>
-        <button data-symbol="BINANCE:BTCUSDT" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">BTCUSDT</button>
-        <button data-symbol="NSE:NIFTY" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">NIFTY</button>
-        <button data-symbol="NSE:BANKNIFTY" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">BANKNIFTY</button>
+        <button type="button" data-symbol="OANDA:XAUUSD" class="sym-btn px-2 py-1 text-xs font-mono font-semibold rounded bg-tv-blue text-white">XAUUSD</button>
+        <button type="button" data-symbol="FX:EURUSD" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">EURUSD</button>
+        <button type="button" data-symbol="FX:GBPUSD" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">GBPUSD</button>
+        <button type="button" data-symbol="FX:USDJPY" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">USDJPY</button>
+        <button type="button" data-symbol="BINANCE:BTCUSDT" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">BTCUSDT</button>
+        <button type="button" data-symbol="NSE:NIFTY" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">NIFTY</button>
+        <button type="button" data-symbol="NSE:BANKNIFTY" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">BANKNIFTY</button>
       </div>
 
-      <!-- Exchange:Symbol Search -->
       <form id="customSymbolForm" class="flex items-center gap-1 shrink-0">
-        <input id="customSymbolInput" type="text" placeholder="NASDAQ:NVDA" class="w-28 bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-2 py-1 text-xs font-mono text-white outline-none" />
-        <button type="submit" class="px-2 py-1 bg-tv-hover hover:bg-tv-blue text-white text-xs font-medium rounded transition">Go</button>
+        <input id="customSymbolInput" type="text" placeholder="FX:USDCHF" class="w-24 bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-2 py-1 text-xs font-mono text-white outline-none" />
+        <button type="submit" class="px-2 py-1 bg-tv-hover hover:bg-tv-blue text-white text-xs font-medium rounded">Go</button>
       </form>
     </div>
 
-    <!-- Right: Timeframes + Layouts + Alerts + Login/Profile + Pro -->
     <div class="flex items-center gap-1.5 shrink-0">
-      <!-- Timeframes -->
-      <div id="tfPills" class="hidden 2xl:flex items-center gap-0.5 bg-tv-bg p-0.5 rounded border border-tv-border">
-        <button data-tf="1" class="tf-btn px-2 py-0.5 text-xs font-mono rounded bg-tv-blue text-white">1m</button>
-        <button data-tf="5" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">5m</button>
-        <button data-tf="15" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">15m</button>
-        <button data-tf="60" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">1H</button>
-        <button data-tf="240" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">4H</button>
-        <button data-tf="D" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">1D</button>
+      <div id="tfPills" class="hidden xl:flex items-center gap-0.5 bg-tv-bg p-0.5 rounded border border-tv-border">
+        <button type="button" data-tf="1" class="tf-btn px-2 py-0.5 text-xs font-mono rounded bg-tv-blue text-white">1m</button>
+        <button type="button" data-tf="5" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">5m</button>
+        <button type="button" data-tf="15" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">15m</button>
+        <button type="button" data-tf="60" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">1H</button>
+        <button type="button" data-tf="240" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">4H</button>
+        <button type="button" data-tf="D" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">1D</button>
       </div>
 
-      <!-- Multi-Chart 1x / 2x / 4x -->
       <div class="hidden md:flex items-center bg-tv-bg p-0.5 rounded border border-tv-border text-[11px] font-mono">
-        <button id="layoutSingleBtn" class="px-2 py-0.5 rounded bg-tv-blue text-white font-semibold">1x</button>
-        <button id="layoutSplitBtn" class="px-2 py-0.5 rounded text-tv-muted hover:text-white">2x 🔒</button>
-        <button id="layoutQuadBtn" class="px-2 py-0.5 rounded text-tv-muted hover:text-white">4x 🔒</button>
+        <button type="button" id="layoutSingleBtn" class="px-2 py-0.5 rounded bg-tv-blue text-white font-semibold">1x</button>
+        <button type="button" id="layoutSplitBtn" class="px-2 py-0.5 rounded text-tv-muted hover:text-white">2x</button>
+        <button type="button" id="layoutQuadBtn" class="px-2 py-0.5 rounded text-tv-muted hover:text-white">4x</button>
       </div>
 
-      <!-- Saved Chart Layouts Dropdown -->
-      <button id="openLayoutModalBtn" title="Save & Load Chart Templates" class="hidden sm:flex items-center gap-1 px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white transition">
-        <span>☁️ Layouts</span>
-      </button>
+      <button type="button" id="openLayoutModalBtn" class="hidden sm:flex items-center gap-1 px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white">☁️ Layouts</button>
+      <button type="button" id="openAlertModalBtn" class="px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white flex items-center gap-1">🔔 <span id="alertCountBadge" class="font-mono text-[10px] text-amber-400">0</span></button>
+      <button type="button" id="togglePaperPanelBtn" class="hidden lg:flex items-center gap-1 px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-emerald-400 font-semibold">⇄ Trade</button>
+      <button type="button" id="toggleIndicatorBarBtn" class="px-2 py-1 text-xs font-medium bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-white"><span class="text-tv-blue font-mono font-bold">fx</span></button>
+      <button type="button" id="openUpgradeBtn" class="px-2.5 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black rounded shadow">⚡ Pro ₹149</button>
 
-      <!-- Price Alert Bell -->
-      <button id="openAlertModalBtn" title="Set Sound Price Alerts" class="px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white flex items-center gap-1 transition">
-        <span>🔔</span>
-        <span id="alertCountBadge" class="font-mono text-[10px] text-amber-400">0</span>
-      </button>
-
-      <!-- Paper Trading Floating Toggle -->
-      <button id="togglePaperPanelBtn" title="Toggle Instant Buy/Sell Panel" class="hidden lg:flex items-center gap-1 px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-emerald-400 font-semibold transition">
-        <span>⇄ Trade</span>
-      </button>
-
-      <!-- Indicators Toggle -->
-      <button id="toggleIndicatorBarBtn" class="px-2 py-1 text-xs font-medium bg-tv-bg hover:bg-tv-hover border border-tv-border rounded flex items-center gap-1 text-white transition">
-        <span class="text-tv-blue font-mono font-bold">fx</span>
-        <span class="hidden xl:inline">Indicators</span>
-      </button>
-
-      <!-- Upgrade Pro CTA -->
-      <button id="openUpgradeBtn" class="px-2.5 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black rounded shadow flex items-center gap-1 transition">
-        <span>⚡ Pro ₹149</span>
-      </button>
-
-      <!-- USER LOGIN / ACCOUNT PROFILE BUTTON -->
-      <button id="authHeaderBtn" class="px-2.5 py-1 text-xs font-semibold bg-tv-blue hover:bg-tv-blueHover text-white rounded flex items-center gap-1.5 transition">
+      <button type="button" id="authHeaderBtn" class="px-2.5 py-1 text-xs font-semibold bg-tv-blue hover:bg-tv-blueHover text-white rounded flex items-center gap-1.5">
         <span id="authHeaderAvatar" class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">👤</span>
         <span id="authHeaderText">Sign In</span>
       </button>
 
-      <!-- Right Sidebar Toggle -->
-      <button id="toggleSidebarBtn" title="Toggle Right Sidebar" class="p-1.5 bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <rect x="3" y="3" width="18" height="18" rx="2" /><line x1="15" y1="3" x2="15" y2="21" />
-        </svg>
+      <button type="button" id="toggleSidebarBtn" title="Toggle Right Sidebar" class="p-1.5 bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" /><line x1="15" y1="3" x2="15" y2="21" /></svg>
       </button>
     </div>
   </header>
 
-  <!-- SESSION KILLZONES & CLOUD SYNC STATUS BAR -->
+  <!-- SESSION & CLOUD BAR -->
   <div class="bg-tv-deep border-b border-tv-border px-3 py-1 flex items-center justify-between gap-2 text-[11px] font-mono shrink-0">
     <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
-      <span class="text-tv-muted font-sans font-semibold uppercase tracking-wider text-[10px]">Sessions:</span>
-      <span id="sessSydney" class="flex items-center gap-1">Sydney</span>
-      <span id="sessTokyo" class="flex items-center gap-1">Tokyo</span>
-      <span id="sessLondon" class="flex items-center gap-1">London</span>
-      <span id="sessNewYork" class="flex items-center gap-1">New York</span>
-      <span id="killzoneBadge" class="hidden sm:inline-block px-1.5 py-0.2 rounded bg-tv-panel text-tv-muted text-[10px]">Checking liquidity...</span>
+      <span class="text-tv-muted font-sans font-semibold uppercase text-[10px]">Sessions:</span>
+      <span id="sessSydney">Sydney</span>
+      <span id="sessTokyo">Tokyo</span>
+      <span id="sessLondon">London</span>
+      <span id="sessNewYork">New York</span>
+      <span id="killzoneBadge" class="hidden sm:inline-block px-1.5 py-0.2 rounded bg-tv-panel text-tv-muted text-[10px]">Checking...</span>
     </div>
     <div class="flex items-center gap-3">
-      <span id="cloudSyncIndicator" class="text-[10px] text-tv-muted">☁️ Local Mode (Sign in to Cloud Sync)</span>
+      <span id="cloudSyncIndicator" class="text-[10px] text-tv-muted">☁️ Local Mode</span>
       <span id="liveClockIst" class="text-emerald-400 font-semibold">--:--:-- IST</span>
     </div>
   </div>
 
-  <!-- INDICATOR STUDY MANAGER BAR -->
+  <!-- INDICATOR BAR -->
   <div id="indicatorBar" class="bg-tv-panel/80 border-b border-tv-border px-3 py-1.5 flex flex-wrap items-center justify-between gap-2 shrink-0">
     <div class="flex items-center gap-1.5 flex-wrap">
       <span class="text-[11px] font-semibold uppercase tracking-wider text-tv-muted mr-1"><span class="text-tv-blue font-mono">fx</span> Studies:</span>
-      <button data-study="MASimple@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">SMA</button>
-      <button data-study="MAExp@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">EMA</button>
-      <button data-study="RSI@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">RSI</button>
-      <button data-study="MACD@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">MACD</button>
-      <button data-study="BB@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">Bollinger</button>
-      <button data-study="VWAP@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">VWAP</button>
-      <button data-study="Volume@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">Volume</button>
-      <button data-study="ATR@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">ATR</button>
-      <button data-study="IchimokuCloud@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">Ichimoku</button>
+      <button type="button" data-study="MASimple@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">SMA</button>
+      <button type="button" data-study="MAExp@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">EMA</button>
+      <button type="button" data-study="RSI@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">RSI</button>
+      <button type="button" data-study="MACD@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">MACD</button>
+      <button type="button" data-study="BB@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">Bollinger</button>
+      <button type="button" data-study="VWAP@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">VWAP</button>
+      <button type="button" data-study="Volume@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">Volume</button>
+      <button type="button" data-study="ATR@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">ATR</button>
     </div>
-
     <div class="flex items-center gap-2">
       <span id="activeStudiesCount" class="text-[11px] font-mono text-tv-blue">0/1 Free Study</span>
-      <button id="openPineModalBtn" class="px-2 py-0.5 text-xs font-medium bg-tv-green/20 hover:bg-tv-green/30 text-tv-green border border-tv-green/40 rounded transition">
-        SMC & Gold Pine v5 🔒
-      </button>
-      <button id="hideIndicatorBarBtn" class="text-xs text-tv-muted hover:text-white px-1">Hide</button>
+      <button type="button" id="openPineModalBtn" class="px-2 py-0.5 text-xs font-medium bg-tv-green/20 hover:bg-tv-green/30 text-tv-green border border-tv-green/40 rounded">Pine v5 Library</button>
+      <button type="button" id="hideIndicatorBarBtn" class="text-xs text-tv-muted hover:text-white px-1">Hide</button>
     </div>
   </div>
 
-  <!-- MAIN TRADINGVIEW WORKSPACE -->
+  <!-- MAIN WORKSPACE -->
   <div class="flex-1 flex min-h-0 overflow-hidden">
-
-    <!-- LEFT VERTICAL DRAWING & QUICK TOOLS SIDEBAR (TRADINGVIEW STYLE) -->
+    <!-- LEFT VERTICAL TOOLBAR -->
     <nav class="w-10 bg-tv-panel border-r border-tv-border flex flex-col items-center py-2 gap-1.5 shrink-0 z-20">
-      <button title="Crosshair Cursor" class="tv-left-tool tool-active w-7 h-7 rounded flex items-center justify-center text-xs hover:bg-tv-hover transition">╋</button>
-      <button data-quicktool="fib" title="Golden Zone Fib Retracement" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover transition">📐</button>
-      <button data-quicktool="calc" title="Long / Short Position Risk Tool" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover transition">⚖️</button>
-      <button data-quicktool="prop" title="Prop Firm Drawdown Guard" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover transition">🛡️</button>
-      <button data-quicktool="alert" title="Create Price Alert" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover transition">🔔</button>
-      <button data-quicktool="screener" title="Market Screener" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover transition">🔍</button>
+      <button type="button" title="Cursor" class="tv-left-tool tool-active w-7 h-7 rounded flex items-center justify-center text-xs">╋</button>
+      <button type="button" data-quicktool="fib" title="Golden Zone" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">📐</button>
+      <button type="button" data-quicktool="calc" title="Risk & Lot Calculator" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">⚖️</button>
+      <button type="button" data-quicktool="prop" title="Prop Firm Guard" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">🛡️</button>
+      <button type="button" data-quicktool="alert" title="Price Alerts" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">🔔</button>
+      <button type="button" data-quicktool="screener" title="Market Screener" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">🔍</button>
       <div class="w-5 border-t border-tv-border my-1"></div>
-      <button id="toggleFullChartBtn" title="Maximize Chart (Hide Side & Bottom Panels)" class="w-7 h-7 rounded flex items-center justify-center text-xs text-amber-400 hover:bg-tv-hover transition">⛶</button>
+      <button type="button" id="toggleFullChartBtn" title="Fullscreen Chart" class="w-7 h-7 rounded flex items-center justify-center text-xs text-amber-400 hover:bg-tv-hover">⛶</button>
     </nav>
 
-    <!-- CENTER CHART GRID (1x, 2x SPLIT, 4x QUAD) -->
+    <!-- CHART AREA -->
     <main id="chartWorkspace" class="flex-1 grid grid-cols-1 grid-rows-1 min-w-0 bg-tv-bg relative">
-      <!-- FLOATING TRADINGVIEW INSTANT BUY / SELL PAPER TRADING PANEL -->
+      <!-- Floating Paper Order Box -->
       <div id="floatingOrderPanel" class="hidden absolute top-3 left-14 z-20 bg-tv-panel/95 backdrop-blur border border-tv-border rounded-lg shadow-2xl p-2 flex items-center gap-2 font-mono text-xs">
-        <button id="instantSellBtn" class="px-3 py-1.5 bg-tv-red hover:bg-rose-500 text-white font-bold rounded shadow transition flex flex-col items-center leading-tight">
-          <span class="text-[9px] opacity-80">SELL MKT</span>
+        <button type="button" id="instantSellBtn" class="px-3 py-1.5 bg-tv-red hover:bg-rose-500 text-white font-bold rounded flex flex-col items-center leading-tight">
+          <span class="text-[9px] opacity-80">SELL</span>
           <span id="floatSymbolSell">XAUUSD</span>
         </button>
         <div class="flex flex-col items-center px-1">
           <span class="text-[9px] text-tv-muted">LOTS</span>
           <input id="floatLotInput" type="number" step="0.01" value="0.10" class="w-14 bg-tv-deep border border-tv-border rounded px-1 py-0.5 text-center text-white outline-none" />
         </div>
-        <button id="instantBuyBtn" class="px-3 py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white font-bold rounded shadow transition flex flex-col items-center leading-tight">
-          <span class="text-[9px] opacity-80">BUY MKT</span>
+        <button type="button" id="instantBuyBtn" class="px-3 py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white font-bold rounded flex flex-col items-center leading-tight">
+          <span class="text-[9px] opacity-80">BUY</span>
           <span id="floatSymbolBuy">XAUUSD</span>
         </button>
-        <button id="closeFloatOrderBtn" class="text-tv-muted hover:text-white px-1 text-xs">✕</button>
+        <button type="button" id="closeFloatOrderBtn" class="text-tv-muted hover:text-white px-1">✕</button>
       </div>
 
-      <!-- Chart 1 -->
       <div id="primaryChartWrap" class="flex flex-col min-w-0 min-h-0 h-full w-full">
         <div id="tv_chart_container" class="flex-1 w-full h-full"></div>
       </div>
 
-      <!-- Chart 2 (Pro 2x / 4x) -->
       <div id="secondaryChartWrap" class="hidden flex-col min-w-0 min-h-0 h-full w-full border-l-2 border-tv-border">
         <div class="h-7 bg-tv-deep border-b border-tv-border px-2 flex items-center justify-between text-[11px] font-mono shrink-0">
           <div class="flex items-center gap-1.5">
             <span class="text-emerald-400 font-semibold">CHART 2:</span>
             <select id="splitSymbolSelect" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
-              <option value="TVC:DXY" selected>DXY (Dollar Index)</option>
+              <option value="TVC:DXY" selected>DXY</option>
               <option value="OANDA:XAUUSD">XAUUSD</option>
               <option value="FX:EURUSD">EURUSD</option>
               <option value="BINANCE:BTCUSDT">BTCUSDT</option>
-              <option value="NSE:NIFTY">NIFTY 50</option>
+              <option value="NSE:NIFTY">NIFTY</option>
             </select>
             <select id="splitTfSelect" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
               <option value="5">5m</option>
@@ -240,19 +199,18 @@
               <option value="240">4H</option>
             </select>
           </div>
-          <button id="closeSplitBtn" class="text-tv-muted hover:text-white">✕ 1x</button>
+          <button type="button" id="closeSplitBtn" class="text-tv-muted hover:text-white">✕ 1x</button>
         </div>
         <div id="tv_chart_container_2" class="flex-1 w-full h-full"></div>
       </div>
 
-      <!-- Chart 3 (Pro 4x) -->
       <div id="thirdChartWrap" class="hidden flex-col min-w-0 min-h-0 h-full w-full border-t-2 border-tv-border">
         <div class="h-7 bg-tv-deep border-b border-tv-border px-2 flex items-center gap-1.5 text-[11px] font-mono shrink-0">
           <span class="text-sky-400 font-semibold">CHART 3:</span>
           <select id="quadSymbol3" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
             <option value="FX:EURUSD" selected>EURUSD</option>
             <option value="OANDA:XAUUSD">XAUUSD</option>
-            <option value="NSE:NIFTY">NIFTY 50</option>
+            <option value="NSE:NIFTY">NIFTY</option>
           </select>
           <select id="quadTf3" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
             <option value="15">15m</option>
@@ -262,7 +220,6 @@
         <div id="tv_chart_container_3" class="flex-1 w-full h-full"></div>
       </div>
 
-      <!-- Chart 4 (Pro 4x) -->
       <div id="fourthChartWrap" class="hidden flex-col min-w-0 min-h-0 h-full w-full border-t-2 border-l-2 border-tv-border">
         <div class="h-7 bg-tv-deep border-b border-tv-border px-2 flex items-center gap-1.5 text-[11px] font-mono shrink-0">
           <span class="text-amber-400 font-semibold">CHART 4:</span>
@@ -280,36 +237,29 @@
       </div>
     </main>
 
-    <!-- RIGHT SIDEBAR: PRO CALCULATORS + CUSTOM WATCHLIST + ECONOMIC NEWS -->
+    <!-- RIGHT SIDEBAR -->
     <aside id="rightSidebar" class="w-80 bg-tv-panel border-l border-tv-border flex flex-col shrink-0 overflow-y-auto">
       <div class="p-2 bg-tv-deep border-b border-tv-border grid grid-cols-3 gap-1 text-[10px] font-semibold">
-        <button id="toolTabCalc" class="py-1.5 rounded bg-tv-blue text-white">Risk & Lot 🔒</button>
-        <button id="toolTabFib" class="py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white">Golden Zone 🔒</button>
-        <button id="toolTabProp" class="py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white">Prop Guard 🔒</button>
+        <button type="button" id="toolTabCalc" class="py-1.5 rounded bg-tv-blue text-white">Risk & Lot</button>
+        <button type="button" id="toolTabFib" class="py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white">Golden Zone</button>
+        <button type="button" id="toolTabProp" class="py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white">Prop Guard</button>
       </div>
 
-      <!-- TOOL 1: RISK & POSITION CALCULATOR -->
+      <!-- CALCULATOR -->
       <div id="panelToolCalc" class="p-3 border-b border-tv-border">
         <div class="flex items-center justify-between mb-2">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-white">Position & Lot Calc <span class="pro-lock-tag text-amber-400">🔒</span></h2>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-white">Position & Lot Calc</h2>
           <div class="flex bg-tv-bg rounded border border-tv-border p-0.5 text-[10px] font-mono">
-            <button id="currUsdBtn" class="px-1.5 py-0.5 rounded bg-tv-blue text-white font-semibold">USD</button>
-            <button id="currInrBtn" class="px-1.5 py-0.5 rounded text-tv-muted hover:text-white">INR</button>
+            <button type="button" id="currUsdBtn" class="px-1.5 py-0.5 rounded bg-tv-blue text-white font-semibold">USD</button>
+            <button type="button" id="currInrBtn" class="px-1.5 py-0.5 rounded text-tv-muted hover:text-white">INR</button>
           </div>
         </div>
 
         <div class="space-y-2 text-xs">
           <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-[10px] text-tv-muted mb-0.5">Balance</label>
-              <input id="calcBalance" type="number" value="10000" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue" />
-            </div>
-            <div>
-              <label class="block text-[10px] text-tv-muted mb-0.5">Risk %</label>
-              <input id="calcRiskPct" type="number" step="0.1" value="1.0" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue" />
-            </div>
+            <div><label class="block text-[10px] text-tv-muted mb-0.5">Balance</label><input id="calcBalance" type="number" value="10000" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
+            <div><label class="block text-[10px] text-tv-muted mb-0.5">Risk %</label><input id="calcRiskPct" type="number" step="0.1" value="1.0" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
           </div>
-
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-[10px] text-tv-muted mb-0.5">Instrument</label>
@@ -329,37 +279,22 @@
               </select>
             </div>
           </div>
-
           <div class="grid grid-cols-3 gap-1.5">
-            <div>
-              <label class="block text-[10px] text-tv-muted mb-0.5">Entry</label>
-              <input id="calcEntry" type="number" step="any" placeholder="2650.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" />
-            </div>
-            <div>
-              <label class="block text-[10px] text-tv-muted mb-0.5">Stop Loss</label>
-              <input id="calcSl" type="number" step="any" placeholder="2645.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" />
-            </div>
-            <div>
-              <label class="block text-[10px] text-tv-muted mb-0.5">Take Profit</label>
-              <input id="calcTp" type="number" step="any" placeholder="2662.50" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" />
-            </div>
+            <div><label class="block text-[10px] text-tv-muted mb-0.5">Entry</label><input id="calcEntry" type="number" step="any" placeholder="2650.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
+            <div><label class="block text-[10px] text-tv-muted mb-0.5">Stop Loss</label><input id="calcSl" type="number" step="any" placeholder="2645.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
+            <div><label class="block text-[10px] text-tv-muted mb-0.5">Take Profit</label><input id="calcTp" type="number" step="any" placeholder="2662.50" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
           </div>
-
           <input id="calcNote" type="text" placeholder="Setup note (e.g. 0.280 Golden Zone)..." class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 text-[11px] text-white outline-none" />
-
           <div class="bg-tv-bg border border-tv-border rounded p-2 space-y-1 font-mono text-[11px]">
             <div class="flex justify-between"><span class="text-tv-muted">Risk Amount:</span><span id="outRiskAmt" class="text-tv-red font-semibold">$100.00</span></div>
-            <div class="flex justify-between"><span class="text-tv-muted">Lot Size:</span><span id="outLotSize" class="text-white font-bold">Pro Feature 🔒</span></div>
+            <div class="flex justify-between"><span class="text-tv-muted">Lot Size:</span><span id="outLotSize" class="text-white font-bold">—</span></div>
             <div class="flex justify-between"><span class="text-tv-muted">Risk : Reward:</span><span id="outRR" class="text-tv-green font-semibold">—</span></div>
           </div>
-
-          <button id="logTradeBtn" class="w-full py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white font-semibold rounded transition">
-            + Log Trade to Cloud Journal <span class="pro-lock-tag text-amber-300">🔒</span>
-          </button>
+          <button type="button" id="logTradeBtn" class="w-full py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white font-semibold rounded">+ Log Trade to Cloud Journal</button>
         </div>
       </div>
 
-      <!-- TOOL 2: GOLDEN ZONE SNIPER -->
+      <!-- GOLDEN ZONE -->
       <div id="panelToolFib" class="hidden p-3 border-b border-tv-border space-y-2 text-xs">
         <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">0.280–0.382 Golden Zone Sniper</h2>
         <div class="grid grid-cols-2 gap-2">
@@ -376,10 +311,10 @@
           <div class="flex justify-between text-emerald-400"><span>0.618 Golden Pocket:</span><span id="fibGoldenLevel">—</span></div>
           <div class="flex justify-between text-sky-400"><span>-0.272 Extension:</span><span id="fibTargetLevel">—</span></div>
         </div>
-        <button id="applyFibToCalcBtn" class="w-full py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded transition">⚡ Send to Calculator</button>
+        <button type="button" id="applyFibToCalcBtn" class="w-full py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded">⚡ Send to Calculator</button>
       </div>
 
-      <!-- TOOL 3: PROP FIRM DRAWDOWN GUARD -->
+      <!-- PROP GUARD -->
       <div id="panelToolProp" class="hidden p-3 border-b border-tv-border space-y-2 text-xs">
         <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Prop Firm Drawdown Guard</h2>
         <div class="grid grid-cols-3 gap-1.5">
@@ -399,11 +334,11 @@
         </div>
       </div>
 
-      <!-- WATCHLIST & ECONOMIC CALENDAR -->
+      <!-- WATCHLIST & NEWS -->
       <div class="flex-1 flex flex-col min-h-[220px] p-3">
         <div class="flex items-center gap-1 bg-tv-bg p-0.5 rounded border border-tv-border mb-2 text-[11px] font-semibold">
-          <button id="sideTabWatchlist" class="flex-1 py-1 rounded bg-tv-panel text-white">Watchlist</button>
-          <button id="sideTabCalendar" class="flex-1 py-1 rounded text-tv-muted hover:text-white">News Calendar</button>
+          <button type="button" id="sideTabWatchlist" class="flex-1 py-1 rounded bg-tv-panel text-white">Watchlist</button>
+          <button type="button" id="sideTabCalendar" class="flex-1 py-1 rounded text-tv-muted hover:text-white">News Calendar</button>
         </div>
         <div id="marketOverviewWidget" class="flex-1 w-full rounded overflow-hidden border border-tv-border"></div>
         <div id="economicCalendarWidget" class="hidden flex-1 w-full rounded overflow-hidden border border-tv-border"></div>
@@ -411,40 +346,32 @@
     </aside>
   </div>
 
-  <!-- BOTTOM PANEL: JOURNAL, HEATMAP, ANALYTICS, SCREENER & PINE STUDIO -->
+  <!-- BOTTOM PANEL -->
   <section id="bottomPanel" class="h-48 bg-tv-panel border-t border-tv-border flex flex-col shrink-0 z-10">
     <div class="h-8 px-3 border-b border-tv-border flex items-center justify-between bg-tv-deep overflow-x-auto no-scrollbar">
       <div class="flex items-center gap-3.5 text-xs shrink-0">
-        <button data-btab="journal" class="btab-btn font-semibold text-white border-b-2 border-tv-blue py-1.5">
-          Trade Journal <span id="journalCountBadge" class="ml-1 px-1.5 py-0.2 bg-tv-blue/20 text-tv-blue rounded font-mono text-[10px]">0</span> <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
+        <button type="button" data-btab="journal" class="btab-btn font-semibold text-white border-b-2 border-tv-blue py-1.5">
+          Trade Journal <span id="journalCountBadge" class="ml-1 px-1.5 py-0.2 bg-tv-blue/20 text-tv-blue rounded font-mono text-[10px]">0</span>
         </button>
-        <button data-btab="heatmap" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">
-          P&L Heatmap <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
-        </button>
-        <button data-btab="analytics" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">
-          Equity Curve <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
-        </button>
-        <button data-btab="screener" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">
-          Market Screener
-        </button>
-        <button data-btab="pine" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5 flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-tv-green"></span> Pine v5 Library <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
+        <button type="button" data-btab="heatmap" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">P&L Heatmap</button>
+        <button type="button" data-btab="analytics" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">Equity Curve</button>
+        <button type="button" data-btab="screener" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">Market Screener</button>
+        <button type="button" data-btab="pine" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-tv-green"></span> Pine v5 Library
         </button>
       </div>
 
       <div class="flex items-center gap-2 text-xs font-mono shrink-0">
         <span class="text-tv-muted">Net P&L: <strong id="topNetPnl" class="text-tv-green">+$0.00</strong></span>
-        <span class="text-tv-muted hidden sm:inline">Win: <strong id="topWinRate" class="text-white">0.0%</strong></span>
         <label id="importMt5Label" class="cursor-pointer px-2 py-0.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 rounded text-[11px] font-sans text-emerald-300">
-          Import MT5/CSV 🔒
+          Import CSV
           <input id="mt5FileInput" type="file" accept=".csv,.html,.htm" class="hidden" />
         </label>
-        <button id="exportCsvBtn" class="px-2 py-0.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-[11px] font-sans text-tv-text">Export CSV 🔒</button>
-        <button id="toggleBottomPanelBtn" class="px-2 py-0.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-[11px] font-sans text-tv-muted hover:text-white">Hide</button>
+        <button type="button" id="exportCsvBtn" class="px-2 py-0.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-[11px] font-sans text-tv-text">Export CSV</button>
+        <button type="button" id="toggleBottomPanelBtn" class="px-2 py-0.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-[11px] font-sans text-tv-muted hover:text-white">Hide</button>
       </div>
     </div>
 
-    <!-- Tab 1: Trade Journal -->
     <div id="tab-journal" class="btab-content flex-1 overflow-auto p-2">
       <table class="w-full text-left border-collapse text-xs font-mono">
         <thead>
@@ -456,22 +383,18 @@
       </table>
     </div>
 
-    <!-- Tab 2: P&L Heatmap -->
     <div id="tab-heatmap" class="btab-content hidden flex-1 overflow-auto p-3">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-bold text-white" id="heatmapMonthTitle">Monthly P&L Heatmap</span>
-        <div class="flex items-center gap-3 text-[11px] font-mono">
-          <span class="text-emerald-400">■ Profit</span><span class="text-rose-400">■ Loss</span>
-        </div>
+        <div class="flex items-center gap-3 text-[11px] font-mono"><span class="text-emerald-400">■ Profit</span><span class="text-rose-400">■ Loss</span></div>
       </div>
       <div id="heatmapGrid" class="grid grid-cols-7 sm:grid-cols-10 lg:grid-cols-16 gap-1.5 font-mono text-[10px]"></div>
     </div>
 
-    <!-- Tab 3: Equity Curve -->
     <div id="tab-analytics" class="btab-content hidden flex-1 overflow-auto p-3">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 h-full">
         <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono content-start">
-          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Closed Trades</div><div id="statTotalTrades" class="text-base font-bold text-white">0</div></div>
+          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Closed</div><div id="statTotalTrades" class="text-base font-bold text-white">0</div></div>
           <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Win Rate</div><div id="statWinRate" class="text-base font-bold text-tv-green">0.0%</div></div>
           <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Profit Factor</div><div id="statProfitFactor" class="text-base font-bold text-white">0.00</div></div>
           <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Net P&L</div><div id="statNetPnl" class="text-base font-bold text-tv-green">$0.00</div></div>
@@ -486,12 +409,10 @@
       </div>
     </div>
 
-    <!-- Tab 4: Live TradingView Forex/Crypto Screener -->
     <div id="tab-screener" class="btab-content hidden flex-1 overflow-hidden">
       <div id="tvScreenerContainer" class="w-full h-full"></div>
     </div>
 
-    <!-- Tab 5: Pine v5 Studio -->
     <div id="tab-pine" class="btab-content hidden flex-1 overflow-hidden p-2 flex gap-2">
       <div class="w-56 flex flex-col gap-1.5 shrink-0">
         <select id="pineTemplateSelect" class="bg-tv-bg border border-tv-border rounded px-2 py-1 text-xs text-white outline-none">
@@ -500,190 +421,144 @@
           <option value="killzone_box">⏰ London & NY Killzones</option>
           <option value="ema_cross">📈 EMA 20/50 Crossover</option>
         </select>
-        <button id="copyPineBtn" class="px-2 py-1 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-medium rounded">Copy Pine v5</button>
-        <button id="savePineBtn" class="px-2 py-1 bg-tv-bg hover:bg-tv-hover border border-tv-border text-tv-text text-xs rounded">Save Script</button>
+        <button type="button" id="copyPineBtn" class="px-2 py-1 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-medium rounded">Copy Pine v5</button>
+        <button type="button" id="savePineBtn" class="px-2 py-1 bg-tv-bg hover:bg-tv-hover border border-tv-border text-tv-text text-xs rounded">Save Script</button>
       </div>
       <textarea id="pineEditor" spellcheck="false" class="flex-1 bg-tv-deep border border-tv-border rounded p-2 font-mono text-xs text-emerald-300 outline-none resize-none"></textarea>
     </div>
   </section>
 
-  <!-- FOOTER BAR (WITH QUICK RESTORE BUTTON WHEN BOTTOM PANEL IS HIDDEN) -->
+  <!-- FOOTER -->
   <footer class="h-5 bg-tv-deep border-t border-tv-border px-3 flex items-center justify-between text-[10px] text-tv-muted shrink-0">
     <div class="flex items-center gap-3">
       <span>pipscopetrade1 Terminal</span>
-      <button id="footerShowBottomBtn" class="hidden text-tv-blue hover:underline font-semibold">▲ Show Bottom Panel</button>
+      <button type="button" id="footerShowBottomBtn" class="hidden text-tv-blue hover:underline font-semibold">▲ Show Bottom Panel</button>
     </div>
-    <span>Market data powered by <a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer" class="text-tv-blue hover:underline">TradingView</a></span>
+    <span>Charts & market data powered by <a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer" class="text-tv-blue hover:underline">TradingView</a></span>
   </footer>
 
-  <!-- ========================================================= -->
-  <!-- MODAL 1: USER LOGIN / SIGN UP / CLOUD PROFILE & LOGOUT    -->
-  <!-- ========================================================= -->
+  <!-- MODAL 1: AUTH -->
   <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="bg-tv-panel border border-tv-border rounded-xl max-w-md w-full overflow-hidden shadow-2xl">
       <div class="px-5 py-3.5 border-b border-tv-border flex items-center justify-between bg-tv-deep">
-        <h3 id="authModalTitle" class="text-sm font-bold text-white">👤 Trader Account & Cloud Sync</h3>
-        <button id="closeAuthModalBtn" class="text-tv-muted hover:text-white text-lg">✕</button>
+        <h3 class="text-sm font-bold text-white">👤 Trader Account & Cloud Sync</h3>
+        <button type="button" id="closeAuthModalBtn" class="text-tv-muted hover:text-white text-lg">✕</button>
       </div>
-
-      <!-- LOGGED OUT VIEW (LOGIN / SIGN UP TABS) -->
       <div id="authLoggedOutView" class="p-5 space-y-3">
         <div class="grid grid-cols-2 bg-tv-bg p-1 rounded border border-tv-border text-xs font-semibold">
-          <button id="tabLoginMode" class="py-1.5 rounded bg-tv-blue text-white">Sign In</button>
-          <button id="tabSignupMode" class="py-1.5 rounded text-tv-muted hover:text-white">Create Account</button>
+          <button type="button" id="tabLoginMode" class="py-1.5 rounded bg-tv-blue text-white">Sign In</button>
+          <button type="button" id="tabSignupMode" class="py-1.5 rounded text-tv-muted hover:text-white">Create Account</button>
         </div>
-
         <div id="signupNameWrap" class="hidden">
           <label class="block text-[11px] text-tv-muted mb-1">Full Name</label>
-          <input id="authNameInput" type="text" placeholder="e.g. Mohammad Saif" class="w-full bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-3 py-2 text-xs text-white outline-none" />
+          <input id="authNameInput" type="text" placeholder="Your Name" class="w-full bg-tv-bg border border-tv-border rounded px-3 py-2 text-xs text-white outline-none" />
         </div>
-
         <div>
           <label class="block text-[11px] text-tv-muted mb-1">Email Address</label>
-          <input id="authEmailInput" type="email" placeholder="you@gmail.com" class="w-full bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-3 py-2 text-xs text-white outline-none" />
+          <input id="authEmailInput" type="email" placeholder="you@gmail.com" class="w-full bg-tv-bg border border-tv-border rounded px-3 py-2 text-xs text-white outline-none" />
         </div>
-
         <div>
           <label class="block text-[11px] text-tv-muted mb-1">Password</label>
-          <input id="authPassInput" type="password" placeholder="••••••••" class="w-full bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-3 py-2 text-xs text-white outline-none" />
+          <input id="authPassInput" type="password" placeholder="••••••••" class="w-full bg-tv-bg border border-tv-border rounded px-3 py-2 text-xs text-white outline-none" />
         </div>
-
         <p id="authFeedbackMsg" class="text-xs text-tv-red hidden"></p>
-
-        <button id="submitAuthBtn" class="w-full py-2 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-bold rounded transition">
-          Sign In & Sync Cloud
-        </button>
-        <p class="text-[11px] text-tv-muted text-center">Your Pro plan, Trade Journal & Saved Layouts sync automatically across all devices.</p>
+        <button type="button" id="submitAuthBtn" class="w-full py-2 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-bold rounded">Sign In & Sync Cloud</button>
       </div>
-
-      <!-- LOGGED IN PROFILE VIEW -->
       <div id="authLoggedInView" class="hidden p-5 space-y-3 text-xs">
         <div class="bg-tv-bg border border-tv-border rounded-lg p-3 flex items-center justify-between">
           <div>
             <div id="profUserName" class="font-bold text-white text-sm">Trader</div>
             <div id="profUserEmail" class="text-tv-muted font-mono text-[11px]">email@example.com</div>
           </div>
-          <span id="profPlanBadge" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono font-bold">FREE</span>
+          <span id="profPlanBadge" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono font-bold">PRO</span>
         </div>
-
-        <div class="grid grid-cols-2 gap-2 font-mono text-[11px]">
-          <div class="bg-tv-deep border border-tv-border rounded p-2">
-            <span class="text-tv-muted block font-sans">Cloud Trades:</span>
-            <strong id="profTradeCount" class="text-white text-sm">0</strong>
-          </div>
-          <div class="bg-tv-deep border border-tv-border rounded p-2">
-            <span class="text-tv-muted block font-sans">Saved Layouts:</span>
-            <strong id="profLayoutCount" class="text-white text-sm">0</strong>
-          </div>
-        </div>
-
-        <button id="manualSyncNowBtn" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded transition">
-          ☁️ Sync Data to Cloud Now
-        </button>
-
-        <button id="logoutUserBtn" class="w-full py-2 bg-tv-red/20 hover:bg-tv-red text-tv-red hover:text-white border border-tv-red/40 font-semibold rounded transition">
-          Log Out
-        </button>
+        <button type="button" id="manualSyncNowBtn" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded">☁️ Sync Data to Cloud Now</button>
+        <button type="button" id="logoutUserBtn" class="w-full py-2 bg-tv-red/20 hover:bg-tv-red text-tv-red hover:text-white border border-tv-red/40 font-semibold rounded">Log Out</button>
       </div>
     </div>
   </div>
 
-  <!-- ========================================================= -->
-  <!-- MODAL 2: SAVED CHART TEMPLATES / LAYOUTS                  -->
-  <!-- ========================================================= -->
+  <!-- MODAL 2: LAYOUTS -->
   <div id="layoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="bg-tv-panel border border-tv-border rounded-xl max-w-md w-full overflow-hidden shadow-2xl">
       <div class="px-4 py-3 border-b border-tv-border flex items-center justify-between bg-tv-deep">
-        <h3 class="text-sm font-bold text-white">☁️ Saved Chart Layouts & Templates</h3>
-        <button id="closeLayoutModalBtn" class="text-tv-muted hover:text-white">✕</button>
+        <h3 class="text-sm font-bold text-white">☁️ Saved Chart Layouts</h3>
+        <button type="button" id="closeLayoutModalBtn" class="text-tv-muted hover:text-white">✕</button>
       </div>
       <div class="p-4 space-y-3 text-xs">
         <div class="flex gap-1.5">
-          <input id="newLayoutNameInput" type="text" placeholder="e.g. Gold 15m Scalping Setup" class="flex-1 bg-tv-bg border border-tv-border rounded px-2.5 py-1.5 text-white outline-none" />
-          <button id="saveCurrentLayoutBtn" class="px-3 py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white font-semibold rounded">Save Current</button>
+          <input id="newLayoutNameInput" type="text" placeholder="e.g. Gold 15m Setup" class="flex-1 bg-tv-bg border border-tv-border rounded px-2.5 py-1.5 text-white outline-none" />
+          <button type="button" id="saveCurrentLayoutBtn" class="px-3 py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white font-semibold rounded">Save</button>
         </div>
         <div id="savedLayoutsList" class="space-y-1.5 max-h-56 overflow-y-auto"></div>
       </div>
     </div>
   </div>
 
-  <!-- ========================================================= -->
-  <!-- MODAL 3: SOUND PRICE ALERTS MANAGER                       -->
-  <!-- ========================================================= -->
+  <!-- MODAL 3: ALERTS -->
   <div id="alertModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="bg-tv-panel border border-tv-border rounded-xl max-w-md w-full overflow-hidden shadow-2xl">
       <div class="px-4 py-3 border-b border-tv-border flex items-center justify-between bg-tv-deep">
         <h3 class="text-sm font-bold text-white">🔔 Sound Price Alerts</h3>
-        <button id="closeAlertModalBtn" class="text-tv-muted hover:text-white">✕</button>
+        <button type="button" id="closeAlertModalBtn" class="text-tv-muted hover:text-white">✕</button>
       </div>
       <div class="p-4 space-y-3 text-xs">
         <div class="grid grid-cols-3 gap-1.5">
           <input id="alertSymInput" type="text" value="XAUUSD" class="bg-tv-bg border border-tv-border rounded px-2 py-1.5 font-mono text-white outline-none" />
-          <input id="alertPriceInput" type="number" step="any" placeholder="Target Price" class="bg-tv-bg border border-tv-border rounded px-2 py-1.5 font-mono text-white outline-none" />
-          <button id="addPriceAlertBtn" class="bg-amber-500 hover:bg-amber-400 text-black font-bold rounded">+ Add Alert</button>
+          <input id="alertPriceInput" type="number" step="any" placeholder="Price" class="bg-tv-bg border border-tv-border rounded px-2 py-1.5 font-mono text-white outline-none" />
+          <button type="button" id="addPriceAlertBtn" class="bg-amber-500 hover:bg-amber-400 text-black font-bold rounded">+ Add</button>
         </div>
         <div id="priceAlertsList" class="space-y-1.5 max-h-48 overflow-y-auto font-mono"></div>
       </div>
     </div>
   </div>
 
-  <!-- ========================================================= -->
-  <!-- MODAL 4: PRO UPGRADE & UPI PAYMENT                        -->
-  <!-- ========================================================= -->
+  <!-- MODAL 4: UPGRADE / UPI -->
   <div id="upgradeModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4 overflow-y-auto">
     <div class="bg-tv-panel border border-tv-border rounded-xl max-w-3xl w-full overflow-hidden shadow-2xl my-auto">
       <div class="px-5 py-3.5 border-b border-tv-border flex items-center justify-between bg-tv-deep">
         <div>
-          <h3 class="text-base font-extrabold text-white flex items-center gap-2">
-            <span>⚡ Upgrade to pipscopetrade1 PRO</span>
-            <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">Less than ₹5/day</span>
-          </h3>
+          <h3 class="text-base font-extrabold text-white">⚡ Upgrade to pipscopetrade1 PRO</h3>
           <p class="text-xs text-tv-muted mt-0.5">All institutional charts, multi-screen layouts, cloud journal & Pine scripts.</p>
         </div>
-        <button id="closeUpgradeModalBtn" class="text-tv-muted hover:text-white text-lg px-2">✕</button>
+        <button type="button" id="closeUpgradeModalBtn" class="text-tv-muted hover:text-white text-lg px-2">✕</button>
       </div>
-
       <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
         <div class="space-y-3">
-          <div class="text-xs font-semibold uppercase tracking-wider text-tv-muted">1. Choose Your Pro Plan</div>
-          <div id="planMonthlyCard" class="plan-card cursor-pointer p-3 rounded-lg border-2 border-tv-blue bg-tv-blue/10 transition">
+          <div id="planMonthlyCard" class="cursor-pointer p-3 rounded-lg border-2 border-tv-blue bg-tv-blue/10">
             <div class="flex items-center justify-between"><span class="font-bold text-white text-sm">Monthly Pro</span><span class="font-mono font-bold text-lg text-white">₹149<span class="text-xs text-tv-muted font-normal">/mo</span></span></div>
-            <p class="text-[11px] text-tv-muted mt-0.5">Full institutional toolkit • Cloud Sync</p>
           </div>
-          <div id="planYearlyCard" class="plan-card cursor-pointer p-3 rounded-lg border border-tv-border bg-tv-bg hover:border-emerald-500/60 transition relative">
+          <div id="planYearlyCard" class="cursor-pointer p-3 rounded-lg border border-tv-border bg-tv-bg relative">
             <span class="absolute -top-2.5 right-3 px-2 py-0.5 bg-emerald-500 text-black font-bold text-[10px] rounded-full">SAVE ₹139</span>
             <div class="flex items-center justify-between"><span class="font-bold text-white text-sm">Yearly Pro</span><span class="font-mono font-bold text-lg text-emerald-400">₹1,649<span class="text-xs text-tv-muted font-normal">/yr</span></span></div>
-            <p class="text-[11px] text-tv-muted mt-0.5">Just ₹137/month • Priority Pine scripts</p>
           </div>
           <ul class="text-[11px] space-y-1.5 text-tv-text bg-tv-deep border border-tv-border rounded-lg p-3">
             <li>✓ <strong>2x Split & 4x Multi-Chart Grid</strong></li>
             <li>✓ <strong>Unlimited Indicators Stack</strong></li>
-            <li>✓ <strong>MT5 / XM Statement Auto-Importer</strong> + P&L Heatmap</li>
-            <li>✓ <strong>0.280–0.382 Golden Zone Sniper</strong> & Prop Guard</li>
-            <li>✓ <strong>Cross-Device Cloud Sync</strong> when signed in</li>
+            <li>✓ <strong>Trade Journal, P&L Heatmap & Equity Curve</strong></li>
+            <li>✓ <strong>0.280–0.382 Golden Zone Sniper & Prop Guard</strong></li>
+            <li>✓ <strong>Pine v5 Library & Cross-Device Cloud Sync</strong></li>
           </ul>
         </div>
-
         <div class="bg-tv-bg border border-tv-border rounded-lg p-4 flex flex-col items-center text-center justify-between">
           <div class="w-full">
-            <div class="text-xs font-semibold uppercase tracking-wider text-tv-muted mb-2">2. Scan & Pay via Any UPI App</div>
+            <div class="text-xs font-semibold uppercase tracking-wider text-tv-muted mb-2">Scan & Pay via UPI</div>
             <div class="bg-white p-2 rounded-lg shadow-md inline-block"><img id="upiQrImg" src="" alt="UPI QR" class="w-36 h-36 object-contain" /></div>
             <div class="mt-2 font-mono text-xs">
               <div class="text-tv-muted">Payable: <strong id="upiPayAmount" class="text-white text-sm">₹149.00</strong></div>
               <div class="text-[11px] text-tv-muted mt-0.5 flex items-center justify-center gap-1.5">
-                <span>UPI ID: <strong id="displayUpiId" class="text-emerald-400">pipscopetrade1@naviaxis</strong></span>
-                <button id="copyUpiIdBtn" class="px-1.5 py-0.5 bg-tv-panel border border-tv-border rounded text-[10px] text-white font-sans">Copy</button>
+                <span>UPI ID: <strong class="text-emerald-400">pipscopetrade1@naviaxis</strong></span>
+                <button type="button" id="copyUpiIdBtn" class="px-1.5 py-0.5 bg-tv-panel border border-tv-border rounded text-[10px] text-white font-sans">Copy</button>
               </div>
             </div>
             <a id="upiIntentLink" href="#" class="mt-2 w-full py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded block">📱 Open UPI App</a>
           </div>
-
           <div class="w-full mt-2.5 pt-2.5 border-t border-tv-border text-left space-y-1.5">
-            <label class="block text-[11px] text-tv-muted">3. Email & 12-Digit UTR Number:</label>
-            <input id="payerContactInput" type="text" placeholder="Your Email (auto-filled if signed in)" class="w-full bg-tv-deep border border-tv-border rounded px-2.5 py-1 text-xs text-white outline-none" />
+            <label class="block text-[11px] text-tv-muted">Email & 12-Digit UTR Number (or Admin Code):</label>
+            <input id="payerContactInput" type="text" placeholder="Your Email" class="w-full bg-tv-deep border border-tv-border rounded px-2.5 py-1 text-xs text-white outline-none" />
             <div class="flex gap-1.5">
-              <input id="utrInput" type="text" maxlength="16" placeholder="12-Digit UTR" class="flex-1 bg-tv-deep border border-tv-border rounded px-2.5 py-1.5 text-xs font-mono text-white outline-none" />
-              <button id="verifyUpiBtn" class="px-3 py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-semibold rounded">Submit</button>
+              <input id="utrInput" type="text" maxlength="20" placeholder="12-Digit UTR" class="flex-1 bg-tv-deep border border-tv-border rounded px-2.5 py-1.5 text-xs font-mono text-white outline-none" />
+              <button type="button" id="verifyUpiBtn" class="px-3 py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-semibold rounded">Submit</button>
             </div>
             <p id="upiStatusMsg" class="text-[11px] text-amber-400 mt-1 hidden"></p>
             <p id="upiErrorMsg" class="text-[11px] text-tv-red mt-1 hidden"></p>
@@ -694,15 +569,11 @@
   </div>
 
   <script>
-    // =========================================================
-    // CONFIGURATION
-    // =========================================================
     const MERCHANT_UPI_ID = 'pipscopetrade1@naviaxis';
     const MERCHANT_NAME = 'pipscopetrade1';
-    const GOOGLE_SHEET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwl033BmqUUqgrEQ-cUPS3ssgKRZo3O_Nc0TgWXQv6YAtRhXwK1nF3x8-zJAXC3LASb/exec';
+    const GOOGLE_SHEET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwl033BmqUUqgrEQ-cUPS3ssgKRZo3O_Nc0TgWXQv6YAtRhXwK1nF3x8-zJAX/exec';
     const ADMIN_SECRET_CODE = 'SAIFPRO2026';
 
-    // --- STATE ---
     let currentSymbol = 'OANDA:XAUUSD';
     let currentInterval = '1';
     let layoutMode = '1x';
@@ -718,48 +589,87 @@
     let priceAlerts = JSON.parse(localStorage.getItem('pipscopetrade1_alerts') || '[]');
 
     function isProActive() {
-      if (currentUser && currentUser.expiresAt && Date.now() < currentUser.expiresAt) return true;
-      if (proSubscription && Date.now() < proSubscription.expiresAt) return true;
+      const now = Date.now();
+      if (proSubscription && now < Number(proSubscription.expiresAt || 0)) return true;
+      if (currentUser && (String(currentUser.plan || '').toUpperCase() === 'PRO' || now < Number(currentUser.expiresAt || 0))) return true;
       return false;
     }
 
-    // --- CLOUD SYNC HELPER ---
+    function hideUpgradeModal() {
+      const m = document.getElementById('upgradeModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function showUpgradeModal() {
+      updateUpiDetails();
+      const m = document.getElementById('upgradeModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    async function activateProAndRefreshAll(days, sourceLabel) {
+      const expiresAt = Date.now() + (days || 30) * 24 * 60 * 60 * 1000;
+      proSubscription = { plan: sourceLabel || 'pro', activatedAt: Date.now(), expiresAt };
+      localStorage.setItem('pipscopetrade1_pro_sub', JSON.stringify(proSubscription));
+      localStorage.removeItem('pipscopetrade1_pending_utr');
+
+      if (currentUser) {
+        currentUser.plan = 'PRO';
+        currentUser.expiresAt = expiresAt;
+        localStorage.setItem('pipscopetrade1_user', JSON.stringify(currentUser));
+        await syncUserToCloud();
+      }
+
+      hideUpgradeModal();
+      refreshAllUI();
+    }
+
+    function refreshAllUI() {
+      const pro = isProActive();
+      const badge = document.getElementById('planStatusBadge');
+      const upgradeBtn = document.getElementById('openUpgradeBtn');
+      const pendingUtr = localStorage.getItem('pipscopetrade1_pending_utr');
+
+      if (pro) {
+        const exp = Math.max(Number((proSubscription && proSubscription.expiresAt) || 0), Number((currentUser && currentUser.expiresAt) || 0)) || (Date.now() + 30 * 86400000);
+        const expDate = new Date(exp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+        badge.textContent = 'PRO • ' + expDate;
+        badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded';
+        upgradeBtn.innerHTML = '<span>★ Pro Active</span>';
+        upgradeBtn.className = 'px-2.5 py-1 text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded';
+        document.getElementById('activeStudiesCount').textContent = activeStudies.length + ' Active';
+      } else {
+        badge.textContent = pendingUtr ? 'VERIFYING...' : 'FREE';
+        badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded';
+        upgradeBtn.innerHTML = '<span>⚡ Pro ₹149</span>';
+        upgradeBtn.className = 'px-2.5 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 text-black rounded shadow';
+        document.getElementById('activeStudiesCount').textContent = activeStudies.length + '/1 Free Study';
+      }
+
+      updateCalculator();
+      updateFibGoldenZone();
+      updatePropGuard();
+      renderJournal();
+      renderAlerts();
+    }
+
     async function syncUserToCloud() {
       if (!currentUser || !currentUser.email) return;
       const ind = document.getElementById('cloudSyncIndicator');
       ind.textContent = '☁️ Syncing...';
-      ind.className = 'text-[10px] text-amber-400';
-
-      const exp = Math.max(currentUser.expiresAt || 0, (proSubscription && proSubscription.expiresAt) || 0);
+      const exp = Math.max(Number((proSubscription && proSubscription.expiresAt) || 0), Number((currentUser && currentUser.expiresAt) || 0));
       const plan = exp > Date.now() ? 'PRO' : 'FREE';
-      currentUser.plan = plan;
-      currentUser.expiresAt = exp;
-      localStorage.setItem('pipscopetrade1_user', JSON.stringify(currentUser));
-
-      const syncUrl = GOOGLE_SHEET_SCRIPT_URL +
-        '?action=sync' +
-        '&email=' + encodeURIComponent(currentUser.email) +
-        '&plan=' + encodeURIComponent(plan) +
-        '&expiresAt=' + encodeURIComponent(exp) +
-        '&trades=' + encodeURIComponent(JSON.stringify(trades.slice(0, 40))) +
-        '&layouts=' + encodeURIComponent(JSON.stringify(savedLayouts.slice(0, 15))) +
-        '&_t=' + Date.now();
-
-      try {
-        await fetch(syncUrl, { mode: 'no-cors' });
-      } catch (e) {
-        new Image().src = syncUrl;
-      }
+      const syncUrl = `${GOOGLE_SHEET_SCRIPT_URL}?action=sync&email=${encodeURIComponent(currentUser.email)}&plan=${encodeURIComponent(plan)}&expiresAt=${encodeURIComponent(exp)}&trades=${encodeURIComponent(JSON.stringify(trades.slice(0, 30)))}&layouts=${encodeURIComponent(JSON.stringify(savedLayouts.slice(0, 15)))}&_t=${Date.now()}`;
+      try { await fetch(syncUrl, { mode: 'no-cors' }); } catch (e) { new Image().src = syncUrl; }
       ind.textContent = '☁️ Cloud Synced (' + currentUser.email + ')';
       ind.className = 'text-[10px] text-emerald-400';
     }
 
-    // --- AUTHENTICATION (SIGN UP, LOGIN, LOGOUT) ---
     function updateAuthUI() {
       const hdrText = document.getElementById('authHeaderText');
       const hdrAvatar = document.getElementById('authHeaderAvatar');
       const cloudInd = document.getElementById('cloudSyncIndicator');
-
       if (currentUser) {
         hdrText.textContent = currentUser.name.split(' ')[0];
         hdrAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
@@ -769,34 +679,30 @@
       } else {
         hdrText.textContent = 'Sign In';
         hdrAvatar.textContent = '👤';
-        cloudInd.textContent = '☁️ Local Mode (Sign in to Cloud Sync)';
+        cloudInd.textContent = '☁️ Local Mode';
         cloudInd.className = 'text-[10px] text-tv-muted';
       }
     }
 
-    function openAuthModal() {
+    document.getElementById('authHeaderBtn').addEventListener('click', function() {
       const outView = document.getElementById('authLoggedOutView');
       const inView = document.getElementById('authLoggedInView');
       document.getElementById('authFeedbackMsg').classList.add('hidden');
-
       if (currentUser) {
         outView.classList.add('hidden');
         inView.classList.remove('hidden');
         document.getElementById('profUserName').textContent = currentUser.name;
         document.getElementById('profUserEmail').textContent = currentUser.email;
-        document.getElementById('profPlanBadge').textContent = isProActive() ? 'PRO ACTIVE' : 'FREE PLAN';
-        document.getElementById('profTradeCount').textContent = trades.length;
-        document.getElementById('profLayoutCount').textContent = savedLayouts.length;
+        document.getElementById('profPlanBadge').textContent = isProActive() ? 'PRO ACTIVE' : 'FREE';
       } else {
         inView.classList.add('hidden');
         outView.classList.remove('hidden');
       }
       document.getElementById('authModal').classList.remove('hidden');
       document.getElementById('authModal').classList.add('flex');
-    }
+    });
 
-    document.getElementById('authHeaderBtn').addEventListener('click', openAuthModal);
-    document.getElementById('closeAuthModalBtn').addEventListener('click', function() {
+    document.getElementById('closeAuthModalBtn').addEventListener('click', () => {
       document.getElementById('authModal').classList.add('hidden');
       document.getElementById('authModal').classList.remove('flex');
     });
@@ -822,362 +728,60 @@
       const password = document.getElementById('authPassInput').value.trim();
       const name = document.getElementById('authNameInput').value.trim() || email.split('@')[0];
       const msgEl = document.getElementById('authFeedbackMsg');
-      const btn = this;
-
       msgEl.classList.add('hidden');
       if (!email || !password) {
-        msgEl.textContent = 'Please enter both Email and Password.';
+        msgEl.textContent = 'Please enter Email and Password.';
         msgEl.classList.remove('hidden');
         return;
       }
-
-      btn.disabled = true;
-      btn.textContent = authMode === 'signup' ? 'Creating Account...' : 'Signing In...';
-
+      this.disabled = true;
       try {
-        const url = GOOGLE_SHEET_SCRIPT_URL +
-          '?action=' + authMode +
-          '&name=' + encodeURIComponent(name) +
-          '&email=' + encodeURIComponent(email) +
-          '&password=' + encodeURIComponent(password);
-
+        const url = `${GOOGLE_SHEET_SCRIPT_URL}?action=${authMode}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
         const res = await fetch(url);
         const data = await res.json();
-
         if (data.status === 'ok' && data.user) {
           currentUser = data.user;
           localStorage.setItem('pipscopetrade1_user', JSON.stringify(currentUser));
-
-          if (data.user.expiresAt && data.user.expiresAt > Date.now()) {
-            proSubscription = { plan: 'cloud', activatedAt: Date.now(), expiresAt: data.user.expiresAt };
+          if (data.user.expiresAt && Number(data.user.expiresAt) > Date.now()) {
+            proSubscription = { plan: 'cloud', activatedAt: Date.now(), expiresAt: Number(data.user.expiresAt) };
             localStorage.setItem('pipscopetrade1_pro_sub', JSON.stringify(proSubscription));
           }
-          if (Array.isArray(data.user.trades) && data.user.trades.length > 0) {
+          if (Array.isArray(data.user.trades) && data.user.trades.length) {
             trades = data.user.trades;
             localStorage.setItem('pipscopetrade1_trades_v1', JSON.stringify(trades));
           }
-          if (Array.isArray(data.user.layouts) && data.user.layouts.length > 0) {
+          if (Array.isArray(data.user.layouts) && data.user.layouts.length) {
             savedLayouts = data.user.layouts;
             localStorage.setItem('pipscopetrade1_layouts', JSON.stringify(savedLayouts));
           }
-
           updateAuthUI();
-          updateProUI();
-          renderJournal();
-          updateCalculator();
+          refreshAllUI();
           document.getElementById('authModal').classList.add('hidden');
           document.getElementById('authModal').classList.remove('flex');
         } else {
-          msgEl.textContent = data.message || 'Authentication failed. Check credentials.';
+          msgEl.textContent = data.message || 'Invalid credentials.';
           msgEl.classList.remove('hidden');
         }
-      } catch (err) {
-        msgEl.textContent = 'Connection error. Please ensure Apps Script is deployed as Anyone.';
+      } catch (e) {
+        msgEl.textContent = 'Network error connecting to Google Sheet.';
         msgEl.classList.remove('hidden');
       } finally {
-        btn.disabled = false;
-        btn.textContent = authMode === 'signup' ? 'Create Free Account' : 'Sign In & Sync Cloud';
+        this.disabled = false;
       }
     });
 
-    document.getElementById('manualSyncNowBtn').addEventListener('click', async function() {
-      this.textContent = 'Syncing...';
-      await syncUserToCloud();
-      this.textContent = '✓ Synced to Cloud!';
-      setTimeout(() => { this.textContent = '☁️ Sync Data to Cloud Now'; }, 1500);
-    });
+    document.getElementById('manualSyncNowBtn').addEventListener('click', syncUserToCloud);
 
     document.getElementById('logoutUserBtn').addEventListener('click', function() {
       currentUser = null;
-      proSubscription = null;
       localStorage.removeItem('pipscopetrade1_user');
-      localStorage.removeItem('pipscopetrade1_pro_sub');
       updateAuthUI();
-      updateProUI();
-      renderJournal();
-      updateCalculator();
+      refreshAllUI();
       document.getElementById('authModal').classList.add('hidden');
       document.getElementById('authModal').classList.remove('flex');
     });
 
-    // --- PRO UI UPDATER ---
-    function updateProUI() {
-      const pro = isProActive();
-      const badge = document.getElementById('planStatusBadge');
-      const upgradeBtn = document.getElementById('openUpgradeBtn');
-      const pendingUtr = localStorage.getItem('pipscopetrade1_pending_utr');
-
-      if (pro) {
-        const exp = (currentUser && currentUser.expiresAt) || (proSubscription && proSubscription.expiresAt) || (Date.now() + 30 * 86400000);
-        const expDate = new Date(exp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
-        badge.textContent = 'PRO • ' + expDate;
-        badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded';
-        upgradeBtn.innerHTML = '<span>★ Pro</span>';
-        upgradeBtn.className = 'px-2 py-1 text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded';
-
-        document.querySelectorAll('.pro-lock-tag').forEach(el => el.classList.add('hidden'));
-        document.getElementById('exportCsvBtn').textContent = 'Export CSV';
-        document.getElementById('importMt5Label').childNodes[0].textContent = 'Import MT5/CSV ';
-        document.getElementById('layoutSplitBtn').textContent = '2x';
-        document.getElementById('layoutQuadBtn').textContent = '4x';
-        document.getElementById('toolTabCalc').textContent = 'Risk & Lot';
-        document.getElementById('toolTabFib').textContent = 'Golden Zone';
-        document.getElementById('toolTabProp').textContent = 'Prop Guard';
-        document.getElementById('openPineModalBtn').textContent = 'SMC & Gold Pine v5 →';
-        document.getElementById('activeStudiesCount').textContent = activeStudies.length + ' Studies Active';
-      } else {
-        badge.textContent = pendingUtr ? 'VERIFYING...' : 'FREE';
-        badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded';
-        upgradeBtn.innerHTML = '<span>⚡ Pro ₹149</span>';
-        upgradeBtn.className = 'px-2.5 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 text-black rounded shadow';
-        document.querySelectorAll('.pro-lock-tag').forEach(el => el.classList.remove('hidden'));
-      }
-    }
-
-    // --- CHECK UTR APPROVAL ---
-    async function checkGoogleSheetApproval() {
-      if (isProActive()) return;
-      const pendingData = JSON.parse(localStorage.getItem('pipscopetrade1_pending_utr') || 'null');
-      if (!pendingData || !pendingData.utr) return;
-
-      try {
-        const res = await fetch(GOOGLE_SHEET_SCRIPT_URL + '?action=check&utr=' + encodeURIComponent(pendingData.utr));
-        const data = await res.json();
-        if (data.status === 'Approved') {
-          const days = pendingData.plan === 'yearly' ? 365 : 30;
-          const exp = Date.now() + days * 86400000;
-          proSubscription = { plan: pendingData.plan, utr: pendingData.utr, activatedAt: Date.now(), expiresAt: exp };
-          localStorage.setItem('pipscopetrade1_pro_sub', JSON.stringify(proSubscription));
-          localStorage.removeItem('pipscopetrade1_pending_utr');
-          if (currentUser) {
-            currentUser.plan = 'PRO';
-            currentUser.expiresAt = exp;
-            await syncUserToCloud();
-          }
-          updateProUI();
-          updateCalculator();
-          renderJournal();
-        }
-      } catch (e) {}
-    }
-
-    // --- SAVED CHART TEMPLATES / LAYOUTS ---
-    function renderSavedLayouts() {
-      const list = document.getElementById('savedLayoutsList');
-      if (!savedLayouts.length) {
-        list.innerHTML = '<div class="text-tv-muted text-center py-4">No saved chart templates yet. Set your symbol, timeframe & indicators and click Save Current.</div>';
-        return;
-      }
-      list.innerHTML = savedLayouts.map((l, idx) => `
-        <div class="bg-tv-bg border border-tv-border rounded p-2 flex items-center justify-between">
-          <div>
-            <div class="font-bold text-white">${l.name}</div>
-            <div class="text-[10px] font-mono text-tv-muted">${l.symbol} • ${l.interval}m • ${l.studies.length} studies</div>
-          </div>
-          <div class="flex gap-1">
-            <button onclick="loadSavedLayout(${idx})" class="px-2 py-1 bg-tv-blue text-white rounded text-[10px] font-semibold">Load</button>
-            <button onclick="deleteSavedLayout(${idx})" class="px-2 py-1 bg-tv-deep text-tv-muted hover:text-tv-red rounded text-[10px]">✕</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    window.loadSavedLayout = function(idx) {
-      const l = savedLayouts[idx];
-      if (!l) return;
-      currentSymbol = l.symbol;
-      currentInterval = l.interval;
-      activeStudies = l.studies || [];
-      loadChartWidget();
-      document.getElementById('layoutModal').classList.add('hidden');
-      document.getElementById('layoutModal').classList.remove('flex');
-    };
-
-    window.deleteSavedLayout = function(idx) {
-      savedLayouts.splice(idx, 1);
-      localStorage.setItem('pipscopetrade1_layouts', JSON.stringify(savedLayouts));
-      renderSavedLayouts();
-      syncUserToCloud();
-    };
-
-    document.getElementById('openLayoutModalBtn').addEventListener('click', function() {
-      renderSavedLayouts();
-      document.getElementById('layoutModal').classList.remove('hidden');
-      document.getElementById('layoutModal').classList.add('flex');
-    });
-    document.getElementById('closeLayoutModalBtn').addEventListener('click', function() {
-      document.getElementById('layoutModal').classList.add('hidden');
-      document.getElementById('layoutModal').classList.remove('flex');
-    });
-    document.getElementById('saveCurrentLayoutBtn').addEventListener('click', function() {
-      const name = document.getElementById('newLayoutNameInput').value.trim() || (currentSymbol.split(':').pop() + ' Setup');
-      savedLayouts.unshift({ name: name, symbol: currentSymbol, interval: currentInterval, studies: [...activeStudies] });
-      localStorage.setItem('pipscopetrade1_layouts', JSON.stringify(savedLayouts));
-      document.getElementById('newLayoutNameInput').value = '';
-      renderSavedLayouts();
-      syncUserToCloud();
-    });
-
-    // --- SOUND PRICE ALERTS ---
-    function playAlertBeep() {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, ctx.currentTime);
-        osc.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.25);
-      } catch (e) {}
-    }
-
-    function renderAlerts() {
-      document.getElementById('alertCountBadge').textContent = priceAlerts.length;
-      const list = document.getElementById('priceAlertsList');
-      if (!priceAlerts.length) {
-        list.innerHTML = '<div class="text-tv-muted text-center py-3 font-sans">No active price alerts.</div>';
-        return;
-      }
-      list.innerHTML = priceAlerts.map((a, i) => `
-        <div class="bg-tv-bg border border-tv-border rounded p-2 flex items-center justify-between">
-          <span><strong class="text-white">${a.symbol}</strong> @ <span class="text-amber-400">${a.price}</span></span>
-          <button onclick="removePriceAlert(${i})" class="text-tv-muted hover:text-tv-red">Delete</button>
-        </div>
-      `).join('');
-    }
-
-    window.removePriceAlert = function(idx) {
-      priceAlerts.splice(idx, 1);
-      localStorage.setItem('pipscopetrade1_alerts', JSON.stringify(priceAlerts));
-      renderAlerts();
-    };
-
-    document.getElementById('openAlertModalBtn').addEventListener('click', function() {
-      document.getElementById('alertSymInput').value = currentSymbol.split(':').pop();
-      renderAlerts();
-      document.getElementById('alertModal').classList.remove('hidden');
-      document.getElementById('alertModal').classList.add('flex');
-    });
-    document.getElementById('closeAlertModalBtn').addEventListener('click', function() {
-      document.getElementById('alertModal').classList.add('hidden');
-      document.getElementById('alertModal').classList.remove('flex');
-    });
-    document.getElementById('addPriceAlertBtn').addEventListener('click', function() {
-      const sym = document.getElementById('alertSymInput').value.trim().toUpperCase();
-      const price = parseFloat(document.getElementById('alertPriceInput').value);
-      if (!sym || isNaN(price)) return;
-      priceAlerts.push({ symbol: sym, price: price });
-      localStorage.setItem('pipscopetrade1_alerts', JSON.stringify(priceAlerts));
-      document.getElementById('alertPriceInput').value = '';
-      playAlertBeep();
-      renderAlerts();
-    });
-
-    // --- FLOATING PAPER TRADING INSTANT BUY / SELL ---
-    document.getElementById('togglePaperPanelBtn').addEventListener('click', function() {
-      const p = document.getElementById('floatingOrderPanel');
-      p.classList.toggle('hidden');
-      const shortSym = currentSymbol.split(':').pop();
-      document.getElementById('floatSymbolBuy').textContent = shortSym;
-      document.getElementById('floatSymbolSell').textContent = shortSym;
-    });
-    document.getElementById('closeFloatOrderBtn').addEventListener('click', function() {
-      document.getElementById('floatingOrderPanel').classList.add('hidden');
-    });
-
-    function executeInstantPaperTrade(side) {
-      if (!isProActive()) { openUpgradeModal(); return; }
-      const lots = document.getElementById('floatLotInput').value || '0.10';
-      const now = new Date();
-      trades.unshift({
-        id: Date.now(),
-        dateKey: now.toISOString().slice(0, 10),
-        time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        symbol: currentSymbol.split(':').pop(),
-        side: side,
-        size: lots + ' Lots',
-        entry: 'Market',
-        sl: '-',
-        tp: '-',
-        note: 'Instant Paper Order',
-        status: 'OPEN',
-        pnl: 0
-      });
-      saveTrades();
-      playAlertBeep();
-    }
-    document.getElementById('instantBuyBtn').addEventListener('click', () => executeInstantPaperTrade('BUY'));
-    document.getElementById('instantSellBtn').addEventListener('click', () => executeInstantPaperTrade('SELL'));
-
-    // --- LEFT TOOLBAR QUICK SHORTCUTS ---
-    document.querySelectorAll('.tv-left-tool').forEach(btn => {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.tv-left-tool').forEach(b => b.classList.remove('tool-active'));
-        this.classList.add('tool-active');
-        const qt = this.dataset.quicktool;
-        if (qt === 'fib') { document.getElementById('rightSidebar').classList.remove('hidden'); switchRightTool('fib'); }
-        if (qt === 'calc') { document.getElementById('rightSidebar').classList.remove('hidden'); switchRightTool('calc'); }
-        if (qt === 'prop') { document.getElementById('rightSidebar').classList.remove('hidden'); switchRightTool('prop'); }
-        if (qt === 'alert') { document.getElementById('openAlertModalBtn').click(); }
-        if (qt === 'screener') {
-          document.getElementById('bottomPanel').classList.remove('hidden');
-          document.getElementById('footerShowBottomBtn').classList.add('hidden');
-          switchBottomTab('screener');
-        }
-      });
-    });
-
-    document.getElementById('toggleFullChartBtn').addEventListener('click', function() {
-      const side = document.getElementById('rightSidebar');
-      const bot = document.getElementById('bottomPanel');
-      const bothHidden = side.classList.contains('hidden') && bot.classList.contains('hidden');
-      if (bothHidden) {
-        side.classList.remove('hidden');
-        bot.classList.remove('hidden');
-        document.getElementById('footerShowBottomBtn').classList.add('hidden');
-      } else {
-        side.classList.add('hidden');
-        bot.classList.add('hidden');
-        document.getElementById('footerShowBottomBtn').classList.remove('hidden');
-      }
-    });
-
-    // --- BOTTOM PANEL HIDE / SHOW ---
-    document.getElementById('toggleBottomPanelBtn').addEventListener('click', function() {
-      document.getElementById('bottomPanel').classList.add('hidden');
-      document.getElementById('footerShowBottomBtn').classList.remove('hidden');
-    });
-    document.getElementById('footerShowBottomBtn').addEventListener('click', function() {
-      document.getElementById('bottomPanel').classList.remove('hidden');
-      this.classList.add('hidden');
-    });
-
-    // --- CLOCK & SESSIONS ---
-    function updateSessionsAndClock() {
-      const now = new Date();
-      document.getElementById('liveClockIst').textContent = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false }) + ' IST';
-      const utcHour = now.getUTCHours();
-      const sydney = utcHour >= 22 || utcHour < 7;
-      const tokyo = utcHour >= 0 && utcHour < 9;
-      const london = utcHour >= 8 && utcHour < 17;
-      const ny = utcHour >= 13 && utcHour < 22;
-
-      const badge = (id, name, open) => {
-        document.getElementById(id).innerHTML = open
-          ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> <span class="text-white font-semibold">${name}</span>`
-          : `<span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> <span class="text-tv-muted">${name}</span>`;
-      };
-      badge('sessSydney', 'Sydney', sydney);
-      badge('sessTokyo', 'Tokyo', tokyo);
-      badge('sessLondon', 'London', london);
-      badge('sessNewYork', 'New York', ny);
-
-      const kz = document.getElementById('killzoneBadge');
-      kz.textContent = (london && ny) ? '🔥 London-NY Overlap' : (london || ny) ? '⚡ High Liquidity' : 'Asian Session';
-    }
-    setInterval(updateSessionsAndClock, 1000);
-
-    // --- UPI MODAL & UTR ---
+    // UPI & UTR
     function updateUpiDetails() {
       const amount = selectedPlan === 'monthly' ? '149.00' : '1649.00';
       const upiUrl = `upi://pay?pa=${encodeURIComponent(MERCHANT_UPI_ID)}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${amount}&cu=INR`;
@@ -1186,16 +790,8 @@
       document.getElementById('upiIntentLink').href = upiUrl;
     }
 
-    function openUpgradeModal() {
-      updateUpiDetails();
-      document.getElementById('upgradeModal').classList.remove('hidden');
-      document.getElementById('upgradeModal').classList.add('flex');
-    }
-    document.getElementById('openUpgradeBtn').addEventListener('click', openUpgradeModal);
-    document.getElementById('closeUpgradeModalBtn').addEventListener('click', () => {
-      document.getElementById('upgradeModal').classList.add('hidden');
-      document.getElementById('upgradeModal').classList.remove('flex');
-    });
+    document.getElementById('openUpgradeBtn').addEventListener('click', showUpgradeModal);
+    document.getElementById('closeUpgradeModalBtn').addEventListener('click', hideUpgradeModal);
     document.getElementById('planMonthlyCard').addEventListener('click', () => { selectedPlan = 'monthly'; updateUpiDetails(); });
     document.getElementById('planYearlyCard').addEventListener('click', () => { selectedPlan = 'yearly'; updateUpiDetails(); });
     document.getElementById('copyUpiIdBtn').addEventListener('click', function() {
@@ -1210,15 +806,11 @@
       const errEl = document.getElementById('upiErrorMsg');
       const statusEl = document.getElementById('upiStatusMsg');
       errEl.classList.add('hidden');
+      statusEl.classList.add('hidden');
 
       if (utr === ADMIN_SECRET_CODE) {
-        const exp = Date.now() + 3650 * 86400000;
-        proSubscription = { plan: 'admin', utr: ADMIN_SECRET_CODE, activatedAt: Date.now(), expiresAt: exp };
-        localStorage.setItem('pipscopetrade1_pro_sub', JSON.stringify(proSubscription));
-        if (currentUser) { currentUser.plan = 'PRO'; currentUser.expiresAt = exp; await syncUserToCloud(); }
-        updateProUI(); updateCalculator(); renderJournal();
-        document.getElementById('upgradeModal').classList.add('hidden');
-        alert('Admin Pro Unlocked & Cloud Synced!');
+        await activateProAndRefreshAll(3650, 'admin');
+        alert('Pro unlocked!');
         return;
       }
 
@@ -1231,28 +823,28 @@
       const amount = selectedPlan === 'monthly' ? 149 : 1649;
       const planLabel = selectedPlan === 'monthly' ? 'Pro Monthly (₹149)' : 'Pro Yearly (₹1,649)';
       const submitUrl = `${GOOGLE_SHEET_SCRIPT_URL}?action=submit&userId=${encodeURIComponent(contact)}&plan=${encodeURIComponent(planLabel)}&amount=${amount}&utr=${encodeURIComponent(utr)}&_t=${Date.now()}`;
-
       try { await fetch(submitUrl, { mode: 'no-cors' }); } catch (e) { new Image().src = submitUrl; }
 
       localStorage.setItem('pipscopetrade1_pending_utr', JSON.stringify({ utr, plan: selectedPlan, submittedAt: Date.now() }));
-      updateProUI();
-      statusEl.textContent = `UTR ${utr} submitted! Refresh page once approved in admin sheet.`;
+      refreshAllUI();
+      statusEl.textContent = `UTR ${utr} submitted! Once approved in Google Sheet, refresh to unlock Pro.`;
       statusEl.classList.remove('hidden');
     });
 
-    // --- RIGHT TOOLS, CHARTS, SCREENER, JOURNAL ---
-    function switchRightTool(toolName) {
-      if ((toolName === 'fib' || toolName === 'prop') && !isProActive()) { openUpgradeModal(); return; }
-      ['Calc', 'Fib', 'Prop'].forEach(t => {
-        const active = t.toLowerCase() === toolName;
-        document.getElementById('toolTab' + t).className = active ? 'py-1.5 rounded bg-tv-blue text-white' : 'py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white';
-        document.getElementById('panelTool' + t).classList.toggle('hidden', !active);
-      });
+    async function checkGoogleSheetApproval() {
+      if (isProActive()) return;
+      const pending = JSON.parse(localStorage.getItem('pipscopetrade1_pending_utr') || 'null');
+      if (!pending || !pending.utr) return;
+      try {
+        const res = await fetch(`${GOOGLE_SHEET_SCRIPT_URL}?action=check&utr=${encodeURIComponent(pending.utr)}`);
+        const data = await res.json();
+        if (data.status === 'Approved') {
+          await activateProAndRefreshAll(pending.plan === 'yearly' ? 365 : 30, 'utr_' + pending.utr);
+        }
+      } catch (e) {}
     }
-    document.getElementById('toolTabCalc').addEventListener('click', () => switchRightTool('calc'));
-    document.getElementById('toolTabFib').addEventListener('click', () => switchRightTool('fib'));
-    document.getElementById('toolTabProp').addEventListener('click', () => switchRightTool('prop'));
 
+    // CHARTS (NO EXTERNAL LINK TRIGGERS ON PAIR SWITCH)
     function createTvWidget(containerId, symbol, interval, studies, hideSide) {
       const el = document.getElementById(containerId);
       if (!el || typeof TradingView === 'undefined') return;
@@ -1260,70 +852,22 @@
       new TradingView.widget({
         autosize: true, symbol, interval, timezone: 'Asia/Kolkata', theme: 'dark', style: '1', locale: 'en',
         toolbar_bg: '#1e222d', enable_publishing: false, withdateranges: true, hide_side_toolbar: hideSide || false,
-        allow_symbol_change: true, studies: studies || [], container_id: containerId
+        allow_symbol_change: false, studies: studies || [], container_id: containerId
       });
     }
 
     function loadChartWidget() {
       createTvWidget('tv_chart_container', currentSymbol, currentInterval, activeStudies, false);
-      document.getElementById('activeStudiesCount').textContent = isProActive() ? `${activeStudies.length} Studies Active` : `${activeStudies.length}/1 Free Study`;
       const shortSym = currentSymbol.split(':').pop();
       document.getElementById('floatSymbolBuy').textContent = shortSym;
       document.getElementById('floatSymbolSell').textContent = shortSym;
+      refreshAllUI();
     }
 
-    function loadSecondaryChartWidget() {
-      if (layoutMode === '1x') return;
-      createTvWidget('tv_chart_container_2', document.getElementById('splitSymbolSelect').value, document.getElementById('splitTfSelect').value, [], true);
-      if (layoutMode === '4x') {
-        createTvWidget('tv_chart_container_3', document.getElementById('quadSymbol3').value, document.getElementById('quadTf3').value, [], true);
-        createTvWidget('tv_chart_container_4', document.getElementById('quadSymbol4').value, document.getElementById('quadTf4').value, [], true);
-      }
-    }
-
-    function setChartLayout(mode) {
-      if ((mode === '2x' || mode === '4x') && !isProActive()) { openUpgradeModal(); return; }
-      layoutMode = mode;
-      const ws = document.getElementById('chartWorkspace');
-      const c2 = document.getElementById('secondaryChartWrap'), c3 = document.getElementById('thirdChartWrap'), c4 = document.getElementById('fourthChartWrap');
-      [c2, c3, c4].forEach(c => { c.classList.add('hidden'); c.classList.remove('flex'); });
-      if (mode === '1x') ws.className = 'flex-1 grid grid-cols-1 grid-rows-1 min-w-0 bg-tv-bg relative';
-      if (mode === '2x') { ws.className = 'flex-1 grid grid-cols-2 grid-rows-1 min-w-0 bg-tv-bg relative'; c2.classList.remove('hidden'); c2.classList.add('flex'); loadSecondaryChartWidget(); }
-      if (mode === '4x') { ws.className = 'flex-1 grid grid-cols-2 grid-rows-2 min-w-0 bg-tv-bg relative'; [c2, c3, c4].forEach(c => { c.classList.remove('hidden'); c.classList.add('flex'); }); loadSecondaryChartWidget(); }
-    }
-    document.getElementById('layoutSingleBtn').addEventListener('click', () => setChartLayout('1x'));
-    document.getElementById('closeSplitBtn').addEventListener('click', () => setChartLayout('1x'));
-    document.getElementById('layoutSplitBtn').addEventListener('click', () => setChartLayout('2x'));
-    document.getElementById('layoutQuadBtn').addEventListener('click', () => setChartLayout('4x'));
-    ['splitSymbolSelect', 'splitTfSelect', 'quadSymbol3', 'quadTf3', 'quadSymbol4', 'quadTf4'].forEach(id => document.getElementById(id).addEventListener('change', loadSecondaryChartWidget));
-
-    function loadWatchlistWidget() {
-      const wrap = document.getElementById('marketOverviewWidget');
-      wrap.innerHTML = '';
-      const s = document.createElement('script');
-      s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
-      s.async = true;
-      s.innerHTML = JSON.stringify({
-        colorTheme: 'dark', dateRange: '1D', showChart: false, locale: 'en', width: '100%', height: '100%', isTransparent: true,
-        tabs: [{ title: 'Watchlist', symbols: [{ s: 'OANDA:XAUUSD', d: 'Gold' }, { s: 'FX:EURUSD', d: 'EURUSD' }, { s: 'BINANCE:BTCUSDT', d: 'BTC' }, { s: 'NSE:NIFTY', d: 'NIFTY' }] }]
-      });
-      wrap.appendChild(s);
-    }
-
-    let screenerLoaded = false;
-    function loadScreenerWidget() {
-      if (screenerLoaded) return;
-      screenerLoaded = true;
-      const wrap = document.getElementById('tvScreenerContainer');
-      const s = document.createElement('script');
-      s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
-      s.async = true;
-      s.innerHTML = JSON.stringify({ width: '100%', height: '100%', defaultColumn: 'overview', defaultScreen: 'general', market: 'forex', showToolbar: true, colorTheme: 'dark', locale: 'en', isTransparent: true });
-      wrap.appendChild(s);
-    }
-
-    document.querySelectorAll('.sym-btn').forEach(btn => btn.addEventListener('click', function() {
+    document.querySelectorAll('.sym-btn').forEach(btn => btn.addEventListener('click', function(e) {
+      e.preventDefault();
       document.querySelectorAll('.sym-btn').forEach(b => { b.classList.remove('bg-tv-blue', 'text-white'); b.classList.add('bg-tv-bg', 'text-tv-text'); });
+      this.classList.remove('bg-tv-bg', 'text-tv-text');
       this.classList.add('bg-tv-blue', 'text-white');
       currentSymbol = this.dataset.symbol;
       loadChartWidget();
@@ -1335,16 +879,40 @@
       if (val) { currentSymbol = val; loadChartWidget(); }
     });
 
-    document.querySelectorAll('.tf-btn').forEach(btn => btn.addEventListener('click', function() {
+    document.querySelectorAll('.tf-btn').forEach(btn => btn.addEventListener('click', function(e) {
+      e.preventDefault();
       document.querySelectorAll('.tf-btn').forEach(b => { b.classList.remove('bg-tv-blue', 'text-white'); b.classList.add('text-tv-muted'); });
+      this.classList.remove('text-tv-muted');
       this.classList.add('bg-tv-blue', 'text-white');
       currentInterval = this.dataset.tf;
       loadChartWidget();
     }));
 
+    function setChartLayout(mode) {
+      if ((mode === '2x' || mode === '4x') && !isProActive()) { showUpgradeModal(); return; }
+      layoutMode = mode;
+      const ws = document.getElementById('chartWorkspace');
+      const c2 = document.getElementById('secondaryChartWrap'), c3 = document.getElementById('thirdChartWrap'), c4 = document.getElementById('fourthChartWrap');
+      [c2, c3, c4].forEach(c => { c.classList.add('hidden'); c.classList.remove('flex'); });
+      if (mode === '1x') ws.className = 'flex-1 grid grid-cols-1 grid-rows-1 min-w-0 bg-tv-bg relative';
+      if (mode === '2x') { ws.className = 'flex-1 grid grid-cols-2 grid-rows-1 min-w-0 bg-tv-bg relative'; c2.classList.remove('hidden'); c2.classList.add('flex'); createTvWidget('tv_chart_container_2', document.getElementById('splitSymbolSelect').value, document.getElementById('splitTfSelect').value, [], true); }
+      if (mode === '4x') {
+        ws.className = 'flex-1 grid grid-cols-2 grid-rows-2 min-w-0 bg-tv-bg relative';
+        [c2, c3, c4].forEach(c => { c.classList.remove('hidden'); c.classList.add('flex'); });
+        createTvWidget('tv_chart_container_2', document.getElementById('splitSymbolSelect').value, document.getElementById('splitTfSelect').value, [], true);
+        createTvWidget('tv_chart_container_3', document.getElementById('quadSymbol3').value, document.getElementById('quadTf3').value, [], true);
+        createTvWidget('tv_chart_container_4', document.getElementById('quadSymbol4').value, document.getElementById('quadTf4').value, [], true);
+      }
+    }
+
+    document.getElementById('layoutSingleBtn').addEventListener('click', () => setChartLayout('1x'));
+    document.getElementById('closeSplitBtn').addEventListener('click', () => setChartLayout('1x'));
+    document.getElementById('layoutSplitBtn').addEventListener('click', () => setChartLayout('2x'));
+    document.getElementById('layoutQuadBtn').addEventListener('click', () => setChartLayout('4x'));
+
     document.querySelectorAll('.study-btn').forEach(btn => btn.addEventListener('click', function() {
       const id = this.dataset.study;
-      if (!isProActive() && activeStudies.length >= 1 && !activeStudies.includes(id)) { openUpgradeModal(); return; }
+      if (!isProActive() && activeStudies.length >= 1 && !activeStudies.includes(id)) { showUpgradeModal(); return; }
       if (activeStudies.includes(id)) { activeStudies = activeStudies.filter(s => s !== id); this.classList.remove('active-study'); }
       else { activeStudies.push(id); this.classList.add('active-study'); }
       loadChartWidget();
@@ -1354,7 +922,19 @@
     document.getElementById('hideIndicatorBarBtn').addEventListener('click', () => document.getElementById('indicatorBar').classList.add('hidden'));
     document.getElementById('toggleSidebarBtn').addEventListener('click', () => document.getElementById('rightSidebar').classList.toggle('hidden'));
 
-    // --- CALCULATOR & JOURNAL ---
+    // SIDEBAR TOOLS
+    function switchRightTool(toolName) {
+      if ((toolName === 'fib' || toolName === 'prop') && !isProActive()) { showUpgradeModal(); return; }
+      ['Calc', 'Fib', 'Prop'].forEach(t => {
+        const active = t.toLowerCase() === toolName;
+        document.getElementById('toolTab' + t).className = active ? 'py-1.5 rounded bg-tv-blue text-white' : 'py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white';
+        document.getElementById('panelTool' + t).classList.toggle('hidden', !active);
+      });
+    }
+    document.getElementById('toolTabCalc').addEventListener('click', () => switchRightTool('calc'));
+    document.getElementById('toolTabFib').addEventListener('click', () => switchRightTool('fib'));
+    document.getElementById('toolTabProp').addEventListener('click', () => switchRightTool('prop'));
+
     function updateCalculator() {
       const bal = parseFloat(document.getElementById('calcBalance').value) || 0;
       const riskPct = parseFloat(document.getElementById('calcRiskPct').value) || 0;
@@ -1367,14 +947,64 @@
       document.getElementById('outRiskAmt').textContent = sym + riskAmt.toFixed(2);
 
       if (!isNaN(entry) && !isNaN(sl) && entry !== sl) {
-        if (!isProActive()) { document.getElementById('outLotSize').textContent = 'Pro Feature 🔒'; return; }
         const dist = Math.abs(entry - sl);
         document.getElementById('outLotSize').textContent = inst === 'XAUUSD' ? (riskAmt / (dist * 100)).toFixed(2) + ' Lots' : (riskAmt / (dist * 100000)).toFixed(2) + ' Lots';
         document.getElementById('outRR').textContent = (!isNaN(tp) && tp !== entry) ? '1 : ' + (Math.abs(tp - entry) / dist).toFixed(2) : '—';
+      } else {
+        document.getElementById('outLotSize').textContent = 'Enter Entry & SL';
+        document.getElementById('outRR').textContent = '—';
       }
     }
     ['calcBalance', 'calcRiskPct', 'calcInstrument', 'calcEntry', 'calcSl', 'calcTp'].forEach(id => document.getElementById(id).addEventListener('input', updateCalculator));
+    document.getElementById('currUsdBtn').addEventListener('click', () => { currencyMode = 'USD'; updateCalculator(); renderJournal(); });
+    document.getElementById('currInrBtn').addEventListener('click', () => { currencyMode = 'INR'; updateCalculator(); renderJournal(); });
 
+    let computedFib = null;
+    function updateFibGoldenZone() {
+      const low = parseFloat(document.getElementById('fibLow').value);
+      const high = parseFloat(document.getElementById('fibHigh').value);
+      const trend = document.getElementById('fibTrend').value;
+      if (isNaN(low) || isNaN(high) || high <= low) return;
+      const d = high - low;
+      const z280 = trend === 'BULL' ? high - d * 0.280 : low + d * 0.280;
+      const z382 = trend === 'BULL' ? high - d * 0.382 : low + d * 0.382;
+      const half = trend === 'BULL' ? high - d * 0.500 : low + d * 0.500;
+      const g618 = trend === 'BULL' ? high - d * 0.618 : low + d * 0.618;
+      const tgt  = trend === 'BULL' ? high + d * 0.272 : low - d * 0.272;
+      document.getElementById('fibSniperZone').textContent = `${z280.toFixed(2)} – ${z382.toFixed(2)}`;
+      document.getElementById('fibHalfLevel').textContent = half.toFixed(2);
+      document.getElementById('fibGoldenLevel').textContent = g618.toFixed(2);
+      document.getElementById('fibTargetLevel').textContent = tgt.toFixed(2);
+      computedFib = { side: trend === 'BULL' ? 'BUY' : 'SELL', entry: +((z280 + z382) / 2).toFixed(2), sl: +(trend === 'BULL' ? g618 - d * 0.08 : g618 + d * 0.08).toFixed(2), tp: +tgt.toFixed(2) };
+    }
+    ['fibLow', 'fibHigh', 'fibTrend'].forEach(id => document.getElementById(id).addEventListener('input', updateFibGoldenZone));
+    document.getElementById('applyFibToCalcBtn').addEventListener('click', function() {
+      if (!computedFib) return;
+      document.getElementById('calcSide').value = computedFib.side;
+      document.getElementById('calcEntry').value = computedFib.entry;
+      document.getElementById('calcSl').value = computedFib.sl;
+      document.getElementById('calcTp').value = computedFib.tp;
+      document.getElementById('calcNote').value = '0.280-0.382 Golden Zone';
+      switchRightTool('calc');
+      updateCalculator();
+    });
+
+    function updatePropGuard() {
+      const acc = parseFloat(document.getElementById('propAccSize').value) || 10000;
+      const ddPct = parseFloat(document.getElementById('propDailyMax').value) || 5;
+      const tgtPct = parseFloat(document.getElementById('propTargetPct').value) || 8;
+      const net = trades.filter(t => t.status !== 'OPEN').reduce((a, b) => a + b.pnl, 0);
+      const tgtAmt = acc * (tgtPct / 100);
+      const maxDd = acc * (ddPct / 100);
+      const ddLeft = Math.max(0, maxDd - (net < 0 ? Math.abs(net) : 0));
+      document.getElementById('propTargetText').textContent = `$${net.toFixed(0)} / $${tgtAmt.toFixed(0)}`;
+      document.getElementById('propTargetBar').style.width = Math.max(0, Math.min(100, (net / tgtAmt) * 100)) + '%';
+      document.getElementById('propDdText').textContent = `$${ddLeft.toFixed(2)} Safe`;
+      document.getElementById('propDdBar').style.width = Math.max(0, Math.min(100, (ddLeft / maxDd) * 100)) + '%';
+    }
+    ['propAccSize', 'propDailyMax', 'propTargetPct'].forEach(id => document.getElementById(id).addEventListener('input', updatePropGuard));
+
+    // JOURNAL & BOTTOM TABS
     function saveTrades() {
       localStorage.setItem('pipscopetrade1_trades_v1', JSON.stringify(trades));
       renderJournal();
@@ -1382,7 +1012,7 @@
     }
 
     document.getElementById('logTradeBtn').addEventListener('click', function() {
-      if (!isProActive()) { openUpgradeModal(); return; }
+      if (!isProActive()) { showUpgradeModal(); return; }
       const entry = parseFloat(document.getElementById('calcEntry').value);
       const sl = parseFloat(document.getElementById('calcSl').value);
       const tp = parseFloat(document.getElementById('calcTp').value);
@@ -1419,8 +1049,8 @@
       const tbody = document.getElementById('journalTableBody');
       const sym = currencyMode === 'USD' ? '$' : '₹';
       document.getElementById('journalCountBadge').textContent = trades.length;
-      if (!isProActive() || !trades.length) {
-        tbody.innerHTML = '<tr><td colspan="10" class="py-5 text-center text-tv-muted font-sans">Sign in to sync your cloud journal or upgrade to Pro (₹149/mo) to unlock MT5 Import, Risk Calc & Pine Scripts.</td></tr>';
+      if (!trades.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="py-5 text-center text-tv-muted font-sans">No trades logged yet. Use Risk Calculator or ⇄ Trade to log trades.</td></tr>';
       } else {
         tbody.innerHTML = trades.map(t => `
           <tr class="border-b border-tv-border/50 hover:bg-tv-hover/40">
@@ -1446,31 +1076,156 @@
     }
 
     function switchBottomTab(tabName) {
-      if (tabName !== 'screener' && !isProActive()) { openUpgradeModal(); return; }
+      if (tabName !== 'screener' && !isProActive()) { showUpgradeModal(); return; }
       document.querySelectorAll('.btab-btn').forEach(b => {
         b.classList.remove('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue');
         b.classList.add('font-medium', 'text-tv-muted');
       });
       const activeBtn = document.querySelector(`.btab-btn[data-btab="${tabName}"]`);
-      if (activeBtn) { activeBtn.classList.add('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue'); }
+      if (activeBtn) activeBtn.classList.add('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue');
       document.querySelectorAll('.btab-content').forEach(c => c.classList.add('hidden'));
       document.getElementById('tab-' + tabName).classList.remove('hidden');
-      if (tabName === 'screener') loadScreenerWidget();
+      if (tabName === 'screener') {
+        const wrap = document.getElementById('tvScreenerContainer');
+        if (!wrap.dataset.loaded) {
+          wrap.dataset.loaded = '1';
+          const s = document.createElement('script');
+          s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
+          s.async = true;
+          s.innerHTML = JSON.stringify({ width: '100%', height: '100%', defaultColumn: 'overview', defaultScreen: 'general', market: 'forex', showToolbar: true, colorTheme: 'dark', locale: 'en', isTransparent: true });
+          wrap.appendChild(s);
+        }
+      }
     }
     document.querySelectorAll('.btab-btn').forEach(btn => btn.addEventListener('click', () => switchBottomTab(btn.dataset.btab)));
     document.getElementById('openPineModalBtn').addEventListener('click', () => switchBottomTab('pine'));
 
-    // --- INIT ---
-    window.addEventListener('DOMContentLoaded', function() {
-      updateAuthUI();
-      updateProUI();
-      checkGoogleSheetApproval();
-      updateSessionsAndClock();
+    document.getElementById('toggleBottomPanelBtn').addEventListener('click', () => {
+      document.getElementById('bottomPanel').classList.add('hidden');
+      document.getElementById('footerShowBottomBtn').classList.remove('hidden');
+    });
+    document.getElementById('footerShowBottomBtn').addEventListener('click', function() {
+      document.getElementById('bottomPanel').classList.remove('hidden');
+      this.classList.add('hidden');
+    });
+
+    // LAYOUTS, ALERTS, PAPER PANEL, CLOCK
+    function renderSavedLayouts() {
+      const list = document.getElementById('savedLayoutsList');
+      list.innerHTML = savedLayouts.length ? savedLayouts.map((l, idx) => `
+        <div class="bg-tv-bg border border-tv-border rounded p-2 flex items-center justify-between">
+          <div><div class="font-bold text-white">${l.name}</div><div class="text-[10px] font-mono text-tv-muted">${l.symbol} • ${l.interval}m</div></div>
+          <div class="flex gap-1"><button onclick="loadSavedLayout(${idx})" class="px-2 py-1 bg-tv-blue text-white rounded text-[10px]">Load</button><button onclick="deleteSavedLayout(${idx})" class="px-2 py-1 bg-tv-deep text-tv-muted rounded text-[10px]">✕</button></div>
+        </div>
+      `).join('') : '<div class="text-tv-muted text-center py-3">No layouts saved.</div>';
+    }
+    window.loadSavedLayout = function(idx) {
+      const l = savedLayouts[idx];
+      if (!l) return;
+      currentSymbol = l.symbol; currentInterval = l.interval; activeStudies = l.studies || [];
       loadChartWidget();
-      loadWatchlistWidget();
-      updateCalculator();
-      renderJournal();
+      document.getElementById('layoutModal').classList.add('hidden');
+      document.getElementById('layoutModal').classList.remove('flex');
+    };
+    window.deleteSavedLayout = function(idx) {
+      savedLayouts.splice(idx, 1);
+      localStorage.setItem('pipscopetrade1_layouts', JSON.stringify(savedLayouts));
+      renderSavedLayouts(); syncUserToCloud();
+    };
+    document.getElementById('openLayoutModalBtn').addEventListener('click', () => { renderSavedLayouts(); document.getElementById('layoutModal').classList.remove('hidden'); document.getElementById('layoutModal').classList.add('flex'); });
+    document.getElementById('closeLayoutModalBtn').addEventListener('click', () => { document.getElementById('layoutModal').classList.add('hidden'); document.getElementById('layoutModal').classList.remove('flex'); });
+    document.getElementById('saveCurrentLayoutBtn').addEventListener('click', () => {
+      const name = document.getElementById('newLayoutNameInput').value.trim() || (currentSymbol.split(':').pop() + ' Setup');
+      savedLayouts.unshift({ name, symbol: currentSymbol, interval: currentInterval, studies: [...activeStudies] });
+      localStorage.setItem('pipscopetrade1_layouts', JSON.stringify(savedLayouts));
+      document.getElementById('newLayoutNameInput').value = '';
+      renderSavedLayouts(); syncUserToCloud();
+    });
+
+    function renderAlerts() {
+      document.getElementById('alertCountBadge').textContent = priceAlerts.length;
+      const list = document.getElementById('priceAlertsList');
+      list.innerHTML = priceAlerts.length ? priceAlerts.map((a, i) => `
+        <div class="bg-tv-bg border border-tv-border rounded p-2 flex items-center justify-between">
+          <span><strong class="text-white">${a.symbol}</strong> @ <span class="text-amber-400">${a.price}</span></span>
+          <button onclick="removePriceAlert(${i})" class="text-tv-muted hover:text-tv-red">Delete</button>
+        </div>
+      `).join('') : '<div class="text-tv-muted text-center py-3 font-sans">No alerts set.</div>';
+    }
+    window.removePriceAlert = function(i) { priceAlerts.splice(i, 1); localStorage.setItem('pipscopetrade1_alerts', JSON.stringify(priceAlerts)); renderAlerts(); };
+    document.getElementById('openAlertModalBtn').addEventListener('click', () => { document.getElementById('alertSymInput').value = currentSymbol.split(':').pop(); renderAlerts(); document.getElementById('alertModal').classList.remove('hidden'); document.getElementById('alertModal').classList.add('flex'); });
+    document.getElementById('closeAlertModalBtn').addEventListener('click', () => { document.getElementById('alertModal').classList.add('hidden'); document.getElementById('alertModal').classList.remove('flex'); });
+    document.getElementById('addPriceAlertBtn').addEventListener('click', () => {
+      const sym = document.getElementById('alertSymInput').value.trim().toUpperCase();
+      const price = parseFloat(document.getElementById('alertPriceInput').value);
+      if (!sym || isNaN(price)) return;
+      priceAlerts.push({ symbol: sym, price });
+      localStorage.setItem('pipscopetrade1_alerts', JSON.stringify(priceAlerts));
+      document.getElementById('alertPriceInput').value = '';
       renderAlerts();
+    });
+
+    document.getElementById('togglePaperPanelBtn').addEventListener('click', () => document.getElementById('floatingOrderPanel').classList.toggle('hidden'));
+    document.getElementById('closeFloatOrderBtn').addEventListener('click', () => document.getElementById('floatingOrderPanel').classList.add('hidden'));
+    function placePaperOrder(side) {
+      if (!isProActive()) { showUpgradeModal(); return; }
+      const lots = document.getElementById('floatLotInput').value || '0.10';
+      const now = new Date();
+      trades.unshift({ id: Date.now(), dateKey: now.toISOString().slice(0, 10), time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), symbol: currentSymbol.split(':').pop(), side, size: lots + ' Lots', entry: 'Market', sl: '-', tp: '-', note: 'Paper Order', status: 'OPEN', pnl: 0 });
+      saveTrades();
+    }
+    document.getElementById('instantBuyBtn').addEventListener('click', () => placePaperOrder('BUY'));
+    document.getElementById('instantSellBtn').addEventListener('click', () => placePaperOrder('SELL'));
+
+    document.getElementById('pineEditor').value = '//@version=5\nindicator("pipscopetrade1 0.280-0.382 Golden Zone", overlay=true)\nhi = ta.highest(high, 30)\nlo = ta.lowest(low, 30)\ngzTop = hi - (hi - lo) * 0.280\ngzBot = hi - (hi - lo) * 0.382\nplot(gzTop, "0.280", color=color.amber)\nplot(gzBot, "0.382", color=color.green)';
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('liveClockIst').textContent = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false }) + ' IST';
+      const h = now.getUTCHours();
+      const badge = (id, name, open) => {
+        document.getElementById(id).innerHTML = open ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span> <span class="text-white font-semibold">${name}</span>` : `<span class="w-1.5 h-1.5 rounded-full bg-tv-muted inline-block"></span> <span class="text-tv-muted">${name}</span>`;
+      };
+      badge('sessSydney', 'Sydney', h >= 22 || h < 7);
+      badge('sessTokyo', 'Tokyo', h >= 0 && h < 9);
+      badge('sessLondon', 'London', h >= 8 && h < 17);
+      badge('sessNewYork', 'New York', h >= 13 && h < 22);
+      document.getElementById('killzoneBadge').textContent = ((h >= 8 && h < 17) && (h >= 13 && h < 22)) ? '🔥 London-NY Overlap' : ((h >= 8 && h < 17) || (h >= 13 && h < 22)) ? '⚡ Active Session' : 'Asian Session';
+    }
+    setInterval(updateClock, 1000);
+
+    function loadWatchlist() {
+      const wrap = document.getElementById('marketOverviewWidget');
+      wrap.innerHTML = '';
+      const s = document.createElement('script');
+      s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+      s.async = true;
+      s.innerHTML = JSON.stringify({ colorTheme: 'dark', dateRange: '1D', showChart: false, locale: 'en', width: '100%', height: '100%', isTransparent: true, tabs: [{ title: 'Watchlist', symbols: [{ s: 'OANDA:XAUUSD', d: 'Gold' }, { s: 'FX:EURUSD', d: 'EURUSD' }, { s: 'BINANCE:BTCUSDT', d: 'BTC' }, { s: 'NSE:NIFTY', d: 'NIFTY' }] }] });
+      wrap.appendChild(s);
+    }
+
+    document.getElementById('sideTabWatchlist').addEventListener('click', () => { document.getElementById('marketOverviewWidget').classList.remove('hidden'); document.getElementById('economicCalendarWidget').classList.add('hidden'); });
+    document.getElementById('sideTabCalendar').addEventListener('click', () => {
+      document.getElementById('economicCalendarWidget').classList.remove('hidden');
+      document.getElementById('marketOverviewWidget').classList.add('hidden');
+      const wrap = document.getElementById('economicCalendarWidget');
+      if (!wrap.dataset.loaded) {
+        wrap.dataset.loaded = '1';
+        const s = document.createElement('script');
+        s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+        s.async = true;
+        s.innerHTML = JSON.stringify({ colorTheme: 'dark', isTransparent: true, width: '100%', height: '100%', locale: 'en', importanceFilter: '0,1' });
+        wrap.appendChild(s);
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', async function() {
+      updateAuthUI();
+      updateClock();
+      loadChartWidget();
+      loadWatchlist();
+      await checkGoogleSheetApproval();
+      refreshAllUI();
     });
   </script>
 </body>
