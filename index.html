@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TradeView Pro — Hybrid Live Charting & Pine Script Terminal</title>
+  <title>MsTrading Pro — Institutional Live Charting & Trading Terminal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -20,1214 +20,1231 @@
               bg: '#131722',
               panel: '#1e222d',
               hover: '#2a2e39',
-              border: '#2a2e39',
-              text: '#d1d4dc',
-              muted: '#787b86',
+              border: '#2b2b43',
               blue: '#2962ff',
+              blueHover: '#1e53e5',
               green: '#089981',
-              red: '#f23645'
+              red: '#f23645',
+              text: '#d1d4dc',
+              muted: '#787b86'
             }
           },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
+            mono: ['JetBrains Mono', 'monospace']
           }
         }
       }
     }
   </script>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
-      background-color: #0b0e14;
+      background-color: #131722;
       color: #d1d4dc;
       font-family: 'Inter', sans-serif;
       overflow: hidden;
+      user-select: none;
     }
-    ::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #131722;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #2a2e39;
-      border-radius: 3px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #434651;
-    }
-    .sym-btn.active {
-      background-color: rgba(41, 98, 255, 0.22);
-      color: #ffffff;
-      border-color: #2962ff;
-    }
-    .tf-btn.active {
-      background-color: rgba(41, 98, 255, 0.2);
-      color: #2962ff;
-    }
-    .study-pill.active {
-      background-color: rgba(41, 98, 255, 0.22);
+    input, textarea, select { user-select: text; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #131722; }
+    ::-webkit-scrollbar-thumb { background: #2a2e39; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #363a45; }
+    .active-study {
+      background-color: rgba(41, 98, 255, 0.18);
       border-color: #2962ff;
       color: #ffffff;
-    }
-    #tv_chart_container {
-      width: 100%;
-      height: 100%;
-    }
-    #tv_chart_container iframe {
-      width: 100% !important;
-      height: 100% !important;
     }
   </style>
 </head>
-<body class="h-screen w-screen flex flex-col overflow-hidden text-xs bg-tv-deep text-tv-text">
+<body class="h-screen w-screen flex flex-col bg-tv-bg text-tv-text">
 
-  <!-- Toast Notification Stack -->
-  <div id="toast-container" class="fixed top-14 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-  <!-- Close / Edit Trade Modal -->
-  <div id="close-trade-modal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-tv-panel border border-tv-border rounded-lg p-4 w-full max-w-sm shadow-2xl">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-white">Close / Update Trade</h3>
-        <button id="modal-close-x" class="text-tv-muted hover:text-white text-base leading-none">&times;</button>
-      </div>
-      <div id="modal-trade-summary" class="text-[11px] font-mono bg-tv-bg p-2 rounded border border-tv-border mb-3 text-tv-text"></div>
-      <div class="space-y-2.5">
-        <div>
-          <label class="block text-[10px] text-tv-muted mb-1">Exit Price</label>
-          <input id="modal-exit-price" type="number" step="any"
-            class="w-full bg-tv-bg border border-tv-border rounded px-2.5 py-1.5 text-white font-mono focus:outline-none focus:border-tv-blue" />
+  <!-- TOP NAVIGATION BAR -->
+  <header class="h-12 bg-tv-panel border-b border-tv-border px-3 flex items-center justify-between gap-2 shrink-0 z-20">
+    <!-- Brand + Quick Symbols -->
+    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+      <div class="flex items-center gap-2 pr-2 border-r border-tv-border shrink-0">
+        <div class="w-7 h-7 rounded bg-gradient-to-br from-emerald-500 to-tv-blue flex items-center justify-center font-mono font-bold text-white text-xs shadow">
+          MS
         </div>
-        <div>
-          <label class="block text-[10px] text-tv-muted mb-1">Outcome Status</label>
-          <select id="modal-status" class="w-full bg-tv-bg border border-tv-border rounded px-2.5 py-1.5 text-white focus:outline-none focus:border-tv-blue">
-            <option value="WIN">WIN (Target Hit)</option>
-            <option value="LOSS">LOSS (Stop Hit)</option>
-            <option value="BREAKEVEN">BREAKEVEN</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-[10px] text-tv-muted mb-1">Trade Notes</label>
-          <input id="modal-notes" type="text" placeholder="Execution review, emotions, setup..."
-            class="w-full bg-tv-bg border border-tv-border rounded px-2.5 py-1.5 text-white focus:outline-none focus:border-tv-blue" />
-        </div>
-      </div>
-      <div class="flex justify-end gap-2 mt-4">
-        <button id="modal-cancel-btn" class="px-3 py-1.5 rounded bg-tv-hover text-tv-text hover:text-white">Cancel</button>
-        <button id="modal-save-btn" class="px-3.5 py-1.5 rounded bg-tv-blue hover:bg-blue-600 text-white font-semibold">Save & Close Trade</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 1. TOP HEADER BAR -->
-  <header class="h-11 bg-tv-panel border-b border-tv-border flex items-center justify-between px-2.5 gap-2 shrink-0 overflow-x-auto">
-    <!-- Left: Brand + Quick Symbol Switchers + Custom Symbol Search -->
-    <div class="flex items-center gap-1.5 shrink-0">
-      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-tv-deep border border-tv-border">
-        <svg class="w-4 h-4 text-tv-blue" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M3 17h4v-7H3v7zm6 0h4V7H9v10zm6 0h4v-4h-4v4z"/>
-        </svg>
-        <span class="font-bold tracking-tight text-white">TradeView Pro</span>
-        <span class="px-1.5 py-0.2 rounded bg-tv-green/20 text-tv-green text-[10px] font-semibold">LIVE</span>
+        <span class="font-bold text-white tracking-tight text-sm">MsTrading <span class="text-emerald-400">Pro</span></span>
+        <span id="planStatusBadge" class="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded">FREE</span>
       </div>
 
-      <!-- Quick Symbol Buttons -->
-      <div id="symbol-pills" class="flex items-center gap-1">
-        <button data-symbol="OANDA:XAUUSD" data-inst="gold" class="sym-btn active px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white font-medium transition">XAUUSD</button>
-        <button data-symbol="FX:EURUSD" data-inst="forex_std" class="sym-btn px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white font-medium transition">EURUSD</button>
-        <button data-symbol="FX:GBPUSD" data-inst="forex_std" class="sym-btn px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white font-medium transition">GBPUSD</button>
-        <button data-symbol="FX:USDJPY" data-inst="forex_jpy" class="sym-btn px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white font-medium transition">USDJPY</button>
-        <button data-symbol="BINANCE:BTCUSDT" data-inst="crypto" class="sym-btn px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white font-medium transition">BTCUSDT</button>
-        <button data-symbol="NSE:NIFTY" data-inst="nifty" class="sym-btn px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white font-medium transition">NIFTY</button>
-        <button data-symbol="NSE:BANKNIFTY" data-inst="banknifty" class="sym-btn px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white font-medium transition">BANKNIFTY</button>
+      <!-- Quick Symbol Pills -->
+      <div id="symbolPills" class="flex items-center gap-1 shrink-0">
+        <button data-symbol="OANDA:XAUUSD" data-free="true" class="sym-btn px-2 py-1 text-xs font-mono font-semibold rounded bg-tv-blue text-white transition">XAUUSD</button>
+        <button data-symbol="FX:EURUSD" data-free="true" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">EURUSD</button>
+        <button data-symbol="FX:GBPUSD" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">GBPUSD 🔒</button>
+        <button data-symbol="FX:USDJPY" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">USDJPY 🔒</button>
+        <button data-symbol="BINANCE:BTCUSDT" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">BTCUSDT 🔒</button>
+        <button data-symbol="NSE:NIFTY" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">NIFTY 🔒</button>
+        <button data-symbol="NSE:BANKNIFTY" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">BANKNIFTY 🔒</button>
       </div>
 
-      <!-- Custom Symbol Search Input -->
-      <form id="custom-symbol-form" class="flex items-center bg-tv-bg border border-tv-border rounded overflow-hidden focus-within:border-tv-blue">
-        <input id="custom-symbol-input" type="text" placeholder="e.g. NASDAQ:AAPL" title="Enter any TradingView Exchange:Symbol"
-          class="w-28 lg:w-32 bg-transparent px-2 py-1 text-white placeholder-tv-muted focus:outline-none font-mono text-[11px]" />
-        <button type="submit" class="px-2 py-1 bg-tv-hover hover:bg-tv-blue text-tv-text hover:text-white font-medium transition">Go</button>
+      <!-- Custom Exchange:Symbol Search -->
+      <form id="customSymbolForm" class="flex items-center gap-1 ml-1 shrink-0">
+        <input id="customSymbolInput" type="text" placeholder="e.g. NASDAQ:AAPL" class="w-32 bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-2 py-1 text-xs font-mono text-white outline-none" />
+        <button type="submit" class="px-2 py-1 bg-tv-hover hover:bg-tv-blue text-white text-xs font-medium rounded transition">Go</button>
       </form>
     </div>
 
-    <!-- Right: Timeframe Switcher + Indicators & Pine Script Drawer Button -->
-    <div class="flex items-center gap-1.5 shrink-0">
-      <!-- Timeframes -->
-      <div id="timeframe-bar" class="flex items-center bg-tv-bg p-0.5 rounded border border-tv-border">
-        <button data-tf="1" class="tf-btn px-1.5 py-1 rounded font-medium text-tv-muted hover:text-white transition">1m</button>
-        <button data-tf="5" class="tf-btn px-1.5 py-1 rounded font-medium text-tv-muted hover:text-white transition">5m</button>
-        <button data-tf="15" class="tf-btn active px-1.5 py-1 rounded font-medium text-tv-muted hover:text-white transition">15m</button>
-        <button data-tf="60" class="tf-btn px-1.5 py-1 rounded font-medium text-tv-muted hover:text-white transition">1H</button>
-        <button data-tf="240" class="tf-btn px-1.5 py-1 rounded font-medium text-tv-muted hover:text-white transition">4H</button>
-        <button data-tf="D" class="tf-btn px-1.5 py-1 rounded font-medium text-tv-muted hover:text-white transition">1D</button>
+    <!-- Right Controls: Layout Split + Timeframes + Upgrade + Indicators -->
+    <div class="flex items-center gap-2 shrink-0">
+      <!-- Single vs Dual Split Screen -->
+      <div class="hidden md:flex items-center bg-tv-bg p-0.5 rounded border border-tv-border text-[11px] font-mono">
+        <button id="layoutSingleBtn" title="Single Chart View" class="px-2 py-0.5 rounded bg-tv-blue text-white font-semibold">1x</button>
+        <button id="layoutSplitBtn" title="Dual Split-Screen Chart (Pro)" class="px-2 py-0.5 rounded text-tv-muted hover:text-white">2x 🔒</button>
       </div>
 
-      <!-- Indicators & Pine Script Drawer Trigger -->
-      <button id="btn-toggle-pine-drawer"
-        class="px-2.5 py-1.5 rounded bg-tv-blue/20 hover:bg-tv-blue border border-tv-blue text-white font-semibold flex items-center gap-1.5 transition cursor-pointer">
-        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="16 18 22 12 16 6"/>
-          <polyline points="8 6 2 12 8 18"/>
-        </svg>
-        <span>Indicators & Pine Script</span>
+      <!-- Timeframe Pills -->
+      <div id="tfPills" class="hidden xl:flex items-center gap-0.5 bg-tv-bg p-0.5 rounded border border-tv-border">
+        <button data-tf="1" class="tf-btn px-2 py-0.5 text-xs font-mono rounded bg-tv-blue text-white">1m</button>
+        <button data-tf="5" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">5m</button>
+        <button data-tf="15" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">15m</button>
+        <button data-tf="60" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">1H</button>
+        <button data-tf="240" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">4H</button>
+        <button data-tf="D" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">1D</button>
+      </div>
+
+      <button id="openUpgradeBtn" class="px-2.5 py-1 text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black rounded shadow flex items-center gap-1 transition">
+        <span>⚡ Upgrade Pro</span>
       </button>
 
-      <!-- Toggle Right Sidebar -->
-      <button id="btn-toggle-right" title="Toggle Risk Calculator & Quotes"
-        class="p-1.5 rounded bg-tv-bg border border-tv-border text-tv-text hover:text-white hover:bg-tv-hover transition">
-        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="15" y1="3" x2="15" y2="21"/>
+      <button id="toggleIndicatorBarBtn" class="px-2.5 py-1 text-xs font-medium bg-tv-bg hover:bg-tv-hover border border-tv-border rounded flex items-center gap-1.5 text-white transition">
+        <span class="text-tv-blue font-mono font-bold">fx</span>
+        <span class="hidden sm:inline">Indicators & Pine</span>
+      </button>
+
+      <button id="toggleSidebarBtn" title="Toggle Risk Calculator & Market Feed" class="p-1.5 bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="15" y1="3" x2="15" y2="21" />
         </svg>
       </button>
     </div>
   </header>
 
-  <!-- 2. BUILT-IN INDICATORS & PINE SCRIPT DRAWER (Collapsible Sub-Bar) -->
-  <section id="pine-drawer" class="hidden bg-tv-panel border-b border-tv-border px-3 py-2.5 shrink-0 shadow-xl z-20">
-    <div class="flex flex-wrap items-center justify-between gap-2 pb-2 mb-2 border-b border-tv-border/70">
-      <div class="flex flex-wrap items-center gap-1.5">
-        <span class="text-white font-semibold mr-1 flex items-center gap-1">
-          <svg class="w-3.5 h-3.5 text-tv-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
-          </svg>
-          Live Chart Studies:
-        </span>
-        <button data-study="EMA@tv-basicstudies" class="study-pill active px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white transition">EMA</button>
-        <button data-study="MASimple@tv-basicstudies" class="study-pill px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white transition">SMA</button>
-        <button data-study="RSI@tv-basicstudies" class="study-pill active px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white transition">RSI</button>
-        <button data-study="MACD@tv-basicstudies" class="study-pill px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white transition">MACD</button>
-        <button data-study="BB@tv-basicstudies" class="study-pill px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white transition">Bollinger Bands</button>
-        <button data-study="VWAP@tv-basicstudies" class="study-pill px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white transition">VWAP</button>
-        <button data-study="Volume@tv-basicstudies" class="study-pill active px-2 py-1 rounded border border-tv-border bg-tv-bg text-tv-text hover:text-white transition">Volume</button>
-      </div>
+  <!-- MARKET SESSION KILLZONE & CLOCK BAR -->
+  <div class="bg-tv-deep border-b border-tv-border px-3 py-1 flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono shrink-0">
+    <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
+      <span class="text-tv-muted font-sans font-semibold uppercase tracking-wider text-[10px]">Global Sessions:</span>
+      <span id="sessSydney" class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> Sydney</span>
+      <span id="sessTokyo" class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> Tokyo</span>
+      <span id="sessLondon" class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> London</span>
+      <span id="sessNewYork" class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> New York</span>
+      <span id="killzoneBadge" class="hidden sm:inline-block px-1.5 py-0.2 rounded bg-tv-panel text-tv-muted text-[10px]">Checking liquidity...</span>
+    </div>
+    <div class="flex items-center gap-3 text-tv-text">
+      <span id="liveClockIst" class="text-emerald-400 font-semibold">--:--:-- IST</span>
+      <span id="liveClockUtc" class="hidden md:inline text-tv-muted">--:-- UTC</span>
+    </div>
+  </div>
 
-      <div class="flex items-center gap-2">
-        <button id="btn-open-pine-studio" class="px-2.5 py-1 rounded bg-tv-green/20 border border-tv-green text-tv-green hover:bg-tv-green hover:text-white font-medium transition">
-          Open Pine Script v5 Studio &rarr;
-        </button>
-        <button id="btn-close-pine-drawer" class="text-tv-muted hover:text-white px-1.5 py-0.5 rounded hover:bg-tv-hover">Hide</button>
-      </div>
+  <!-- INDICATOR STUDY MANAGER BAR -->
+  <div id="indicatorBar" class="bg-tv-panel/70 border-b border-tv-border px-3 py-1.5 flex flex-wrap items-center justify-between gap-2 shrink-0">
+    <div class="flex items-center gap-1.5 flex-wrap">
+      <span class="text-[11px] font-semibold uppercase tracking-wider text-tv-muted mr-1 flex items-center gap-1">
+        <span class="text-tv-blue font-mono">fx</span> Live Studies:
+      </span>
+      <button data-study="MASimple@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">SMA</button>
+      <button data-study="MAExp@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">EMA</button>
+      <button data-study="RSI@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">RSI</button>
+      <button data-study="MACD@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">MACD</button>
+      <button data-study="BB@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">Bollinger Bands</button>
+      <button data-study="VWAP@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">VWAP</button>
+      <button data-study="Volume@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">Volume</button>
     </div>
 
-    <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-tv-muted">
-      <span>Click any study pill above to reload the live TradingView chart with those built-in indicators active, or click <b>Indicators (fx)</b> directly inside the TradingView chart toolbar for 100+ technical studies & Pine Editor.</span>
-      <span id="active-studies-count" class="font-mono text-tv-blue">3 Studies Active</span>
+    <div class="flex items-center gap-2">
+      <span id="activeStudiesCount" class="text-[11px] font-mono text-tv-blue mr-2">0 Studies Active</span>
+      <button id="openPineModalBtn" class="px-2.5 py-0.5 text-xs font-medium bg-tv-green/20 hover:bg-tv-green/30 text-tv-green border border-tv-green/40 rounded transition">
+        Open Pine Script v5 Studio →
+      </button>
+      <button id="hideIndicatorBarBtn" class="text-xs text-tv-muted hover:text-white px-1">Hide</button>
     </div>
-  </section>
+  </div>
 
   <!-- MAIN WORKSPACE -->
-  <div class="flex-1 flex overflow-hidden min-h-0">
+  <div class="flex-1 flex min-h-0 overflow-hidden">
+    <!-- CENTER LIVE CHART AREA (SINGLE OR DUAL SPLIT) -->
+    <main class="flex-1 flex min-w-0 bg-tv-bg relative">
+      <!-- Primary Chart -->
+      <div id="primaryChartWrap" class="flex-1 flex flex-col min-w-0 h-full">
+        <div id="tv_chart_container" class="flex-1 w-full h-full"></div>
+      </div>
 
-    <!-- CENTER COLUMN: OFFICIAL TRADINGVIEW REAL-TIME WIDGET + BOTTOM TERMINAL -->
-    <div class="flex-1 flex flex-col min-w-0 min-h-0">
-
-      <!-- Official TradingView Real-Time Live Chart Container -->
-      <main class="flex-1 bg-tv-bg relative overflow-hidden min-h-0">
-        <div id="tv_chart_container" class="w-full h-full"></div>
-      </main>
-
-      <!-- BOTTOM COLLAPSIBLE TERMINAL PANEL -->
-      <section id="bottom-terminal" class="h-52 bg-tv-panel border-t border-tv-border flex flex-col shrink-0 transition-all">
-        <!-- Bottom Tabs & Quick Metrics -->
-        <div class="h-8 px-3 border-b border-tv-border flex items-center justify-between shrink-0 bg-tv-bg/40">
-          <div class="flex items-center gap-4">
-            <button data-btab="journal" class="btab-btn text-white font-semibold border-b-2 border-tv-blue h-8 flex items-center gap-1.5">
-              <span>Trade Journal</span>
-              <span id="journal-count-badge" class="bg-tv-blue/20 text-tv-blue px-1.5 py-0.2 rounded text-[10px]">0</span>
-            </button>
-            <button data-btab="analytics" class="btab-btn text-tv-muted hover:text-white font-medium h-8 flex items-center gap-1.5">
-              <span>Performance Analytics</span>
-            </button>
-            <button data-btab="pinestudio" class="btab-btn text-tv-muted hover:text-white font-medium h-8 flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-tv-blue"></span>
-              <span>Pine Script v5 Studio</span>
-            </button>
+      <!-- Secondary Split Chart (Hidden in 1x mode) -->
+      <div id="secondaryChartWrap" class="hidden flex-1 flex-col min-w-0 h-full border-l-2 border-tv-border">
+        <div class="h-7 bg-tv-deep border-b border-tv-border px-2.5 flex items-center justify-between text-[11px] font-mono shrink-0">
+          <div class="flex items-center gap-1.5">
+            <span class="text-emerald-400 font-semibold">CHART 2:</span>
+            <select id="splitSymbolSelect" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
+              <option value="OANDA:XAUUSD">XAUUSD (Gold)</option>
+              <option value="TVC:DXY">DXY (US Dollar Index)</option>
+              <option value="FX:EURUSD">EURUSD</option>
+              <option value="BINANCE:BTCUSDT">BTCUSDT</option>
+              <option value="NSE:NIFTY">NIFTY 50</option>
+            </select>
+            <select id="splitTfSelect" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
+              <option value="5">5m</option>
+              <option value="15" selected>15m</option>
+              <option value="60">1H</option>
+              <option value="240">4H</option>
+              <option value="D">1D</option>
+            </select>
           </div>
+          <button id="closeSplitBtn" class="text-tv-muted hover:text-white">✕ Close</button>
+        </div>
+        <div id="tv_chart_container_2" class="flex-1 w-full h-full"></div>
+      </div>
+    </main>
 
-          <div class="flex items-center gap-3 font-mono text-[11px]">
-            <div class="hidden sm:block">
-              <span class="text-tv-muted">Net P&L: </span>
-              <span id="top-net-pnl" class="text-white font-semibold">$0.00</span>
-            </div>
-            <div class="hidden md:block">
-              <span class="text-tv-muted">Win Rate: </span>
-              <span id="top-win-rate" class="text-white font-semibold">0.0%</span>
-            </div>
-            <button id="btn-export-csv" title="Export Trade Journal to CSV"
-              class="px-2 py-0.5 rounded bg-tv-hover hover:bg-tv-blue text-tv-text hover:text-white font-sans text-[10px] transition">
-              Export CSV
-            </button>
-            <button id="btn-toggle-bottom" title="Collapse/Expand Bottom Panel"
-              class="p-1 rounded hover:bg-tv-hover text-tv-muted hover:text-white">
-              <svg id="bottom-chevron" class="w-3.5 h-3.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
-            </button>
+    <!-- RIGHT SIDEBAR: RISK CALCULATOR, DISCIPLINE CHECKLIST & MARKET FEED -->
+    <aside id="rightSidebar" class="w-80 bg-tv-panel border-l border-tv-border flex flex-col shrink-0 overflow-y-auto">
+      <!-- Risk & Position Calculator -->
+      <div class="p-3 border-b border-tv-border">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-white">Position & Risk Calculator</h2>
+          <div class="flex bg-tv-bg rounded border border-tv-border p-0.5 text-[11px] font-mono">
+            <button id="currUsdBtn" class="px-2 py-0.5 rounded bg-tv-blue text-white font-semibold">USD ($)</button>
+            <button id="currInrBtn" class="px-2 py-0.5 rounded text-tv-muted hover:text-white">INR (₹)</button>
           </div>
         </div>
 
-        <!-- TAB 1: TRADE JOURNAL (Persistent via localStorage) -->
-        <div id="bpanel-journal" class="bpanel flex-1 overflow-auto">
-          <table class="w-full text-left border-collapse">
-            <thead class="bg-tv-bg/80 text-tv-muted text-[10px] uppercase tracking-wider sticky top-0 z-10">
-              <tr>
-                <th class="py-1.5 px-3 font-medium">Date / Time</th>
-                <th class="py-1.5 px-2 font-medium">Symbol</th>
-                <th class="py-1.5 px-2 font-medium">Side</th>
-                <th class="py-1.5 px-2 font-medium">Size</th>
-                <th class="py-1.5 px-2 font-medium">Entry</th>
-                <th class="py-1.5 px-2 font-medium">SL / TP</th>
-                <th class="py-1.5 px-2 font-medium">Exit</th>
-                <th class="py-1.5 px-2 font-medium">Status</th>
-                <th class="py-1.5 px-2 font-medium">Net P&L</th>
-                <th class="py-1.5 px-2 font-medium">Notes</th>
-                <th class="py-1.5 px-3 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="journal-tbody" class="divide-y divide-tv-border/50 font-mono text-[11px]">
-              <!-- Populated dynamically -->
-            </tbody>
-          </table>
-        </div>
-
-        <!-- TAB 2: PERFORMANCE ANALYTICS -->
-        <div id="bpanel-analytics" class="bpanel hidden flex-1 overflow-auto p-3">
-          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-            <div class="bg-tv-bg border border-tv-border rounded-lg p-3">
-              <div class="text-[10px] text-tv-muted uppercase">Net Realized P&L</div>
-              <div id="stat-net-pnl" class="text-base font-bold font-mono text-white mt-1">$0.00</div>
-            </div>
-            <div class="bg-tv-bg border border-tv-border rounded-lg p-3">
-              <div class="text-[10px] text-tv-muted uppercase">Win Rate</div>
-              <div id="stat-win-rate" class="text-base font-bold font-mono text-tv-green mt-1">0.0%</div>
-            </div>
-            <div class="bg-tv-bg border border-tv-border rounded-lg p-3">
-              <div class="text-[10px] text-tv-muted uppercase">Profit Factor</div>
-              <div id="stat-profit-factor" class="text-base font-bold font-mono text-tv-blue mt-1">0.00</div>
-            </div>
-            <div class="bg-tv-bg border border-tv-border rounded-lg p-3">
-              <div class="text-[10px] text-tv-muted uppercase">Total Closed Trades</div>
-              <div id="stat-total-trades" class="text-base font-bold font-mono text-white mt-1">0</div>
-            </div>
-            <div class="bg-tv-bg border border-tv-border rounded-lg p-3">
-              <div class="text-[10px] text-tv-muted uppercase">Average Planned R:R</div>
-              <div id="stat-avg-rr" class="text-base font-bold font-mono text-amber-400 mt-1">1 : 0.00</div>
-            </div>
-          </div>
-          <div class="mt-3 bg-tv-bg/60 border border-tv-border rounded p-2.5 flex flex-wrap items-center justify-between gap-2 text-[11px] text-tv-muted">
-            <span>All journal entries and custom Pine Scripts are automatically saved in your browser's <code class="text-tv-text">localStorage</code>.</span>
-            <button id="btn-clear-journal" class="px-2.5 py-1 rounded bg-tv-red/15 text-tv-red hover:bg-tv-red hover:text-white transition">Reset Journal Data</button>
-          </div>
-        </div>
-
-        <!-- TAB 3: PINE SCRIPT v5 STUDIO -->
-        <div id="bpanel-pinestudio" class="bpanel hidden flex-1 overflow-hidden flex flex-col md:flex-row">
-          <!-- Left: Template List & How-to Guide -->
-          <div class="w-full md:w-64 border-b md:border-b-0 md:border-r border-tv-border bg-tv-bg/50 p-2 flex flex-col justify-between overflow-y-auto shrink-0">
+        <div class="space-y-2 text-xs">
+          <div class="grid grid-cols-2 gap-2">
             <div>
-              <div class="text-[10px] uppercase tracking-wider text-tv-muted font-semibold px-1.5 mb-1.5">Pine Script v5 Library</div>
-              <div id="pine-template-list" class="space-y-1">
-                <!-- Populated by JS -->
-              </div>
+              <label class="block text-[11px] text-tv-muted mb-0.5">Account Balance</label>
+              <input id="calcBalance" type="number" value="10000" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue" />
             </div>
-            <div class="mt-2 p-2 rounded bg-tv-panel border border-tv-border/80 text-[10px] text-tv-muted leading-relaxed">
-              <strong class="text-white block mb-0.5">How to run on TradingView:</strong>
-              1. Click <b>Copy Pine Script</b>.<br/>
-              2. In the chart above, open <b>Pine Editor</b> (or Indicators &rarr; My Scripts).<br/>
-              3. Paste & click <b>Add to Chart</b>.
+            <div>
+              <label class="block text-[11px] text-tv-muted mb-0.5">Risk %</label>
+              <input id="calcRiskPct" type="number" step="0.1" value="1.0" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue" />
             </div>
           </div>
 
-          <!-- Right: Code Editor & Actions -->
-          <div class="flex-1 flex flex-col min-w-0 bg-tv-deep">
-            <div class="h-8 px-3 bg-tv-bg border-b border-tv-border flex items-center justify-between gap-2 shrink-0">
-              <div class="flex items-center gap-2 min-w-0">
-                <input id="pine-script-title" type="text" value="EMA Crossover (9 / 21 / 50 Trend)"
-                  class="bg-tv-panel border border-tv-border rounded px-2 py-0.5 text-white font-medium text-[11px] w-52 focus:outline-none focus:border-tv-blue" />
-                <span class="text-[10px] text-tv-green font-mono hidden sm:inline">//@version=5</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <button id="btn-save-pine" class="px-2.5 py-1 rounded bg-tv-hover hover:bg-tv-blue text-white font-medium transition">
-                  Save Custom
-                </button>
-                <button id="btn-copy-pine" class="px-3 py-1 rounded bg-tv-blue hover:bg-blue-600 text-white font-semibold flex items-center gap-1 transition">
-                  <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                  </svg>
-                  <span>Copy Pine Script</span>
-                </button>
-              </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] text-tv-muted mb-0.5">Instrument</label>
+              <select id="calcInstrument" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue">
+                <option value="XAUUSD">XAUUSD (Gold)</option>
+                <option value="FOREX">Forex Pair</option>
+                <option value="CRYPTO">Crypto</option>
+                <option value="NIFTY">NIFTY 50</option>
+                <option value="BANKNIFTY">BANKNIFTY</option>
+              </select>
             </div>
-            <textarea id="pine-code-editor" spellcheck="false"
-              class="flex-1 w-full bg-tv-deep text-[#e2e8f0] font-mono text-[11px] leading-relaxed p-3 focus:outline-none resize-none"></textarea>
+            <div>
+              <label class="block text-[11px] text-tv-muted mb-0.5">Direction</label>
+              <select id="calcSide" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue">
+                <option value="BUY">BUY / LONG</option>
+                <option value="SELL">SELL / SHORT</option>
+              </select>
+            </div>
           </div>
-        </div>
-      </section>
-    </div>
 
-    <!-- 3. RIGHT SIDEBAR: LIVE TRADINGVIEW QUOTES + POSITION SIZE & RISK CALCULATOR -->
-    <aside id="right-sidebar" class="w-80 bg-tv-panel border-l border-tv-border flex flex-col shrink-0 overflow-y-auto">
+          <div class="grid grid-cols-3 gap-1.5">
+            <div>
+              <label class="block text-[11px] text-tv-muted mb-0.5">Entry</label>
+              <input id="calcEntry" type="number" step="any" placeholder="2650.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-tv-muted mb-0.5">Stop Loss</label>
+              <input id="calcSl" type="number" step="any" placeholder="2645.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-tv-muted mb-0.5">Take Profit</label>
+              <input id="calcTp" type="number" step="any" placeholder="2662.50" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue" />
+            </div>
+          </div>
 
-      <!-- Live TradingView Market Overview / Watchlist Widget -->
-      <div class="border-b border-tv-border shrink-0">
-        <div class="px-3 py-1.5 bg-tv-bg/50 border-b border-tv-border/60 flex items-center justify-between">
-          <span class="font-semibold text-white uppercase tracking-wider text-[10px]">Live Market Quotes</span>
-          <span class="text-[10px] text-tv-green font-mono">Real-Time Feed</span>
-        </div>
-        <div id="tv-market-quotes" class="h-44 w-full overflow-hidden bg-tv-bg">
-          <!-- Official TradingView Market Overview Widget injected here -->
+          <!-- Pre-Trade Discipline Checklist & Note -->
+          <div class="bg-tv-deep/80 border border-tv-border rounded p-2 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-tv-muted">Pre-Trade Checklist</span>
+              <span id="checklistScore" class="text-[10px] font-mono text-amber-400">0/4 Ready</span>
+            </div>
+            <div class="grid grid-cols-2 gap-1 text-[11px] text-tv-text">
+              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue"> HTF Trend Aligned</label>
+              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue"> Risk ≤ 2%</label>
+              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue"> Clear of Red News</label>
+              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue"> R:R ≥ 1:2</label>
+            </div>
+            <input id="calcNote" type="text" placeholder="Setup note (e.g. London sweep + OB)..." class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 text-[11px] text-white outline-none focus:border-tv-blue" />
+          </div>
+
+          <!-- Calculated Output Box -->
+          <div class="bg-tv-bg border border-tv-border rounded p-2 space-y-1 font-mono">
+            <div class="flex justify-between">
+              <span class="text-tv-muted">Risk Amount:</span>
+              <span id="outRiskAmt" class="text-tv-red font-semibold">$100.00</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-tv-muted">Position / Lot Size:</span>
+              <span id="outLotSize" class="text-white font-bold">Enter Entry & SL</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-tv-muted">Risk : Reward:</span>
+              <span id="outRR" class="text-tv-green font-semibold">—</span>
+            </div>
+          </div>
+
+          <button id="logTradeBtn" class="w-full py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white font-semibold rounded transition">
+            + Log Trade to Journal
+          </button>
         </div>
       </div>
 
-      <!-- Position Size & Risk-Reward Calculator -->
-      <div class="p-3 flex-1 flex flex-col gap-2.5">
-        <div class="flex items-center justify-between">
-          <span class="font-semibold text-white uppercase tracking-wider text-[11px]">Position Size & Risk Calc</span>
-          <!-- Currency Toggle ($ / ₹) -->
-          <div class="flex items-center bg-tv-bg border border-tv-border rounded p-0.5 text-[10px]">
-            <button data-curr="$" class="curr-btn active px-2 py-0.5 rounded bg-tv-blue text-white font-semibold">USD ($)</button>
-            <button data-curr="₹" class="curr-btn px-2 py-0.5 rounded text-tv-muted hover:text-white font-semibold">INR (₹)</button>
-          </div>
+      <!-- Watchlist & Economic Calendar Tabs -->
+      <div class="flex-1 flex flex-col min-h-[250px] p-3">
+        <div class="flex items-center gap-1 bg-tv-bg p-0.5 rounded border border-tv-border mb-2 text-[11px] font-semibold">
+          <button id="sideTabWatchlist" class="flex-1 py-1 rounded bg-tv-panel text-white">Live Watchlist</button>
+          <button id="sideTabCalendar" class="flex-1 py-1 rounded text-tv-muted hover:text-white">Economic News</button>
         </div>
-
-        <!-- Instrument Type Selector -->
-        <div>
-          <label class="block text-[10px] text-tv-muted mb-1">Instrument Contract Specification</label>
-          <select id="calc-instrument" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1.5 text-white focus:outline-none focus:border-tv-blue">
-            <option value="gold">Gold XAUUSD (1 Lot = 100 oz)</option>
-            <option value="forex_std">Forex Standard (1 Lot = 100,000 units)</option>
-            <option value="forex_jpy">Forex JPY Pair (1 Lot = 100,000 units)</option>
-            <option value="forex_mini">Forex Mini (1 Lot = 10,000 units)</option>
-            <option value="forex_micro">Forex Micro (1 Lot = 1,000 units)</option>
-            <option value="crypto">Crypto Spot / Perp (1 Unit = 1 Coin)</option>
-            <option value="nifty">NSE NIFTY 50 (1 Lot = 25 Qty)</option>
-            <option value="banknifty">NSE BANKNIFTY (1 Lot = 15 Qty)</option>
-          </select>
-        </div>
-
-        <!-- Account Balance & Risk % -->
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[10px] text-tv-muted mb-1">Account Balance (<span class="curr-symbol">$</span>)</label>
-            <input id="calc-balance" type="number" value="10000" step="100"
-              class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1.5 text-white font-mono focus:outline-none focus:border-tv-blue" />
-          </div>
-          <div>
-            <label class="block text-[10px] text-tv-muted mb-1">Risk per Trade (%)</label>
-            <input id="calc-risk-pct" type="number" value="1.0" step="0.1" min="0.1" max="100"
-              class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1.5 text-white font-mono focus:outline-none focus:border-tv-blue" />
-          </div>
-        </div>
-
-        <!-- Direction Toggle (LONG / SHORT) -->
-        <div class="grid grid-cols-2 gap-1.5 bg-tv-bg p-1 rounded border border-tv-border">
-          <button id="dir-long-btn" type="button" class="py-1 rounded bg-tv-green text-white font-semibold text-[11px] transition">LONG / BUY</button>
-          <button id="dir-short-btn" type="button" class="py-1 rounded text-tv-muted hover:text-white font-semibold text-[11px] transition">SHORT / SELL</button>
-        </div>
-
-        <!-- Entry, Stop Loss, Take Profit -->
-        <div class="grid grid-cols-3 gap-1.5">
-          <div>
-            <label class="block text-[10px] text-tv-muted mb-1">Entry Price</label>
-            <input id="calc-entry" type="number" step="any" value="2650.00"
-              class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1.5 text-white font-mono focus:outline-none focus:border-tv-blue" />
-          </div>
-          <div>
-            <label class="block text-[10px] text-tv-muted mb-1">Stop Loss</label>
-            <input id="calc-sl" type="number" step="any" value="2644.00"
-              class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1.5 text-tv-red font-mono focus:outline-none focus:border-tv-red" />
-          </div>
-          <div>
-            <label class="block text-[10px] text-tv-muted mb-1">Take Profit</label>
-            <input id="calc-tp" type="number" step="any" value="2665.00"
-              class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1.5 text-tv-green font-mono focus:outline-none focus:border-tv-green" />
-          </div>
-        </div>
-
-        <!-- Calculated Metrics Summary -->
-        <div class="bg-tv-bg border border-tv-border rounded-lg p-2.5 space-y-1.5 font-mono text-[11px]">
-          <div class="flex justify-between items-center">
-            <span class="text-tv-muted font-sans">Position Size:</span>
-            <span id="res-size" class="text-white font-bold text-xs">0.17 Lots</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-tv-muted font-sans">SL / TP Distance:</span>
-            <span id="res-dist" class="text-tv-text">6.00 / 15.00 pts</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-tv-muted font-sans">Risk Amount:</span>
-            <span id="res-risk-amt" class="text-tv-red font-semibold">-$100.00</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-tv-muted font-sans">Potential Reward:</span>
-            <span id="res-reward-amt" class="text-tv-green font-semibold">+$250.00</span>
-          </div>
-          <div class="flex justify-between items-center pt-1 border-t border-tv-border/60">
-            <span class="text-tv-muted font-sans">Risk : Reward Ratio:</span>
-            <span id="res-rr" class="text-amber-400 font-bold">1 : 2.50</span>
-          </div>
-        </div>
-
-        <!-- Log Trade to Journal Button -->
-        <button id="btn-log-trade"
-          class="w-full py-2.5 px-3 rounded bg-tv-blue hover:bg-blue-600 active:scale-[0.99] text-white font-semibold shadow-lg transition flex items-center justify-center gap-1.5 cursor-pointer">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
-          <span>Log Trade to Journal</span>
-        </button>
+        <div id="marketOverviewWidget" class="flex-1 w-full rounded overflow-hidden border border-tv-border"></div>
+        <div id="economicCalendarWidget" class="hidden flex-1 w-full rounded overflow-hidden border border-tv-border"></div>
       </div>
     </aside>
   </div>
 
+  <!-- BOTTOM PANEL: TRADE JOURNAL, ANALYTICS & PINE SCRIPT STUDIO -->
+  <section id="bottomPanel" class="h-44 bg-tv-panel border-t border-tv-border flex flex-col shrink-0 z-10">
+    <!-- Bottom Tabs -->
+    <div class="h-8 px-3 border-b border-tv-border flex items-center justify-between bg-tv-deep">
+      <div class="flex items-center gap-4 text-xs">
+        <button data-btab="journal" class="btab-btn font-semibold text-white border-b-2 border-tv-blue py-1.5">
+          Trade Journal <span id="journalCountBadge" class="ml-1 px-1.5 py-0.2 bg-tv-blue/20 text-tv-blue rounded font-mono text-[10px]">0</span>
+        </button>
+        <button data-btab="analytics" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">
+          Performance & Equity Curve <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
+        </button>
+        <button data-btab="pine" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-tv-green"></span> Pine Script v5 Studio <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-3 text-xs font-mono">
+        <span class="text-tv-muted">Net P&L: <strong id="topNetPnl" class="text-tv-green">+$0.00</strong></span>
+        <span class="text-tv-muted">Win Rate: <strong id="topWinRate" class="text-white">0.0%</strong></span>
+        <button id="exportCsvBtn" class="px-2 py-0.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-[11px] font-sans text-tv-text">Export CSV 🔒</button>
+      </div>
+    </div>
+
+    <!-- Tab 1: Trade Journal Table -->
+    <div id="tab-journal" class="btab-content flex-1 overflow-auto p-2">
+      <table class="w-full text-left border-collapse text-xs font-mono">
+        <thead>
+          <tr class="text-[11px] text-tv-muted border-b border-tv-border">
+            <th class="py-1 px-2">Time</th>
+            <th class="py-1 px-2">Symbol</th>
+            <th class="py-1 px-2">Side</th>
+            <th class="py-1 px-2">Size</th>
+            <th class="py-1 px-2">Entry</th>
+            <th class="py-1 px-2">SL / TP</th>
+            <th class="py-1 px-2">Setup Note</th>
+            <th class="py-1 px-2">Status</th>
+            <th class="py-1 px-2">P&L</th>
+            <th class="py-1 px-2 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="journalTableBody">
+          <tr>
+            <td colspan="10" class="py-6 text-center text-tv-muted font-sans">
+              No trades logged yet. Free plan includes up to 3 journal entries. Upgrade to Pro for unlimited logs.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tab 2: Performance Analytics & Equity Curve -->
+    <div id="tab-analytics" class="btab-content hidden flex-1 overflow-auto p-3">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 h-full">
+        <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-2.5 font-mono content-start">
+          <div class="bg-tv-bg border border-tv-border rounded p-2.5">
+            <div class="text-[11px] text-tv-muted font-sans">Closed Trades</div>
+            <div id="statTotalTrades" class="text-lg font-bold text-white mt-0.5">0</div>
+          </div>
+          <div class="bg-tv-bg border border-tv-border rounded p-2.5">
+            <div class="text-[11px] text-tv-muted font-sans">Win Rate %</div>
+            <div id="statWinRate" class="text-lg font-bold text-tv-green mt-0.5">0.0%</div>
+          </div>
+          <div class="bg-tv-bg border border-tv-border rounded p-2.5">
+            <div class="text-[11px] text-tv-muted font-sans">Profit Factor</div>
+            <div id="statProfitFactor" class="text-lg font-bold text-white mt-0.5">0.00</div>
+          </div>
+          <div class="bg-tv-bg border border-tv-border rounded p-2.5">
+            <div class="text-[11px] text-tv-muted font-sans">Net P&L</div>
+            <div id="statNetPnl" class="text-lg font-bold text-tv-green mt-0.5">$0.00</div>
+          </div>
+        </div>
+        <!-- Live SVG Equity Curve -->
+        <div class="bg-tv-bg border border-tv-border rounded p-2 flex flex-col justify-between">
+          <div class="flex items-center justify-between text-[11px] text-tv-muted">
+            <span>Cumulative Equity Curve</span>
+            <span id="equityPeakLabel" class="font-mono text-emerald-400">Peak: $0.00</span>
+          </div>
+          <svg id="equityCurveSvg" viewBox="0 0 300 70" class="w-full h-16 overflow-visible mt-1">
+            <line x1="0" y1="35" x2="300" y2="35" stroke="#2b2b43" stroke-dasharray="3,3" stroke-width="1" />
+            <polyline id="equityPolyline" fill="none" stroke="#089981" stroke-width="2" points="0,35 300,35" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Pine Script v5 Studio -->
+    <div id="tab-pine" class="btab-content hidden flex-1 overflow-hidden p-2 flex gap-2">
+      <div class="w-52 flex flex-col gap-1.5 shrink-0">
+        <select id="pineTemplateSelect" class="bg-tv-bg border border-tv-border rounded px-2 py-1 text-xs text-white outline-none">
+          <option value="ema_cross">EMA 20/50 Crossover</option>
+          <option value="rsi_div">RSI Overbought/Oversold</option>
+          <option value="session_hl">London/NY Session High-Low</option>
+          <option value="atr_stop">ATR Trailing Stop</option>
+          <option value="vwap_bands">Institutional VWAP Bands</option>
+        </select>
+        <button id="copyPineBtn" class="px-2 py-1 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-medium rounded transition">
+          Copy Pine Script v5
+        </button>
+        <button id="savePineBtn" class="px-2 py-1 bg-tv-bg hover:bg-tv-hover border border-tv-border text-tv-text text-xs rounded transition">
+          Save Custom Script
+        </button>
+      </div>
+      <textarea id="pineEditor" spellcheck="false" class="flex-1 bg-tv-deep border border-tv-border rounded p-2 font-mono text-xs text-emerald-300 outline-none resize-none"></textarea>
+    </div>
+  </section>
+
+  <!-- FOOTER ATTRIBUTION -->
+  <footer class="h-5 bg-tv-deep border-t border-tv-border px-3 flex items-center justify-between text-[10px] text-tv-muted shrink-0">
+    <span>MsTrading Pro Terminal — Personal Trading & Risk Workspace</span>
+    <span>Charts & market data powered by <a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer" class="text-tv-blue hover:underline">TradingView</a></span>
+  </footer>
+
+  <!-- UPGRADE / UPI PAYMENT MODAL -->
+  <div id="upgradeModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-tv-panel border border-tv-border rounded-xl max-w-2xl w-full overflow-hidden shadow-2xl">
+      <!-- Modal Header -->
+      <div class="px-5 py-4 border-b border-tv-border flex items-center justify-between bg-tv-deep">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <span>⚡ Upgrade to MsTrading Pro</span>
+            <span class="text-xs font-normal px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Instant UPI Activation</span>
+          </h3>
+          <p class="text-xs text-tv-muted mt-0.5">Unlock Dual Split-Screen Charts, All Symbols, Pine Script v5 Studio & Unlimited Journal.</p>
+        </div>
+        <button id="closeUpgradeModalBtn" class="text-tv-muted hover:text-white text-lg px-2">✕</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Left: Plan Selection -->
+        <div class="space-y-3">
+          <div class="text-xs font-semibold uppercase tracking-wider text-tv-muted">1. Choose Subscription Plan</div>
+
+          <!-- Monthly Plan Card -->
+          <div id="planMonthlyCard" class="plan-card cursor-pointer p-3.5 rounded-lg border-2 border-tv-blue bg-tv-blue/10 transition">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-white text-sm">Monthly Pro</span>
+              <span class="font-mono font-bold text-lg text-white">₹299<span class="text-xs text-tv-muted font-normal">/month</span></span>
+            </div>
+            <p class="text-xs text-tv-muted mt-1">Billed monthly • Full access to all Pro tools</p>
+          </div>
+
+          <!-- Yearly Plan Card -->
+          <div id="planYearlyCard" class="plan-card cursor-pointer p-3.5 rounded-lg border border-tv-border bg-tv-bg hover:border-emerald-500/60 transition relative">
+            <span class="absolute -top-2.5 right-3 px-2 py-0.5 bg-emerald-500 text-black font-bold text-[10px] rounded-full">SAVE ₹589 (16% OFF)</span>
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-white text-sm">Yearly Pro</span>
+              <span class="font-mono font-bold text-lg text-emerald-400">₹2,999<span class="text-xs text-tv-muted font-normal">/year</span></span>
+            </div>
+            <p class="text-xs text-tv-muted mt-1">Just ₹249/month • Priority updates & templates</p>
+          </div>
+
+          <ul class="text-xs space-y-1.5 text-tv-text pt-2 border-t border-tv-border">
+            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Dual 2x Split-Screen Live Charting Mode</li>
+            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> All Markets (Gold, Forex, Crypto, NIFTY, BANKNIFTY)</li>
+            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Pine Script v5 Studio & Custom Script Storage</li>
+            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Unlimited Trade Journal, Equity Curve & CSV Export</li>
+          </ul>
+        </div>
+
+        <!-- Right: UPI QR & Payment Verification -->
+        <div class="bg-tv-bg border border-tv-border rounded-lg p-4 flex flex-col items-center text-center">
+          <div class="text-xs font-semibold uppercase tracking-wider text-tv-muted mb-2">2. Scan & Pay via Any UPI App</div>
+
+          <!-- Dynamic QR Image -->
+          <div class="bg-white p-2.5 rounded-lg shadow-md">
+            <img id="upiQrImg" src="" alt="UPI QR Code" class="w-40 h-40 object-contain" />
+          </div>
+
+          <div class="mt-2.5 font-mono text-xs">
+            <div class="text-tv-muted">Payable Amount: <strong id="upiPayAmount" class="text-white text-sm">₹299.00</strong></div>
+            <div class="text-[11px] text-tv-muted mt-0.5 flex items-center justify-center gap-1.5">
+              <span>UPI ID: <strong id="displayUpiId" class="text-emerald-400">mstrading1@naviaxis</strong></span>
+              <button id="copyUpiIdBtn" class="px-1.5 py-0.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-[10px] text-white font-sans">Copy</button>
+            </div>
+          </div>
+
+          <!-- Mobile UPI Intent Button -->
+          <a id="upiIntentLink" href="#" class="mt-2.5 w-full py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded transition block">
+            📱 Open UPI App (GPay / PhonePe / Paytm)
+          </a>
+
+          <!-- UTR Verification Box -->
+          <div class="w-full mt-3 pt-3 border-t border-tv-border text-left">
+            <label class="block text-[11px] text-tv-muted mb-1">3. Enter 12-Digit UPI Ref / UTR Number after payment:</label>
+            <div class="flex gap-1.5">
+              <input id="utrInput" type="text" maxlength="16" placeholder="e.g. 632918475612" class="flex-1 bg-tv-deep border border-tv-border focus:border-tv-blue rounded px-2.5 py-1.5 text-xs font-mono text-white outline-none" />
+              <button id="verifyUpiBtn" class="px-3 py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-semibold rounded transition">
+                Activate
+              </button>
+            </div>
+            <p id="upiErrorMsg" class="text-[11px] text-tv-red mt-1 hidden"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    /**
-     * TradeView Pro — Hybrid Real-Time TradingView Widget + Pine Script Studio + Risk Calc & Journal
-     */
-    (function () {
-      // =========================================================================
-      // 1. STATE & STORAGE KEYS
-      // =========================================================================
-      const STORAGE_JOURNAL_KEY = 'tradeview_pro_journal_v1';
-      const STORAGE_PINE_KEY = 'tradeview_pro_custom_pine_v1';
+    // =========================================================
+    // MERCHANT UPI CONFIGURATION
+    // =========================================================
+    const MERCHANT_UPI_ID = 'mstrading1@naviaxis';
+    const MERCHANT_NAME = 'MsTrading Pro';
 
-      const state = {
-        symbol: 'OANDA:XAUUSD',
-        interval: '15',
-        studies: ['EMA@tv-basicstudies', 'RSI@tv-basicstudies', 'Volume@tv-basicstudies'],
-        currency: '$',
-        direction: 'LONG',
-        journal: [],
-        editingTradeId: null,
-        selectedPineIndex: 0
-      };
+    // --- STATE ---
+    let currentSymbol = 'OANDA:XAUUSD';
+    let currentInterval = '1';
+    let isSplitMode = false;
+    let activeStudies = [];
+    let currencyMode = 'USD';
+    let selectedPlan = 'monthly';
+    let proSubscription = JSON.parse(localStorage.getItem('mstrading_pro_sub') || 'null');
+    let trades = JSON.parse(localStorage.getItem('mstrading_trades_v1') || '[]');
 
-      // =========================================================================
-      // 2. TOAST HELPER
-      // =========================================================================
-      function showToast(msg, type = 'info') {
-        const container = document.getElementById('toast-container');
-        const el = document.createElement('div');
-        const borderMap = {
-          info: 'border-tv-blue',
-          success: 'border-tv-green',
-          danger: 'border-tv-red'
-        };
-        el.className = `bg-tv-panel border border-tv-border border-l-4 ${borderMap[type] || borderMap.info} text-white px-3.5 py-2 rounded shadow-2xl text-xs font-medium transition-all duration-300 pointer-events-auto`;
-        el.textContent = msg;
-        container.appendChild(el);
-        setTimeout(() => {
-          el.style.opacity = '0';
-          el.style.transform = 'translateX(14px)';
-          setTimeout(() => el.remove(), 280);
-        }, 2800);
-      }
+    function isProActive() {
+      if (!proSubscription) return false;
+      return Date.now() < proSubscription.expiresAt;
+    }
 
-      // =========================================================================
-      // 3. OFFICIAL TRADINGVIEW REAL-TIME WIDGET LOADER
-      // =========================================================================
-      function loadTradingViewWidget() {
-        const container = document.getElementById('tv_chart_container');
-        container.innerHTML = '';
+    function updateProUI() {
+      const pro = isProActive();
+      const badge = document.getElementById('planStatusBadge');
+      const upgradeBtn = document.getElementById('openUpgradeBtn');
 
-        if (typeof TradingView === 'undefined') {
-          container.innerHTML = `<div class="h-full flex items-center justify-center text-tv-muted p-4 text-center">Loading official TradingView real-time chart engine...</div>`;
-          return;
-        }
-
-        new TradingView.widget({
-          autosize: true,
-          symbol: state.symbol,
-          interval: state.interval,
-          timezone: 'Etc/UTC',
-          theme: 'dark',
-          style: '1',
-          locale: 'en',
-          toolbar_bg: '#131722',
-          enable_publishing: false,
-          withdateranges: true,
-          hide_side_toolbar: false,
-          hide_top_toolbar: false,
-          allow_symbol_change: true,
-          save_image: true,
-          studies: state.studies,
-          container_id: 'tv_chart_container'
-        });
-      }
-
-      // Load Live Market Overview Quotes in Right Sidebar
-      function loadMarketQuotesWidget() {
-        const wrap = document.getElementById('tv-market-quotes');
-        wrap.innerHTML = '';
-        const widgetDiv = document.createElement('div');
-        widgetDiv.className = 'tradingview-widget-container__widget';
-        wrap.appendChild(widgetDiv);
-
-        const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
-        script.async = true;
-        script.innerHTML = JSON.stringify({
-          colorTheme: 'dark',
-          dateRange: '1D',
-          showChart: false,
-          locale: 'en',
-          width: '100%',
-          height: '100%',
-          largeChartUrl: '',
-          isTransparent: true,
-          showSymbolLogo: true,
-          tabs: [
-            {
-              title: 'Watchlist',
-              symbols: [
-                { s: 'OANDA:XAUUSD', d: 'Gold / USD' },
-                { s: 'FX:EURUSD', d: 'EUR / USD' },
-                { s: 'FX:GBPUSD', d: 'GBP / USD' },
-                { s: 'BINANCE:BTCUSDT', d: 'Bitcoin' },
-                { s: 'NSE:NIFTY', d: 'Nifty 50' },
-                { s: 'NSE:BANKNIFTY', d: 'Bank Nifty' }
-              ]
-            }
-          ]
-        });
-        wrap.appendChild(script);
-      }
-
-      // =========================================================================
-      // 4. SYMBOL & TIMEFRAME CONTROLS + PRESET DEFAULTS
-      // =========================================================================
-      const SYMBOL_DEFAULTS = {
-        'OANDA:XAUUSD': { inst: 'gold', entry: 2650.00, sl: 2644.00, tp: 2665.00 },
-        'FX:EURUSD': { inst: 'forex_std', entry: 1.08500, sl: 1.08350, tp: 1.08875 },
-        'FX:GBPUSD': { inst: 'forex_std', entry: 1.29500, sl: 1.29300, tp: 1.30000 },
-        'FX:USDJPY': { inst: 'forex_jpy', entry: 153.800, sl: 153.500, tp: 154.550 },
-        'BINANCE:BTCUSDT': { inst: 'crypto', entry: 94500.00, sl: 94000.00, tp: 95750.00 },
-        'NSE:NIFTY': { inst: 'nifty', entry: 24350.00, sl: 24290.00, tp: 24500.00 },
-        'NSE:BANKNIFTY': { inst: 'banknifty', entry: 52100.00, sl: 51950.00, tp: 52475.00 }
-      };
-
-      function selectSymbol(symbol, instPreset = null) {
-        state.symbol = symbol.toUpperCase().trim();
+      if (pro) {
+        const expDate = new Date(proSubscription.expiresAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        badge.textContent = `PRO • Till ${expDate}`;
+        badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded';
+        upgradeBtn.innerHTML = '<span>★ Pro Active</span>';
+        upgradeBtn.className = 'px-2.5 py-1 text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded flex items-center gap-1';
 
         document.querySelectorAll('.sym-btn').forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.symbol === state.symbol);
+          btn.textContent = btn.textContent.replace(' 🔒', '');
         });
+        document.querySelectorAll('.pro-lock-tag').forEach(el => el.classList.add('hidden'));
+        document.getElementById('exportCsvBtn').textContent = 'Export CSV';
+        document.getElementById('layoutSplitBtn').textContent = '2x';
+      }
+    }
 
-        const def = SYMBOL_DEFAULTS[state.symbol];
-        if (def) {
-          document.getElementById('calc-instrument').value = instPreset || def.inst;
-          document.getElementById('calc-entry').value = def.entry;
-          document.getElementById('calc-sl').value = def.sl;
-          document.getElementById('calc-tp').value = def.tp;
-          setDirection('LONG');
-          recalculatePosition();
-        } else if (instPreset) {
-          document.getElementById('calc-instrument').value = instPreset;
-          recalculatePosition();
-        }
+    // --- LIVE CLOCK & GLOBAL SESSION TRACKER ---
+    function updateSessionsAndClock() {
+      const now = new Date();
+      document.getElementById('liveClockIst').textContent = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false }) + ' IST';
+      document.getElementById('liveClockUtc').textContent = now.toISOString().substr(11, 5) + ' UTC';
 
-        loadTradingViewWidget();
+      const utcHour = now.getUTCHours();
+      const sydneyOpen = utcHour >= 22 || utcHour < 7;
+      const tokyoOpen = utcHour >= 0 && utcHour < 9;
+      const londonOpen = utcHour >= 8 && utcHour < 17;
+      const nyOpen = utcHour >= 13 && utcHour < 22;
+
+      function setSessBadge(elId, label, isOpen) {
+        const el = document.getElementById(elId);
+        el.innerHTML = isOpen
+          ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> <span class="text-white font-semibold">${label}</span>`
+          : `<span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> <span class="text-tv-muted">${label}</span>`;
       }
 
-      document.querySelectorAll('.sym-btn').forEach(btn => {
-        btn.addEventListener('click', () => selectSymbol(btn.dataset.symbol, btn.dataset.inst));
-      });
+      setSessBadge('sessSydney', 'Sydney', sydneyOpen);
+      setSessBadge('sessTokyo', 'Tokyo', tokyoOpen);
+      setSessBadge('sessLondon', 'London', londonOpen);
+      setSessBadge('sessNewYork', 'New York', nyOpen);
 
-      document.getElementById('custom-symbol-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const val = document.getElementById('custom-symbol-input').value.trim();
-        if (!val) return;
-        selectSymbol(val);
-        showToast(`Loaded ${val.toUpperCase()}`, 'info');
-      });
-
-      document.querySelectorAll('.tf-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          state.interval = btn.dataset.tf;
-          loadTradingViewWidget();
-        });
-      });
-
-      // =========================================================================
-      // 5. BUILT-IN INDICATORS & PINE SCRIPT v5 STUDIO
-      // =========================================================================
-      const pineDrawer = document.getElementById('pine-drawer');
-      document.getElementById('btn-toggle-pine-drawer').addEventListener('click', () => {
-        pineDrawer.classList.toggle('hidden');
-      });
-      document.getElementById('btn-close-pine-drawer').addEventListener('click', () => {
-        pineDrawer.classList.add('hidden');
-      });
-
-      document.querySelectorAll('.study-pill').forEach(pill => {
-        pill.addEventListener('click', () => {
-          const study = pill.dataset.study;
-          const idx = state.studies.indexOf(study);
-          if (idx > -1) {
-            state.studies.splice(idx, 1);
-            pill.classList.remove('active');
-          } else {
-            state.studies.push(study);
-            pill.classList.add('active');
-          }
-          document.getElementById('active-studies-count').textContent = `${state.studies.length} Studies Active`;
-          loadTradingViewWidget();
-        });
-      });
-
-      const DEFAULT_PINE_SCRIPTS = [
-        {
-          title: 'EMA Crossover (9 / 21 / 50 Trend)',
-          code: `//@version=5
-indicator("TradeView Pro - EMA Trend Crossover", overlay=true)
-
-// Inputs
-fastLen = input.int(9, "Fast EMA Length", minval=1)
-midLen  = input.int(21, "Medium EMA Length", minval=1)
-slowLen = input.int(50, "Slow Trend EMA", minval=1)
-
-// Calculations
-emaFast = ta.ema(close, fastLen)
-emaMid  = ta.ema(close, midLen)
-emaSlow = ta.ema(close, slowLen)
-
-// Signals
-bullCross = ta.crossover(emaFast, emaMid) and close > emaSlow
-bearCross = ta.crossunder(emaFast, emaMid) and close < emaSlow
-
-// Plots
-plot(emaFast, "EMA 9", color=color.new(#2962ff, 0), linewidth=2)
-plot(emaMid,  "EMA 21", color=color.new(#ff9800, 0), linewidth=2)
-plot(emaSlow, "EMA 50", color=color.new(#e040fb, 0), linewidth=2)
-
-plotshape(bullCross, title="Buy Signal", location=location.belowbar, color=color.new(#089981, 0), style=shape.triangleup, size=size.small, text="BUY")
-plotshape(bearCross, title="Sell Signal", location=location.abovebar, color=color.new(#f23645, 0), style=shape.triangledown, size=size.small, text="SELL")`
-        },
-        {
-          title: 'RSI + Divergence & OB/OS Zones',
-          code: `//@version=5
-indicator("TradeView Pro - RSI Momentum & Zones", overlay=false)
-
-rsiLen = input.int(14, "RSI Length", minval=1)
-obLvl  = input.int(70, "Overbought Level")
-osLvl  = input.int(30, "Oversold Level")
-
-rsiVal = ta.rsi(close, rsiLen)
-rsiMA  = ta.sma(rsiVal, 14)
-
-plot(rsiVal, "RSI", color=color.new(#2962ff, 0), linewidth=2)
-plot(rsiMA, "RSI Signal MA", color=color.new(#ff9800, 0), linewidth=1)
-
-hOb = hline(obLvl, "Overbought", color=color.new(#f23645, 40), linestyle=hline.style_dashed)
-hMid = hline(50, "Midline", color=color.new(#787b86, 60), linestyle=hline.style_dotted)
-hOs = hline(osLvl, "Oversold", color=color.new(#089981, 40), linestyle=hline.style_dashed)
-fill(hOb, hOs, color=color.new(#2962ff, 92))`
-        },
-        {
-          title: 'Bollinger Bands + ATR Squeeze',
-          code: `//@version=5
-indicator("TradeView Pro - BB + ATR Volatility Squeeze", overlay=true)
-
-bbLen  = input.int(20, "BB Length")
-bbMult = input.float(2.0, "BB StdDev Multiplier")
-kcMult = input.float(1.5, "Keltner ATR Multiplier")
-
-basis = ta.sma(close, bbLen)
-dev   = bbMult * ta.stdev(close, bbLen)
-upperBB = basis + dev
-lowerBB = basis - dev
-
-rangema = ta.ema(ta.tr(true), bbLen)
-upperKC = basis + rangema * kcMult
-lowerKC = basis - rangema * kcMult
-
-squeezeOn = lowerBB > lowerKC and upperBB < upperKC
-
-p1 = plot(upperBB, "Upper BB", color=color.new(#2962ff, 30))
-p2 = plot(lowerBB, "Lower BB", color=color.new(#2962ff, 30))
-plot(basis, "Basis", color=color.new(#ff9800, 20))
-fill(p1, p2, color=squeezeOn ? color.new(#f59e0b, 80) : color.new(#2962ff, 92))`
-        },
-        {
-          title: 'MACD Momentum & Histogram',
-          code: `//@version=5
-indicator("TradeView Pro - MACD Momentum", overlay=false)
-
-fastInput   = input.int(12, "Fast Length")
-slowInput   = input.int(26, "Slow Length")
-signalInput = input.int(9, "Signal Smoothing")
-
-[macdLine, signalLine, histLine] = ta.macd(close, fastInput, slowInput, signalInput)
-
-histColor = histLine >= 0 ? (histLine[1] < histLine ? #089981 : #26a69a) : (histLine[1] < histLine ? #ff8a80 : #f23645)
-
-plot(histLine, "Histogram", style=plot.style_columns, color=histColor)
-plot(macdLine, "MACD Line", color=color.new(#2962ff, 0), linewidth=2)
-plot(signalLine, "Signal Line", color=color.new(#ff9800, 0), linewidth=2)
-hline(0, "Zero Line", color=color.new(#787b86, 50))`
-        },
-        {
-          title: 'Custom Blank Pine Script v5 Template',
-          code: `//@version=5
-indicator("My Custom Strategy / Indicator", overlay=true)
-
-// Define your inputs
-length = input.int(20, "Lookback Period", minval=1)
-src    = input.source(close, "Price Source")
-
-// Indicator logic
-maValue = ta.sma(src, length)
-bullCondition = ta.crossover(close, maValue)
-bearCondition = ta.crossunder(close, maValue)
-
-// Plot on chart
-plot(maValue, title="Custom MA", color=color.new(#2962ff, 0), linewidth=2)
-plotshape(bullCondition, title="Long Alert", location=location.belowbar, color=color.green, style=shape.labelup, text="LONG", textcolor=color.white)
-plotshape(bearCondition, title="Short Alert", location=location.abovebar, color=color.red, style=shape.labeldown, text="SHORT", textcolor=color.white)`
-        }
-      ];
-
-      let pineScripts = [...DEFAULT_PINE_SCRIPTS];
-      try {
-        const savedCustom = JSON.parse(localStorage.getItem(STORAGE_PINE_KEY) || 'null');
-        if (savedCustom && savedCustom.code) {
-          pineScripts[4] = savedCustom;
-        }
-      } catch (e) {}
-
-      function renderPineTemplateList() {
-        const listEl = document.getElementById('pine-template-list');
-        listEl.innerHTML = pineScripts.map((item, idx) => `
-          <button data-pidx="${idx}" class="pine-tpl-btn w-full text-left px-2.5 py-1.5 rounded text-[11px] font-medium transition ${
-            idx === state.selectedPineIndex
-              ? 'bg-tv-blue text-white'
-              : 'text-tv-text hover:bg-tv-hover hover:text-white'
-          }">
-            ${item.title}
-          </button>
-        `).join('');
-
-        listEl.querySelectorAll('.pine-tpl-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            selectPineTemplate(parseInt(btn.dataset.pidx, 10));
-          });
-        });
+      const kz = document.getElementById('killzoneBadge');
+      if (londonOpen && nyOpen) {
+        kz.textContent = '🔥 London-NY Overlap (Peak Volume)';
+        kz.className = 'hidden sm:inline-block px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px]';
+      } else if (londonOpen || nyOpen) {
+        kz.textContent = '⚡ High Liquidity Session Active';
+        kz.className = 'hidden sm:inline-block px-1.5 py-0.2 rounded bg-tv-blue/20 text-tv-blue text-[10px]';
+      } else {
+        kz.textContent = 'Asian / Off-Peak Range';
+        kz.className = 'hidden sm:inline-block px-1.5 py-0.2 rounded bg-tv-panel text-tv-muted text-[10px]';
       }
+    }
+    setInterval(updateSessionsAndClock, 1000);
 
-      function selectPineTemplate(idx) {
-        state.selectedPineIndex = idx;
-        const tpl = pineScripts[idx];
-        document.getElementById('pine-script-title').value = tpl.title;
-        document.getElementById('pine-code-editor').value = tpl.code;
-        renderPineTemplateList();
+    // --- UPI MODAL & QR GENERATOR ---
+    function updateUpiDetails() {
+      const amount = selectedPlan === 'monthly' ? '299.00' : '2999.00';
+      const note = selectedPlan === 'monthly' ? 'MsTrading Pro Monthly' : 'MsTrading Pro Yearly';
+      const upiUrl = `upi://pay?pa=${encodeURIComponent(MERCHANT_UPI_ID)}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUrl)}`;
+
+      document.getElementById('upiQrImg').src = qrApiUrl;
+      document.getElementById('upiPayAmount').textContent = `₹${amount}`;
+      document.getElementById('displayUpiId').textContent = MERCHANT_UPI_ID;
+      document.getElementById('upiIntentLink').href = upiUrl;
+
+      const mCard = document.getElementById('planMonthlyCard');
+      const yCard = document.getElementById('planYearlyCard');
+      if (selectedPlan === 'monthly') {
+        mCard.className = 'plan-card cursor-pointer p-3.5 rounded-lg border-2 border-tv-blue bg-tv-blue/10 transition';
+        yCard.className = 'plan-card cursor-pointer p-3.5 rounded-lg border border-tv-border bg-tv-bg hover:border-emerald-500/60 transition relative';
+      } else {
+        yCard.className = 'plan-card cursor-pointer p-3.5 rounded-lg border-2 border-emerald-500 bg-emerald-500/10 transition relative';
+        mCard.className = 'plan-card cursor-pointer p-3.5 rounded-lg border border-tv-border bg-tv-bg hover:border-tv-blue/60 transition';
       }
+    }
 
-      document.getElementById('btn-save-pine').addEventListener('click', () => {
-        const title = document.getElementById('pine-script-title').value.trim() || 'Custom Pine Script v5';
-        const code = document.getElementById('pine-code-editor').value;
-        pineScripts[4] = { title, code };
-        localStorage.setItem(STORAGE_PINE_KEY, JSON.stringify(pineScripts[4]));
-        selectPineTemplate(4);
-        showToast('Saved to Custom Pine Script v5 Template', 'success');
-      });
+    function openUpgradeModal() {
+      updateUpiDetails();
+      document.getElementById('upgradeModal').classList.remove('hidden');
+      document.getElementById('upgradeModal').classList.add('flex');
+    }
 
-      document.getElementById('btn-copy-pine').addEventListener('click', () => {
-        const editor = document.getElementById('pine-code-editor');
-        editor.select();
-        editor.setSelectionRange(0, 99999);
-        try {
-          document.execCommand('copy');
-          showToast('Pine Script v5 copied! Paste into TradingView Pine Editor.', 'success');
-        } catch (err) {
-          showToast('Select code and press Ctrl+C / Cmd+C to copy', 'info');
-        }
-      });
+    function closeUpgradeModal() {
+      document.getElementById('upgradeModal').classList.add('hidden');
+      document.getElementById('upgradeModal').classList.remove('flex');
+    }
 
-      // Bottom Tab Switcher Helper
-      function switchBottomTab(tabName) {
-        if (bottomCollapsed) toggleBottomPanel();
-        document.querySelectorAll('.btab-btn').forEach(b => {
-          b.className = 'btab-btn text-tv-muted hover:text-white font-medium h-8 flex items-center gap-1.5';
-        });
-        const activeBtn = document.querySelector(`.btab-btn[data-btab="${tabName}"]`);
-        if (activeBtn) {
-          activeBtn.className = 'btab-btn text-white font-semibold border-b-2 border-tv-blue h-8 flex items-center gap-1.5';
-        }
-        document.querySelectorAll('.bpanel').forEach(p => p.classList.add('hidden'));
-        document.getElementById(`bpanel-${tabName}`).classList.remove('hidden');
+    document.getElementById('openUpgradeBtn').addEventListener('click', openUpgradeModal);
+    document.getElementById('closeUpgradeModalBtn').addEventListener('click', closeUpgradeModal);
+    document.getElementById('planMonthlyCard').addEventListener('click', () => {
+      selectedPlan = 'monthly';
+      updateUpiDetails();
+    });
+    document.getElementById('planYearlyCard').addEventListener('click', () => {
+      selectedPlan = 'yearly';
+      updateUpiDetails();
+    });
+
+    document.getElementById('copyUpiIdBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(MERCHANT_UPI_ID);
+      const btn = document.getElementById('copyUpiIdBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => (btn.textContent = 'Copy'), 1500);
+    });
+
+    document.getElementById('verifyUpiBtn').addEventListener('click', () => {
+      const utr = document.getElementById('utrInput').value.trim();
+      const errEl = document.getElementById('upiErrorMsg');
+      if (!/^\d{12}$/.test(utr)) {
+        errEl.textContent = 'Please enter a valid 12-digit UPI Transaction / UTR number.';
+        errEl.classList.remove('hidden');
+        return;
       }
-
-      document.querySelectorAll('.btab-btn').forEach(btn => {
-        btn.addEventListener('click', () => switchBottomTab(btn.dataset.btab));
-      });
-
-      document.getElementById('btn-open-pine-studio').addEventListener('click', () => {
-        switchBottomTab('pinestudio');
-      });
-
-      // Collapse/Expand Bottom & Right Panels
-      let bottomCollapsed = false;
-      function toggleBottomPanel() {
-        bottomCollapsed = !bottomCollapsed;
-        const term = document.getElementById('bottom-terminal');
-        const chev = document.getElementById('bottom-chevron');
-        if (bottomCollapsed) {
-          term.classList.remove('h-52');
-          term.classList.add('h-8');
-          chev.style.transform = 'rotate(180deg)';
-        } else {
-          term.classList.add('h-52');
-          term.classList.remove('h-8');
-          chev.style.transform = 'rotate(0deg)';
-        }
-      }
-      document.getElementById('btn-toggle-bottom').addEventListener('click', toggleBottomPanel);
-
-      document.getElementById('btn-toggle-right').addEventListener('click', () => {
-        document.getElementById('right-sidebar').classList.toggle('hidden');
-      });
-
-      // =========================================================================
-      // 6. POSITION SIZE & RISK-REWARD CALCULATOR ($ / ₹)
-      // =========================================================================
-      const INST_SPECS = {
-        gold: { multiplier: 100, pipFactor: 10, unitName: 'Lots', distUnit: 'pts' },
-        forex_std: { multiplier: 100000, pipFactor: 10000, unitName: 'Lots', distUnit: 'pips' },
-        forex_jpy: { multiplier: 100000, pipFactor: 100, unitName: 'Lots', distUnit: 'pips' },
-        forex_mini: { multiplier: 10000, pipFactor: 10000, unitName: 'Mini Lots', distUnit: 'pips' },
-        forex_micro: { multiplier: 1000, pipFactor: 10000, unitName: 'Micro Lots', distUnit: 'pips' },
-        crypto: { multiplier: 1, pipFactor: 1, unitName: 'Units', distUnit: 'pts' },
-        nifty: { multiplier: 25, pipFactor: 1, unitName: 'Lots (25x)', distUnit: 'pts' },
-        banknifty: { multiplier: 15, pipFactor: 1, unitName: 'Lots (15x)', distUnit: 'pts' }
+      errEl.classList.add('hidden');
+      const days = selectedPlan === 'monthly' ? 30 : 365;
+      proSubscription = {
+        plan: selectedPlan,
+        utr: utr,
+        activatedAt: Date.now(),
+        expiresAt: Date.now() + days * 24 * 60 * 60 * 1000
       };
+      localStorage.setItem('mstrading_pro_sub', JSON.stringify(proSubscription));
+      updateProUI();
+      closeUpgradeModal();
+      alert(`Thank you! MsTrading Pro (${selectedPlan === 'monthly' ? '₹299 Monthly' : '₹2,999 Yearly'}) is now active.`);
+    });
 
-      const calcInstrument = document.getElementById('calc-instrument');
-      const calcBalance = document.getElementById('calc-balance');
-      const calcRiskPct = document.getElementById('calc-risk-pct');
-      const calcEntry = document.getElementById('calc-entry');
-      const calcSl = document.getElementById('calc-sl');
-      const calcTp = document.getElementById('calc-tp');
+    // --- PINE TEMPLATES ---
+    const pineTemplates = {
+      ema_cross: `//@version=5
+indicator("MsTrading EMA 20/50 Trend", overlay=true)
+fastEMA = ta.ema(close, 20)
+slowEMA = ta.ema(close, 50)
+plot(fastEMA, color=color.new(#2962ff, 0), linewidth=2, title="EMA 20")
+plot(slowEMA, color=color.new(#f23645, 0), linewidth=2, title="EMA 50")
+bullSignal = ta.crossover(fastEMA, slowEMA)
+bearSignal = ta.crossunder(fastEMA, slowEMA)
+plotshape(bullSignal, style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small)
+plotshape(bearSignal, style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small)`,
 
-      function setDirection(dir) {
-        state.direction = dir;
-        const longBtn = document.getElementById('dir-long-btn');
-        const shortBtn = document.getElementById('dir-short-btn');
-        if (dir === 'LONG') {
-          longBtn.className = 'py-1 rounded bg-tv-green text-white font-semibold text-[11px] transition';
-          shortBtn.className = 'py-1 rounded text-tv-muted hover:text-white font-semibold text-[11px] transition';
-        } else {
-          shortBtn.className = 'py-1 rounded bg-tv-red text-white font-semibold text-[11px] transition';
-          longBtn.className = 'py-1 rounded text-tv-muted hover:text-white font-semibold text-[11px] transition';
-        }
-        recalculatePosition();
+      rsi_div: `//@version=5
+indicator("MsTrading RSI Momentum Zones", overlay=false)
+rsiVal = ta.rsi(close, 14)
+plot(rsiVal, color=color.new(#2962ff, 0), linewidth=2, title="RSI 14")
+hline(70, "Overbought", color=color.red, linestyle=hline.style_dashed)
+hline(30, "Oversold", color=color.green, linestyle=hline.style_dashed)`,
+
+      session_hl: `//@version=5
+indicator("MsTrading Asian Range Breakout", overlay=true)
+asianSession = input.session("0000-0600", "Asian Session (UTC)")
+inSession = not na(time(timeframe.period, asianSession))
+var float hi = na
+var float lo = na
+if inSession and not inSession[1]
+    hi := high
+    lo := low
+else if inSession
+    hi := math.max(hi, high)
+    lo := math.min(lo, low)
+plot(hi, "Session High", color=color.teal, style=plot.style_linebr)
+plot(lo, "Session Low", color=color.orange, style=plot.style_linebr)`,
+
+      atr_stop: `//@version=5
+indicator("MsTrading ATR Dynamic Stop", overlay=true)
+atrLen = input.int(14, "ATR Length")
+mult = input.float(2.0, "Multiplier")
+atr = ta.atr(atrLen)
+longStop = close - atr * mult
+shortStop = close + atr * mult
+plot(longStop, "Long Stop", color=color.new(#089981, 30))
+plot(shortStop, "Short Stop", color=color.new(#f23645, 30))`,
+
+      vwap_bands: `//@version=5
+indicator("MsTrading Institutional VWAP + StdDev", overlay=true)
+vwapVal = ta.vwap(hlc3)
+stdevVal = ta.stdev(close, 20)
+plot(vwapVal, "VWAP", color=color.orange, linewidth=2)
+plot(vwapVal + stdevVal * 1.5, "Upper Band", color=color.new(#2962ff, 40))
+plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
+    };
+
+    // --- LOAD LIVE CHART WIDGETS ---
+    function loadChartWidget() {
+      const container = document.getElementById('tv_chart_container');
+      container.innerHTML = '';
+      if (typeof TradingView === 'undefined') {
+        container.innerHTML = '<div class="p-6 text-sm text-tv-muted">Unable to load live chart script. Please check your internet connection and refresh.</div>';
+        return;
       }
-
-      document.getElementById('dir-long-btn').addEventListener('click', () => setDirection('LONG'));
-      document.getElementById('dir-short-btn').addEventListener('click', () => setDirection('SHORT'));
-
-      document.querySelectorAll('.curr-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.curr-btn').forEach(b => {
-            b.className = 'curr-btn px-2 py-0.5 rounded text-tv-muted hover:text-white font-semibold';
-          });
-          btn.className = 'curr-btn active px-2 py-0.5 rounded bg-tv-blue text-white font-semibold';
-          state.currency = btn.dataset.curr;
-          document.querySelectorAll('.curr-symbol').forEach(el => el.textContent = state.currency);
-          recalculatePosition();
-          renderJournalAndAnalytics();
-        });
+      new TradingView.widget({
+        autosize: true,
+        symbol: currentSymbol,
+        interval: currentInterval,
+        timezone: 'Asia/Kolkata',
+        theme: 'dark',
+        style: '1',
+        locale: 'en',
+        toolbar_bg: '#1e222d',
+        enable_publishing: false,
+        withdateranges: true,
+        hide_side_toolbar: false,
+        allow_symbol_change: true,
+        details: false,
+        hotlist: false,
+        calendar: false,
+        studies: activeStudies,
+        container_id: 'tv_chart_container'
       });
+      document.getElementById('activeStudiesCount').textContent = `${activeStudies.length} ${activeStudies.length === 1 ? 'Study' : 'Studies'} Active`;
+    }
 
-      function recalculatePosition() {
-        const spec = INST_SPECS[calcInstrument.value] || INST_SPECS.gold;
-        const balance = Math.max(0, parseFloat(calcBalance.value) || 0);
-        const riskPct = Math.max(0, parseFloat(calcRiskPct.value) || 0);
-        const entry = parseFloat(calcEntry.value) || 0;
-        const sl = parseFloat(calcSl.value) || 0;
-        const tp = parseFloat(calcTp.value) || 0;
-
-        const riskAmt = balance * (riskPct / 100);
-        const slDiff = Math.abs(entry - sl);
-        const tpDiff = Math.abs(tp - entry);
-
-        let size = 0;
-        if (slDiff > 0) {
-          size = riskAmt / (slDiff * spec.multiplier);
-        }
-        const cleanSize = Number(size.toFixed(2));
-        const rewardAmt = cleanSize * tpDiff * spec.multiplier;
-        const rr = slDiff > 0 ? (tpDiff / slDiff) : 0;
-
-        const slDistDisp = (slDiff * spec.pipFactor).toFixed(spec.pipFactor >= 100 ? 1 : 2);
-        const tpDistDisp = (tpDiff * spec.pipFactor).toFixed(spec.pipFactor >= 100 ? 1 : 2);
-
-        document.getElementById('res-size').textContent = `${cleanSize.toFixed(2)} ${spec.unitName}`;
-        document.getElementById('res-dist').textContent = `${slDistDisp} / ${tpDistDisp} ${spec.distUnit}`;
-        document.getElementById('res-risk-amt').textContent = `-${state.currency}${riskAmt.toFixed(2)}`;
-        document.getElementById('res-reward-amt').textContent = `+${state.currency}${rewardAmt.toFixed(2)}`;
-        document.getElementById('res-rr').textContent = `1 : ${rr.toFixed(2)}`;
-
-        return {
-          size: cleanSize,
-          unitName: spec.unitName,
-          multiplier: spec.multiplier,
-          entry,
-          sl,
-          tp,
-          riskAmt,
-          rewardAmt,
-          rr
-        };
-      }
-
-      [calcInstrument, calcBalance, calcRiskPct, calcEntry, calcSl, calcTp].forEach(el => {
-        el.addEventListener('input', recalculatePosition);
+    function loadSecondaryChartWidget() {
+      if (!isSplitMode || typeof TradingView === 'undefined') return;
+      const container = document.getElementById('tv_chart_container_2');
+      container.innerHTML = '';
+      const sym2 = document.getElementById('splitSymbolSelect').value;
+      const tf2 = document.getElementById('splitTfSelect').value;
+      new TradingView.widget({
+        autosize: true,
+        symbol: sym2,
+        interval: tf2,
+        timezone: 'Asia/Kolkata',
+        theme: 'dark',
+        style: '1',
+        locale: 'en',
+        toolbar_bg: '#1e222d',
+        enable_publishing: false,
+        hide_side_toolbar: true,
+        allow_symbol_change: true,
+        container_id: 'tv_chart_container_2'
       });
+    }
 
-      // =========================================================================
-      // 7. PERSISTENT TRADE JOURNAL & PERFORMANCE ANALYTICS
-      // =========================================================================
-      function loadJournal() {
-        try {
-          const raw = localStorage.getItem(STORAGE_JOURNAL_KEY);
-          state.journal = raw ? JSON.parse(raw) : [];
-        } catch (e) {
-          state.journal = [];
-        }
+    // --- SPLIT SCREEN TOGGLE ---
+    document.getElementById('layoutSplitBtn').addEventListener('click', () => {
+      if (!isProActive()) {
+        openUpgradeModal();
+        return;
       }
+      isSplitMode = true;
+      document.getElementById('secondaryChartWrap').classList.remove('hidden');
+      document.getElementById('secondaryChartWrap').classList.add('flex');
+      document.getElementById('layoutSplitBtn').className = 'px-2 py-0.5 rounded bg-tv-blue text-white font-semibold';
+      document.getElementById('layoutSingleBtn').className = 'px-2 py-0.5 rounded text-tv-muted hover:text-white';
+      loadSecondaryChartWidget();
+    });
 
-      function saveJournal() {
-        localStorage.setItem(STORAGE_JOURNAL_KEY, JSON.stringify(state.journal));
-        renderJournalAndAnalytics();
-      }
+    function disableSplitMode() {
+      isSplitMode = false;
+      document.getElementById('secondaryChartWrap').classList.add('hidden');
+      document.getElementById('secondaryChartWrap').classList.remove('flex');
+      document.getElementById('layoutSingleBtn').className = 'px-2 py-0.5 rounded bg-tv-blue text-white font-semibold';
+      document.getElementById('layoutSplitBtn').className = 'px-2 py-0.5 rounded text-tv-muted hover:text-white';
+    }
 
-      document.getElementById('btn-log-trade').addEventListener('click', () => {
-        const calc = recalculatePosition();
-        if (calc.entry <= 0) {
-          showToast('Please enter a valid Entry Price', 'danger');
+    document.getElementById('layoutSingleBtn').addEventListener('click', disableSplitMode);
+    document.getElementById('closeSplitBtn').addEventListener('click', disableSplitMode);
+    document.getElementById('splitSymbolSelect').addEventListener('change', loadSecondaryChartWidget);
+    document.getElementById('splitTfSelect').addEventListener('change', loadSecondaryChartWidget);
+
+    // --- LOAD WATCHLIST & ECONOMIC CALENDAR WIDGETS ---
+    function loadWatchlistWidget() {
+      const wrap = document.getElementById('marketOverviewWidget');
+      wrap.innerHTML = '';
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+      script.async = true;
+      script.innerHTML = JSON.stringify({
+        colorTheme: 'dark',
+        dateRange: '1D',
+        showChart: false,
+        locale: 'en',
+        width: '100%',
+        height: '100%',
+        isTransparent: true,
+        showSymbolLogo: true,
+        tabs: [
+          {
+            title: 'Watchlist',
+            symbols: [
+              { s: 'OANDA:XAUUSD', d: 'Gold / USD' },
+              { s: 'FX:EURUSD', d: 'EUR / USD' },
+              { s: 'FX:GBPUSD', d: 'GBP / USD' },
+              { s: 'BINANCE:BTCUSDT', d: 'Bitcoin' },
+              { s: 'NSE:NIFTY', d: 'NIFTY 50' },
+              { s: 'NSE:BANKNIFTY', d: 'BANKNIFTY' }
+            ]
+          }
+        ]
+      });
+      wrap.appendChild(script);
+    }
+
+    let calendarLoaded = false;
+    function loadCalendarWidget() {
+      if (calendarLoaded) return;
+      calendarLoaded = true;
+      const wrap = document.getElementById('economicCalendarWidget');
+      wrap.innerHTML = '';
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+      script.async = true;
+      script.innerHTML = JSON.stringify({
+        colorTheme: 'dark',
+        isTransparent: true,
+        width: '100%',
+        height: '100%',
+        locale: 'en',
+        importanceFilter: '0,1',
+        currencyFilter: 'USD,EUR,GBP,INR,JPY'
+      });
+      wrap.appendChild(script);
+    }
+
+    document.getElementById('sideTabWatchlist').addEventListener('click', () => {
+      document.getElementById('sideTabWatchlist').className = 'flex-1 py-1 rounded bg-tv-panel text-white';
+      document.getElementById('sideTabCalendar').className = 'flex-1 py-1 rounded text-tv-muted hover:text-white';
+      document.getElementById('marketOverviewWidget').classList.remove('hidden');
+      document.getElementById('economicCalendarWidget').classList.add('hidden');
+    });
+
+    document.getElementById('sideTabCalendar').addEventListener('click', () => {
+      document.getElementById('sideTabCalendar').className = 'flex-1 py-1 rounded bg-tv-panel text-white';
+      document.getElementById('sideTabWatchlist').className = 'flex-1 py-1 rounded text-tv-muted hover:text-white';
+      document.getElementById('economicCalendarWidget').classList.remove('hidden');
+      document.getElementById('marketOverviewWidget').classList.add('hidden');
+      loadCalendarWidget();
+    });
+
+    // --- SYMBOL & TIMEFRAME HANDLERS ---
+    document.querySelectorAll('.sym-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!btn.dataset.free && !isProActive()) {
+          openUpgradeModal();
           return;
         }
-
-        const trade = {
-          id: 'TRD-' + Date.now(),
-          timestamp: new Date().toLocaleString([], { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
-          symbol: state.symbol,
-          direction: state.direction,
-          size: calc.size,
-          unitName: calc.unitName,
-          multiplier: calc.multiplier,
-          entry: calc.entry,
-          sl: calc.sl,
-          tp: calc.tp,
-          exit: null,
-          status: 'OPEN',
-          pnl: 0,
-          plannedRR: Number(calc.rr.toFixed(2)),
-          notes: ''
-        };
-
-        state.journal.unshift(trade);
-        saveJournal();
-        switchBottomTab('journal');
-        showToast(`Logged ${trade.direction} ${trade.symbol} (${trade.size} ${trade.unitName})`, 'success');
+        document.querySelectorAll('.sym-btn').forEach(b => {
+          b.classList.remove('bg-tv-blue', 'text-white');
+          b.classList.add('bg-tv-bg', 'text-tv-text');
+        });
+        btn.classList.remove('bg-tv-bg', 'text-tv-text');
+        btn.classList.add('bg-tv-blue', 'text-white');
+        currentSymbol = btn.dataset.symbol;
+        loadChartWidget();
       });
+    });
 
-      // Modal Controls for Closing/Editing a Trade
-      const closeModal = document.getElementById('close-trade-modal');
-      function openCloseModal(tradeId) {
-        const trade = state.journal.find(t => t.id === tradeId);
-        if (!trade) return;
-        state.editingTradeId = tradeId;
-
-        document.getElementById('modal-trade-summary').textContent =
-          `${trade.symbol} • ${trade.direction} ${trade.size} ${trade.unitName} @ ${trade.entry}`;
-        document.getElementById('modal-exit-price').value = trade.exit || trade.tp || trade.entry;
-        document.getElementById('modal-status').value = trade.status !== 'OPEN' ? trade.status : 'WIN';
-        document.getElementById('modal-notes').value = trade.notes || '';
-        closeModal.classList.remove('hidden');
+    document.getElementById('customSymbolForm').addEventListener('submit', e => {
+      e.preventDefault();
+      if (!isProActive()) {
+        openUpgradeModal();
+        return;
       }
-
-      document.getElementById('modal-close-x').addEventListener('click', () => closeModal.classList.add('hidden'));
-      document.getElementById('modal-cancel-btn').addEventListener('click', () => closeModal.classList.add('hidden'));
-
-      document.getElementById('modal-save-btn').addEventListener('click', () => {
-        const trade = state.journal.find(t => t.id === state.editingTradeId);
-        if (!trade) return;
-
-        const exitPrice = parseFloat(document.getElementById('modal-exit-price').value) || trade.entry;
-        const status = document.getElementById('modal-status').value;
-        const notes = document.getElementById('modal-notes').value.trim();
-
-        const priceDiff = trade.direction === 'LONG' ? (exitPrice - trade.entry) : (trade.entry - exitPrice);
-        const pnl = priceDiff * trade.size * (trade.multiplier || 1);
-
-        trade.exit = exitPrice;
-        trade.status = status;
-        trade.pnl = Number(pnl.toFixed(2));
-        trade.notes = notes;
-
-        closeModal.classList.add('hidden');
-        saveJournal();
-        showToast(`Trade updated: ${trade.pnl >= 0 ? '+' : ''}${state.currency}${trade.pnl.toFixed(2)}`, trade.pnl >= 0 ? 'success' : 'danger');
+      const val = document.getElementById('customSymbolInput').value.trim().toUpperCase();
+      if (!val) return;
+      currentSymbol = val;
+      document.querySelectorAll('.sym-btn').forEach(b => {
+        b.classList.remove('bg-tv-blue', 'text-white');
+        b.classList.add('bg-tv-bg', 'text-tv-text');
       });
+      loadChartWidget();
+    });
 
-      function deleteTrade(tradeId) {
-        state.journal = state.journal.filter(t => t.id !== tradeId);
-        saveJournal();
-        showToast('Trade removed from journal', 'info');
+    document.querySelectorAll('.tf-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tf-btn').forEach(b => {
+          b.classList.remove('bg-tv-blue', 'text-white');
+          b.classList.add('text-tv-muted');
+        });
+        btn.classList.remove('text-tv-muted');
+        btn.classList.add('bg-tv-blue', 'text-white');
+        currentInterval = btn.dataset.tf;
+        loadChartWidget();
+      });
+    });
+
+    // --- INDICATOR STUDIES ---
+    document.querySelectorAll('.study-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!isProActive() && activeStudies.length >= 1 && !activeStudies.includes(btn.dataset.study)) {
+          openUpgradeModal();
+          return;
+        }
+        const studyId = btn.dataset.study;
+        if (activeStudies.includes(studyId)) {
+          activeStudies = activeStudies.filter(s => s !== studyId);
+          btn.classList.remove('active-study');
+        } else {
+          activeStudies.push(studyId);
+          btn.classList.add('active-study');
+        }
+        loadChartWidget();
+      });
+    });
+
+    document.getElementById('toggleIndicatorBarBtn').addEventListener('click', () => {
+      document.getElementById('indicatorBar').classList.toggle('hidden');
+    });
+    document.getElementById('hideIndicatorBarBtn').addEventListener('click', () => {
+      document.getElementById('indicatorBar').classList.add('hidden');
+    });
+    document.getElementById('toggleSidebarBtn').addEventListener('click', () => {
+      document.getElementById('rightSidebar').classList.toggle('hidden');
+    });
+
+    // --- DISCIPLINE CHECKLIST ---
+    document.querySelectorAll('.disc-chk').forEach(chk => {
+      chk.addEventListener('change', () => {
+        const checked = document.querySelectorAll('.disc-chk:checked').length;
+        const scoreEl = document.getElementById('checklistScore');
+        scoreEl.textContent = `${checked}/4 Ready`;
+        scoreEl.className = checked === 4 ? 'text-[10px] font-mono text-emerald-400 font-bold' : 'text-[10px] font-mono text-amber-400';
+      });
+    });
+
+    // --- CALCULATOR ---
+    function updateCalculator() {
+      const bal = parseFloat(document.getElementById('calcBalance').value) || 0;
+      const riskPct = parseFloat(document.getElementById('calcRiskPct').value) || 0;
+      const inst = document.getElementById('calcInstrument').value;
+      const entry = parseFloat(document.getElementById('calcEntry').value);
+      const sl = parseFloat(document.getElementById('calcSl').value);
+      const tp = parseFloat(document.getElementById('calcTp').value);
+
+      const sym = currencyMode === 'USD' ? '$' : '₹';
+      const riskAmt = bal * (riskPct / 100);
+      document.getElementById('outRiskAmt').textContent = `${sym}${riskAmt.toFixed(2)}`;
+
+      if (!isNaN(entry) && !isNaN(sl) && entry !== sl) {
+        const slDist = Math.abs(entry - sl);
+        let sizeText = '';
+        if (inst === 'XAUUSD') {
+          const lots = riskAmt / (slDist * 100);
+          sizeText = `${lots.toFixed(2)} Lots`;
+        } else if (inst === 'FOREX') {
+          const lots = riskAmt / (slDist * 100000);
+          sizeText = `${lots.toFixed(2)} Lots`;
+        } else if (inst === 'NIFTY') {
+          const qty = Math.floor(riskAmt / slDist);
+          sizeText = `${qty} Qty (${Math.floor(qty / 75)} Lots)`;
+        } else if (inst === 'BANKNIFTY') {
+          const qty = Math.floor(riskAmt / slDist);
+          sizeText = `${qty} Qty (${Math.floor(qty / 30)} Lots)`;
+        } else {
+          const units = riskAmt / slDist;
+          sizeText = `${units.toFixed(4)} Units`;
+        }
+        document.getElementById('outLotSize').textContent = sizeText;
+
+        if (!isNaN(tp) && tp !== entry) {
+          const tpDist = Math.abs(tp - entry);
+          const rr = tpDist / slDist;
+          document.getElementById('outRR').textContent = `1 : ${rr.toFixed(2)}`;
+        } else {
+          document.getElementById('outRR').textContent = '—';
+        }
+      } else {
+        document.getElementById('outLotSize').textContent = 'Enter Entry & SL';
+        document.getElementById('outRR').textContent = '—';
       }
+    }
 
-      function renderJournalAndAnalytics() {
-        const tbody = document.getElementById('journal-tbody');
-        document.getElementById('journal-count-badge').textContent = state.journal.length;
+    ['calcBalance', 'calcRiskPct', 'calcInstrument', 'calcEntry', 'calcSl', 'calcTp'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateCalculator);
+    });
 
-        if (state.journal.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="11" class="py-8 text-center text-tv-muted font-sans">
-                No trades logged yet. Configure your setup in the <b>Position Size & Risk Calc</b> on the right and click <b>Log Trade to Journal</b>.
+    document.getElementById('currUsdBtn').addEventListener('click', () => {
+      currencyMode = 'USD';
+      document.getElementById('currUsdBtn').className = 'px-2 py-0.5 rounded bg-tv-blue text-white font-semibold';
+      document.getElementById('currInrBtn').className = 'px-2 py-0.5 rounded text-tv-muted hover:text-white';
+      updateCalculator();
+      renderJournal();
+    });
+
+    document.getElementById('currInrBtn').addEventListener('click', () => {
+      currencyMode = 'INR';
+      document.getElementById('currInrBtn').className = 'px-2 py-0.5 rounded bg-tv-blue text-white font-semibold';
+      document.getElementById('currUsdBtn').className = 'px-2 py-0.5 rounded text-tv-muted hover:text-white';
+      updateCalculator();
+      renderJournal();
+    });
+
+    // --- JOURNAL, EQUITY CURVE & ANALYTICS ---
+    function saveTrades() {
+      localStorage.setItem('mstrading_trades_v1', JSON.stringify(trades));
+      renderJournal();
+    }
+
+    document.getElementById('logTradeBtn').addEventListener('click', () => {
+      if (!isProActive() && trades.length >= 3) {
+        openUpgradeModal();
+        return;
+      }
+      const entry = parseFloat(document.getElementById('calcEntry').value);
+      const sl = parseFloat(document.getElementById('calcSl').value);
+      const tp = parseFloat(document.getElementById('calcTp').value);
+      const note = document.getElementById('calcNote').value.trim();
+      const checks = document.querySelectorAll('.disc-chk:checked').length;
+
+      if (isNaN(entry) || isNaN(sl)) {
+        alert('Please enter valid Entry and Stop Loss prices first.');
+        return;
+      }
+      const newTrade = {
+        id: Date.now(),
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        symbol: currentSymbol.split(':').pop(),
+        side: document.getElementById('calcSide').value,
+        size: document.getElementById('outLotSize').textContent,
+        entry,
+        sl,
+        tp: isNaN(tp) ? '-' : tp,
+        note: note || `${checks}/4 Rules Checked`,
+        status: 'OPEN',
+        pnl: 0
+      };
+      trades.unshift(newTrade);
+      document.getElementById('calcNote').value = '';
+      saveTrades();
+    });
+
+    function closeTrade(id, isWin) {
+      const bal = parseFloat(document.getElementById('calcBalance').value) || 10000;
+      const riskPct = parseFloat(document.getElementById('calcRiskPct').value) || 1;
+      const riskAmt = bal * (riskPct / 100);
+      trades = trades.map(t => {
+        if (t.id === id) {
+          let rr = 2;
+          if (t.tp !== '-' && t.entry !== t.sl) {
+            rr = Math.abs(t.tp - t.entry) / Math.abs(t.entry - t.sl);
+          }
+          t.status = isWin ? 'WIN' : 'LOSS';
+          t.pnl = isWin ? +(riskAmt * rr).toFixed(2) : +(-riskAmt).toFixed(2);
+        }
+        return t;
+      });
+      saveTrades();
+    }
+
+    function deleteTrade(id) {
+      trades = trades.filter(t => t.id !== id);
+      saveTrades();
+    }
+
+    function renderEquityCurve(closedTrades, sym) {
+      const polyline = document.getElementById('equityPolyline');
+      const peakLabel = document.getElementById('equityPeakLabel');
+      if (!closedTrades.length) {
+        polyline.setAttribute('points', '0,35 300,35');
+        polyline.setAttribute('stroke', '#089981');
+        peakLabel.textContent = `Peak: ${sym}0.00`;
+        return;
+      }
+      // Chronological order
+      const chronological = [...closedTrades].reverse();
+      let cum = 0;
+      const values = [0];
+      chronological.forEach(t => {
+        cum += t.pnl;
+        values.push(cum);
+      });
+      const maxVal = Math.max(...values, 10);
+      const minVal = Math.min(...values, -10);
+      const range = maxVal - minVal || 1;
+      const pts = values.map((v, idx) => {
+        const x = (idx / (values.length - 1)) * 300;
+        const y = 65 - ((v - minVal) / range) * 60;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+      polyline.setAttribute('points', pts);
+      polyline.setAttribute('stroke', cum >= 0 ? '#089981' : '#f23645');
+      peakLabel.textContent = `Peak: ${sym}${Math.max(...values).toFixed(2)}`;
+    }
+
+    function renderJournal() {
+      const tbody = document.getElementById('journalTableBody');
+      const sym = currencyMode === 'USD' ? '$' : '₹';
+      document.getElementById('journalCountBadge').textContent = trades.length;
+
+      if (trades.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="py-6 text-center text-tv-muted font-sans">No trades logged yet. Free plan includes up to 3 journal entries. Upgrade to Pro for unlimited logs.</td></tr>`;
+      } else {
+        tbody.innerHTML = trades.map(t => {
+          const sideColor = t.side === 'BUY' ? 'text-tv-green' : 'text-tv-red';
+          const pnlColor = t.pnl > 0 ? 'text-tv-green' : (t.pnl < 0 ? 'text-tv-red' : 'text-tv-muted');
+          const pnlFormatted = t.status === 'OPEN' ? '—' : `${t.pnl >= 0 ? '+' : '-'}${sym}${Math.abs(t.pnl).toFixed(2)}`;
+          return `
+            <tr class="border-b border-tv-border/50 hover:bg-tv-hover/40">
+              <td class="py-1.5 px-2 text-tv-muted">${t.time}</td>
+              <td class="py-1.5 px-2 font-bold text-white">${t.symbol}</td>
+              <td class="py-1.5 px-2 font-semibold ${sideColor}">${t.side}</td>
+              <td class="py-1.5 px-2">${t.size}</td>
+              <td class="py-1.5 px-2">${t.entry}</td>
+              <td class="py-1.5 px-2 text-tv-muted">${t.sl} / ${t.tp}</td>
+              <td class="py-1.5 px-2 font-sans text-tv-text max-w-[140px] truncate" title="${t.note || ''}">${t.note || '—'}</td>
+              <td class="py-1.5 px-2">
+                <span class="px-1.5 py-0.5 rounded text-[10px] ${t.status === 'OPEN' ? 'bg-tv-blue/20 text-tv-blue' : (t.status === 'WIN' ? 'bg-tv-green/20 text-tv-green' : 'bg-tv-red/20 text-tv-red')}">${t.status}</span>
+              </td>
+              <td class="py-1.5 px-2 font-semibold ${pnlColor}">${pnlFormatted}</td>
+              <td class="py-1.5 px-2 text-right space-x-1">
+                ${t.status === 'OPEN' ? `
+                  <button onclick="closeTrade(${t.id}, true)" class="px-1.5 py-0.5 bg-tv-green/20 hover:bg-tv-green/40 text-tv-green rounded text-[10px]">TP Hit</button>
+                  <button onclick="closeTrade(${t.id}, false)" class="px-1.5 py-0.5 bg-tv-red/20 hover:bg-tv-red/40 text-tv-red rounded text-[10px]">SL Hit</button>
+                ` : ''}
+                <button onclick="deleteTrade(${t.id})" class="px-1.5 py-0.5 bg-tv-bg hover:bg-tv-red/30 text-tv-muted hover:text-white rounded text-[10px]">Del</button>
               </td>
             </tr>
           `;
-        } else {
-          tbody.innerHTML = state.journal.map(t => {
-            const statusBadge = {
-              OPEN: 'bg-tv-blue/20 text-tv-blue',
-              WIN: 'bg-tv-green/20 text-tv-green',
-              LOSS: 'bg-tv-red/20 text-tv-red',
-              BREAKEVEN: 'bg-tv-hover text-tv-text'
-            }[t.status] || 'bg-tv-hover text-white';
-
-            const pnlText = t.status === 'OPEN'
-              ? '--'
-              : `${t.pnl >= 0 ? '+' : ''}${state.currency}${t.pnl.toFixed(2)}`;
-            const pnlClass = t.status === 'OPEN'
-              ? 'text-tv-muted'
-              : (t.pnl >= 0 ? 'text-tv-green font-semibold' : 'text-tv-red font-semibold');
-
-            return `
-              <tr class="hover:bg-tv-hover/40 transition">
-                <td class="py-1.5 px-3 text-tv-muted">${t.timestamp}</td>
-                <td class="py-1.5 px-2 font-semibold text-white">${t.symbol}</td>
-                <td class="py-1.5 px-2 font-semibold ${t.direction === 'LONG' ? 'text-tv-green' : 'text-tv-red'}">${t.direction}</td>
-                <td class="py-1.5 px-2 text-tv-text">${t.size} <span class="text-[10px] text-tv-muted">${t.unitName || ''}</span></td>
-                <td class="py-1.5 px-2 text-white">${t.entry}</td>
-                <td class="py-1.5 px-2 text-[10px]">
-                  <span class="text-tv-red">${t.sl || '-'}</span> / <span class="text-tv-green">${t.tp || '-'}</span>
-                </td>
-                <td class="py-1.5 px-2 text-white">${t.exit !== null ? t.exit : '--'}</td>
-                <td class="py-1.5 px-2">
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-sans font-semibold ${statusBadge}">${t.status}</span>
-                </td>
-                <td class="py-1.5 px-2 ${pnlClass}">${pnlText}</td>
-                <td class="py-1.5 px-2 text-tv-muted font-sans max-w-[140px] truncate" title="${t.notes || ''}">${t.notes || '-'}</td>
-                <td class="py-1.5 px-3 text-right space-x-1 font-sans">
-                  <button data-edit="${t.id}" class="px-2 py-0.5 rounded bg-tv-hover hover:bg-tv-blue text-white text-[10px] transition">
-                    ${t.status === 'OPEN' ? 'Close' : 'Edit'}
-                  </button>
-                  <button data-del="${t.id}" class="px-1.5 py-0.5 rounded bg-tv-hover hover:bg-tv-red text-tv-muted hover:text-white text-[10px] transition">
-                    &times;
-                  </button>
-                </td>
-              </tr>
-            `;
-          }).join('');
-
-          tbody.querySelectorAll('[data-edit]').forEach(btn => {
-            btn.addEventListener('click', () => openCloseModal(btn.dataset.edit));
-          });
-          tbody.querySelectorAll('[data-del]').forEach(btn => {
-            btn.addEventListener('click', () => deleteTrade(btn.dataset.del));
-          });
-        }
-
-        // Calculate Performance Analytics
-        const closedTrades = state.journal.filter(t => t.status !== 'OPEN');
-        const wins = closedTrades.filter(t => t.pnl > 0);
-        const losses = closedTrades.filter(t => t.pnl < 0);
-
-        const netPnl = closedTrades.reduce((acc, t) => acc + t.pnl, 0);
-        const grossProfit = wins.reduce((acc, t) => acc + t.pnl, 0);
-        const grossLoss = Math.abs(losses.reduce((acc, t) => acc + t.pnl, 0));
-        const winRate = closedTrades.length > 0 ? (wins.length / closedTrades.length) * 100 : 0;
-        const profitFactor = grossLoss > 0 ? (grossProfit / grossLoss) : (grossProfit > 0 ? 99.9 : 0);
-        const avgRR = state.journal.length > 0
-          ? state.journal.reduce((acc, t) => acc + (t.plannedRR || 0), 0) / state.journal.length
-          : 0;
-
-        const netStr = `${netPnl >= 0 ? '+' : ''}${state.currency}${netPnl.toFixed(2)}`;
-        const netColor = netPnl > 0 ? 'text-tv-green' : netPnl < 0 ? 'text-tv-red' : 'text-white';
-
-        document.getElementById('top-net-pnl').textContent = netStr;
-        document.getElementById('top-net-pnl').className = `font-semibold ${netColor}`;
-        document.getElementById('top-win-rate').textContent = `${winRate.toFixed(1)}%`;
-
-        document.getElementById('stat-net-pnl').textContent = netStr;
-        document.getElementById('stat-net-pnl').className = `text-base font-bold font-mono mt-1 ${netColor}`;
-        document.getElementById('stat-win-rate').textContent = `${winRate.toFixed(1)}%`;
-        document.getElementById('stat-profit-factor').textContent = profitFactor.toFixed(2);
-        document.getElementById('stat-total-trades').textContent = closedTrades.length;
-        document.getElementById('stat-avg-rr').textContent = `1 : ${avgRR.toFixed(2)}`;
+        }).join('');
       }
 
-      // Export CSV
-      document.getElementById('btn-export-csv').addEventListener('click', () => {
-        if (state.journal.length === 0) {
-          showToast('No trades in journal to export', 'info');
-          return;
-        }
-        const headers = ['Date', 'Symbol', 'Direction', 'Size', 'Unit', 'Entry', 'StopLoss', 'TakeProfit', 'Exit', 'Status', 'NetPnL', 'PlannedRR', 'Notes'];
-        const rows = state.journal.map(t => [
-          `"${t.timestamp}"`,
-          t.symbol,
-          t.direction,
-          t.size,
-          `"${t.unitName || ''}"`,
-          t.entry,
-          t.sl,
-          t.tp,
-          t.exit ?? '',
-          t.status,
-          t.pnl,
-          t.plannedRR,
-          `"${(t.notes || '').replace(/"/g, '""')}"`
-        ].join(','));
+      const closed = trades.filter(t => t.status !== 'OPEN');
+      const wins = closed.filter(t => t.pnl > 0);
+      const losses = closed.filter(t => t.pnl < 0);
+      const grossProfit = wins.reduce((a, b) => a + b.pnl, 0);
+      const grossLoss = Math.abs(losses.reduce((a, b) => a + b.pnl, 0));
+      const netPnl = closed.reduce((a, b) => a + b.pnl, 0);
+      const winRate = closed.length ? ((wins.length / closed.length) * 100) : 0;
+      const pf = grossLoss > 0 ? (grossProfit / grossLoss) : (grossProfit > 0 ? grossProfit : 0);
 
-        const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows].join('\n');
-        const link = document.createElement('a');
-        link.href = encodeURI(csvContent);
-        link.download = `TradeViewPro_Journal_${new Date().toISOString().slice(0, 10)}.csv`;
-        link.click();
-        showToast('Trade Journal exported to CSV', 'success');
-      });
+      const netStr = `${netPnl >= 0 ? '+' : '-'}${sym}${Math.abs(netPnl).toFixed(2)}`;
+      document.getElementById('topNetPnl').textContent = netStr;
+      document.getElementById('topNetPnl').className = netPnl >= 0 ? 'text-tv-green' : 'text-tv-red';
+      document.getElementById('topWinRate').textContent = `${winRate.toFixed(1)}%`;
 
-      document.getElementById('btn-clear-journal').addEventListener('click', () => {
-        state.journal = [];
-        saveJournal();
-        showToast('Trade Journal cleared', 'info');
-      });
+      document.getElementById('statTotalTrades').textContent = closed.length;
+      document.getElementById('statWinRate').textContent = `${winRate.toFixed(1)}%`;
+      document.getElementById('statProfitFactor').textContent = pf.toFixed(2);
+      document.getElementById('statNetPnl').textContent = netStr;
+      document.getElementById('statNetPnl').className = `text-lg font-bold mt-0.5 ${netPnl >= 0 ? 'text-tv-green' : 'text-tv-red'}`;
 
-      // =========================================================================
-      // 8. INITIALIZATION ON WINDOW LOAD
-      // =========================================================================
-      window.addEventListener('load', () => {
-        loadJournal();
-        renderJournalAndAnalytics();
-        renderPineTemplateList();
-        selectPineTemplate(0);
-        recalculatePosition();
-        loadTradingViewWidget();
-        loadMarketQuotesWidget();
+      renderEquityCurve(closed, sym);
+    }
+
+    document.getElementById('exportCsvBtn').addEventListener('click', () => {
+      if (!isProActive()) {
+        openUpgradeModal();
+        return;
+      }
+      if (!trades.length) return;
+      const headers = ['Time,Symbol,Side,Size,Entry,SL,TP,Note,Status,PnL'];
+      const rows = trades.map(t => `${t.time},${t.symbol},${t.side},"${t.size}",${t.entry},${t.sl},${t.tp},"${(t.note || '').replace(/"/g, '')}",${t.status},${t.pnl}`);
+      const blob = new Blob([headers.concat(rows).join('\n')], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'mstrading-journal.csv';
+      a.click();
+    });
+
+    // --- BOTTOM TABS & PINE STUDIO ---
+    function switchBottomTab(tabName) {
+      if ((tabName === 'pine' || tabName === 'analytics') && !isProActive()) {
+        openUpgradeModal();
+        return;
+      }
+      document.querySelectorAll('.btab-btn').forEach(b => {
+        b.classList.remove('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue');
+        b.classList.add('font-medium', 'text-tv-muted');
       });
-    })();
+      const activeBtn = document.querySelector(`.btab-btn[data-btab="${tabName}"]`);
+      if (activeBtn) {
+        activeBtn.classList.remove('font-medium', 'text-tv-muted');
+        activeBtn.classList.add('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue');
+      }
+      document.querySelectorAll('.btab-content').forEach(c => c.classList.add('hidden'));
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+    }
+
+    document.querySelectorAll('.btab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchBottomTab(btn.dataset.btab));
+    });
+
+    document.getElementById('openPineModalBtn').addEventListener('click', () => {
+      switchBottomTab('pine');
+    });
+
+    const pineEditor = document.getElementById('pineEditor');
+    const pineSelect = document.getElementById('pineTemplateSelect');
+    pineEditor.value = localStorage.getItem('mstrading_custom_pine') || pineTemplates.ema_cross;
+
+    pineSelect.addEventListener('change', () => {
+      pineEditor.value = pineTemplates[pineSelect.value] || '';
+    });
+
+    document.getElementById('copyPineBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(pineEditor.value);
+      const btn = document.getElementById('copyPineBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => (btn.textContent = 'Copy Pine Script v5'), 1500);
+    });
+
+    document.getElementById('savePineBtn').addEventListener('click', () => {
+      localStorage.setItem('mstrading_custom_pine', pineEditor.value);
+      const btn = document.getElementById('savePineBtn');
+      btn.textContent = 'Saved!';
+      setTimeout(() => (btn.textContent = 'Save Custom Script'), 1500);
+    });
+
+    // --- INIT ---
+    window.addEventListener('DOMContentLoaded', () => {
+      updateProUI();
+      updateSessionsAndClock();
+      loadChartWidget();
+      loadWatchlistWidget();
+      updateCalculator();
+      renderJournal();
+    });
   </script>
 </body>
 </html>
