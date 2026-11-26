@@ -90,7 +90,7 @@
       </form>
     </div>
 
-    <!-- Right Controls: Multi-Chart Layout + Timeframes + Upgrade -->
+    <!-- Right Controls: Multi-Chart Layout + Timeframes + AI Fib + Upgrade -->
     <div class="flex items-center gap-2 shrink-0">
       <!-- 1x vs 2x vs 4x Pro Grid Screen -->
       <div class="hidden md:flex items-center bg-tv-bg p-0.5 rounded border border-tv-border text-[11px] font-mono">
@@ -747,7 +747,7 @@
       if (!GOOGLE_SHEET_SCRIPT_URL || GOOGLE_SHEET_SCRIPT_URL.indexOf('PASTE_YOUR') !== -1) return;
 
       try {
-        const res = await fetch(GOOGLE_SHEET_SCRIPT_URL + '?utr=' + encodeURIComponent(pendingData.utr));
+        const res = await fetch(GOOGLE_SHEET_SCRIPT_URL + '?action=check&utr=' + encodeURIComponent(pendingData.utr));
         const data = await res.json();
 
         if (data.status === 'Approved') {
@@ -876,7 +876,7 @@
       setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
     });
 
-    // --- SUBMIT UTR TO GOOGLE SHEET OR ADMIN UNLOCK ---
+    // --- SUBMIT UTR TO GOOGLE SHEET (GET METHOD) OR ADMIN UNLOCK ---
     document.getElementById('verifyUpiBtn').addEventListener('click', async function() {
       const utr = document.getElementById('utrInput').value.trim();
       const contact = document.getElementById('payerContactInput').value.trim() || 'Guest User';
@@ -918,17 +918,13 @@
 
       try {
         if (GOOGLE_SHEET_SCRIPT_URL && GOOGLE_SHEET_SCRIPT_URL.indexOf('PASTE_YOUR') === -1) {
-          await fetch(GOOGLE_SHEET_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              userId: contact,
-              plan: planLabel,
-              amount: amount,
-              utr: utr
-            })
-          });
+          const submitUrl = GOOGLE_SHEET_SCRIPT_URL +
+            '?action=submit' +
+            '&userId=' + encodeURIComponent(contact) +
+            '&plan=' + encodeURIComponent(planLabel) +
+            '&amount=' + encodeURIComponent(amount) +
+            '&utr=' + encodeURIComponent(utr);
+          await fetch(submitUrl);
         }
 
         localStorage.setItem('pipscopetrade1_pending_utr', JSON.stringify({
