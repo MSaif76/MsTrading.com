@@ -56,11 +56,6 @@
       border-color: #2962ff;
       color: #ffffff;
     }
-    .pro-blur-preview {
-      filter: blur(2.5px);
-      pointer-events: none;
-      opacity: 0.72;
-    }
   </style>
 </head>
 <body class="h-screen w-screen flex flex-col bg-tv-bg text-tv-text">
@@ -699,12 +694,12 @@
 
     // Paste your Google Apps Script Web App URL inside the quotes below:
     const GOOGLE_SHEET_SCRIPT_URL = 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
-    const ADMIN_SECRET_CODE = 'SAIFPRO2026'; // Admin free unlock code
+    const ADMIN_SECRET_CODE = 'SAIFPRO2026';
 
     // --- STATE ---
     let currentSymbol = 'OANDA:XAUUSD';
     let currentInterval = '1';
-    let layoutMode = '1x'; // '1x' | '2x' | '4x'
+    let layoutMode = '1x';
     let activeStudies = [];
     let currencyMode = 'USD';
     let selectedPlan = 'monthly';
@@ -724,12 +719,12 @@
 
       if (pro) {
         const expDate = new Date(proSubscription.expiresAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-        badge.textContent = `PRO • Till ${expDate}`;
+        badge.textContent = 'PRO • Till ' + expDate;
         badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded';
         upgradeBtn.innerHTML = '<span>★ Pro Active</span>';
         upgradeBtn.className = 'px-2.5 py-1 text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded flex items-center gap-1';
 
-        document.querySelectorAll('.pro-lock-tag').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.pro-lock-tag').forEach(function(el) { el.classList.add('hidden'); });
         document.getElementById('exportCsvBtn').textContent = 'Export CSV';
         document.getElementById('importMt5Label').childNodes[0].textContent = 'Import MT5/CSV ';
         document.getElementById('layoutSplitBtn').textContent = '2x';
@@ -738,7 +733,7 @@
         document.getElementById('toolTabFib').textContent = 'Golden Zone';
         document.getElementById('toolTabProp').textContent = 'Prop Guard';
         document.getElementById('openPineModalBtn').textContent = 'SMC & Gold Pine Scripts →';
-        document.getElementById('activeStudiesCount').textContent = `${activeStudies.length} ${activeStudies.length === 1 ? 'Study' : 'Studies'} Active`;
+        document.getElementById('activeStudiesCount').textContent = activeStudies.length + (activeStudies.length === 1 ? ' Study Active' : ' Studies Active');
       } else if (pendingUtr) {
         badge.textContent = 'VERIFYING UTR...';
         badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/40 rounded animate-pulse';
@@ -751,10 +746,10 @@
       if (isProActive()) return;
       const pendingData = JSON.parse(localStorage.getItem('pipscopetrade1_pending_utr') || 'null');
       if (!pendingData || !pendingData.utr) return;
-      if (!GOOGLE_SHEET_SCRIPT_URL || GOOGLE_SHEET_SCRIPT_URL.includes('PASTE_YOUR')) return;
+      if (!GOOGLE_SHEET_SCRIPT_URL || GOOGLE_SHEET_SCRIPT_URL.indexOf('PASTE_YOUR') !== -1) return;
 
       try {
-        const res = await fetch(`${GOOGLE_SHEET_SCRIPT_URL}?utr=${encodeURIComponent(pendingData.utr)}`);
+        const res = await fetch(GOOGLE_SHEET_SCRIPT_URL + '?utr=' + encodeURIComponent(pendingData.utr));
         const data = await res.json();
 
         if (data.status === 'Approved') {
@@ -798,9 +793,10 @@
 
       function setSessBadge(elId, label, isOpen) {
         const el = document.getElementById(elId);
+        if (!el) return;
         el.innerHTML = isOpen
-          ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> <span class="text-white font-semibold">${label}</span>`
-          : `<span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> <span class="text-tv-muted">${label}</span>`;
+          ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> <span class="text-white font-semibold">' + label + '</span>'
+          : '<span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> <span class="text-tv-muted">' + label + '</span>';
       }
 
       setSessBadge('sessSydney', 'Sydney', sydneyOpen);
@@ -827,8 +823,8 @@
       const amount = selectedPlan === 'monthly' ? '149.00' : '1649.00';
       const displayAmt = selectedPlan === 'monthly' ? '₹149.00' : '₹1,649.00';
       const note = selectedPlan === 'monthly' ? 'pipscopetrade1 Pro Monthly' : 'pipscopetrade1 Pro Yearly';
-      const upiUrl = `upi://pay?pa=${encodeURIComponent(MERCHANT_UPI_ID)}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
-      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUrl)}`;
+      const upiUrl = 'upi://pay?pa=' + encodeURIComponent(MERCHANT_UPI_ID) + '&pn=' + encodeURIComponent(MERCHANT_NAME) + '&am=' + amount + '&cu=INR&tn=' + encodeURIComponent(note);
+      const qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(upiUrl);
 
       document.getElementById('upiQrImg').src = qrApiUrl;
       document.getElementById('upiPayAmount').textContent = displayAmt;
@@ -851,7 +847,7 @@
       const pending = JSON.parse(localStorage.getItem('pipscopetrade1_pending_utr') || 'null');
       const statusEl = document.getElementById('upiStatusMsg');
       if (pending && !isProActive()) {
-        statusEl.textContent = `UTR ${pending.utr} is pending verification. Checking status automatically...`;
+        statusEl.textContent = 'UTR ' + pending.utr + ' is pending verification. Checking status automatically...';
         statusEl.classList.remove('hidden');
         checkGoogleSheetApproval();
       }
@@ -866,24 +862,24 @@
 
     document.getElementById('openUpgradeBtn').addEventListener('click', openUpgradeModal);
     document.getElementById('closeUpgradeModalBtn').addEventListener('click', closeUpgradeModal);
-    document.getElementById('planMonthlyCard').addEventListener('click', () => {
+    document.getElementById('planMonthlyCard').addEventListener('click', function() {
       selectedPlan = 'monthly';
       updateUpiDetails();
     });
-    document.getElementById('planYearlyCard').addEventListener('click', () => {
+    document.getElementById('planYearlyCard').addEventListener('click', function() {
       selectedPlan = 'yearly';
       updateUpiDetails();
     });
 
-    document.getElementById('copyUpiIdBtn').addEventListener('click', () => {
+    document.getElementById('copyUpiIdBtn').addEventListener('click', function() {
       navigator.clipboard.writeText(MERCHANT_UPI_ID);
       const btn = document.getElementById('copyUpiIdBtn');
       btn.textContent = 'Copied!';
-      setTimeout(() => (btn.textContent = 'Copy'), 1500);
+      setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
     });
 
     // --- SUBMIT UTR TO GOOGLE SHEET OR ADMIN UNLOCK ---
-    document.getElementById('verifyUpiBtn').addEventListener('click', async () => {
+    document.getElementById('verifyUpiBtn').addEventListener('click', async function() {
       const utr = document.getElementById('utrInput').value.trim();
       const contact = document.getElementById('payerContactInput').value.trim() || 'Guest User';
       const errEl = document.getElementById('upiErrorMsg');
@@ -923,7 +919,7 @@
       btn.textContent = 'Sending...';
 
       try {
-        if (GOOGLE_SHEET_SCRIPT_URL && !GOOGLE_SHEET_SCRIPT_URL.includes('PASTE_YOUR')) {
+        if (GOOGLE_SHEET_SCRIPT_URL && GOOGLE_SHEET_SCRIPT_URL.indexOf('PASTE_YOUR') === -1) {
           await fetch(GOOGLE_SHEET_SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
@@ -944,7 +940,7 @@
         }));
 
         updateProUI();
-        statusEl.textContent = `UTR ${utr} submitted! Once verified in admin sheet (5–10 mins), refresh page to unlock Pro.`;
+        statusEl.textContent = 'UTR ' + utr + ' submitted! Once verified in admin sheet (5–10 mins), refresh page to unlock Pro.';
         statusEl.classList.remove('hidden');
         alert('UTR Submitted! Your payment is being verified. Pro features will unlock automatically once approved.');
       } catch (e) {
@@ -962,9 +958,9 @@
         openUpgradeModal();
         return;
       }
-      ['Calc', 'Fib', 'Prop'].forEach(t => {
-        const btn = document.getElementById(`toolTab${t}`);
-        const panel = document.getElementById(`panelTool${t}`);
+      ['Calc', 'Fib', 'Prop'].forEach(function(t) {
+        const btn = document.getElementById('toolTab' + t);
+        const panel = document.getElementById('panelTool' + t);
         if (t.toLowerCase() === toolName) {
           btn.className = 'py-1.5 rounded bg-tv-blue text-white';
           panel.classList.remove('hidden');
@@ -975,9 +971,9 @@
       });
     }
 
-    document.getElementById('toolTabCalc').addEventListener('click', () => switchRightTool('calc'));
-    document.getElementById('toolTabFib').addEventListener('click', () => switchRightTool('fib'));
-    document.getElementById('toolTabProp').addEventListener('click', () => switchRightTool('prop'));
+    document.getElementById('toolTabCalc').addEventListener('click', function() { switchRightTool('calc'); });
+    document.getElementById('toolTabFib').addEventListener('click', function() { switchRightTool('fib'); });
+    document.getElementById('toolTabProp').addEventListener('click', function() { switchRightTool('prop'); });
 
     // --- GOLDEN ZONE (0.280 - 0.382) FIB SNIPER CALCULATOR ---
     let computedFibSetup = null;
@@ -1013,7 +1009,7 @@
         sl = g618 + diff * 0.08;
       }
 
-      document.getElementById('fibSniperZone').textContent = `${z280.toFixed(2)} – ${z382.toFixed(2)}`;
+      document.getElementById('fibSniperZone').textContent = z280.toFixed(2) + ' – ' + z382.toFixed(2);
       document.getElementById('fibHalfLevel').textContent = half.toFixed(2);
       document.getElementById('fibGoldenLevel').textContent = g618.toFixed(2);
       document.getElementById('fibTargetLevel').textContent = target.toFixed(2);
@@ -1026,11 +1022,11 @@
       };
     }
 
-    ['fibLow', 'fibHigh', 'fibTrend'].forEach(id => {
+    ['fibLow', 'fibHigh', 'fibTrend'].forEach(function(id) {
       document.getElementById(id).addEventListener('input', updateFibGoldenZone);
     });
 
-    document.getElementById('applyFibToCalcBtn').addEventListener('click', () => {
+    document.getElementById('applyFibToCalcBtn').addEventListener('click', function() {
       if (!isProActive()) { openUpgradeModal(); return; }
       if (!computedFibSetup) {
         alert('Please enter valid Swing Low and Swing High first.');
@@ -1054,82 +1050,42 @@
       const maxDdAmt = accSize * (maxDdPct / 100);
       const targetAmt = accSize * (targetPct / 100);
 
-      const closed = trades.filter(t => t.status !== 'OPEN');
-      const netPnl = closed.reduce((a, b) => a + b.pnl, 0);
+      const closed = trades.filter(function(t) { return t.status !== 'OPEN'; });
+      const netPnl = closed.reduce(function(a, b) { return a + b.pnl; }, 0);
 
       const progressPct = Math.max(0, Math.min(100, (netPnl / targetAmt) * 100));
       const ddUsed = netPnl < 0 ? Math.abs(netPnl) : 0;
       const ddRemaining = Math.max(0, maxDdAmt - ddUsed);
       const ddBufferPct = Math.max(0, Math.min(100, (ddRemaining / maxDdAmt) * 100));
 
-      document.getElementById('propTargetText').textContent = `$${netPnl.toFixed(0)} / $${targetAmt.toFixed(0)}`;
-      document.getElementById('propTargetBar').style.width = `${progressPct}%`;
+      document.getElementById('propTargetText').textContent = '$' + netPnl.toFixed(0) + ' / $' + targetAmt.toFixed(0);
+      document.getElementById('propTargetBar').style.width = progressPct + '%';
 
-      document.getElementById('propDdText').textContent = `$${ddRemaining.toFixed(2)} Safe`;
-      document.getElementById('propDdBar').style.width = `${ddBufferPct}%`;
+      document.getElementById('propDdText').textContent = '$' + ddRemaining.toFixed(2) + ' Safe';
+      document.getElementById('propDdBar').style.width = ddBufferPct + '%';
       document.getElementById('propDdBar').className = ddBufferPct < 30 ? 'h-full bg-tv-red transition-all' : 'h-full bg-tv-blue transition-all';
     }
 
-    ['propAccSize', 'propDailyMax', 'propTargetPct'].forEach(id => {
+    ['propAccSize', 'propDailyMax', 'propTargetPct'].forEach(function(id) {
       document.getElementById(id).addEventListener('input', updatePropGuard);
     });
 
     // --- INSTITUTIONAL PINE SCRIPT V5 LIBRARY ---
     const pineTemplates = {
-      golden_zone: `//@version=5
-indicator("pipscopetrade1 0.280–0.382 Golden Zone Sniper", overlay=true)
-lookback = input.int(30, "Swing Lookback")
-hi = ta.highest(high, lookback)
-lo = ta.lowest(low, lookback)
-rng = hi - lo
-gzTop = hi - rng * 0.280
-gzBot = hi - rng * 0.382
-p1 = plot(gzTop, "0.280 Zone Top", color=color.new(#f59e0b, 20), linewidth=2)
-p2 = plot(gzBot, "0.382 Zone Bottom", color=color.new(#10b981, 20), linewidth=2)
-fill(p1, p2, color=color.new(#f59e0b, 82), title="Golden Zone")
-bullConfirm = close > open and low <= gzTop and close > gzBot
-plotshape(bullConfirm, style=shape.labelup, text="GZ BUY", location=location.belowbar, color=color.emerald, textcolor=color.white, size=size.small)`,
-
-      smc_ob: `//@version=5
-indicator("pipscopetrade1 Institutional Order Block & FVG", overlay=true)
-bullFVG = low > high[2] and close[1] > open[1]
-bearFVG = high < low[2] and close[1] < open[1]
-plotshape(bullFVG, title="Bullish FVG", style=shape.triangleup, location=location.belowbar, color=color.new(#089981, 0), size=size.tiny)
-plotshape(bearFVG, title="Bearish FVG", style=shape.triangledown, location=location.abovebar, color=color.new(#f23645, 0), size=size.tiny)
-bgcolor(bullFVG ? color.new(#089981, 90) : bearFVG ? color.new(#f23645, 90) : na)`,
-
-      killzone_box: `//@version=5
-indicator("pipscopetrade1 London & NY Killzones", overlay=true)
-lonKZ = not na(time(timeframe.period, "0700-1000", "UTC"))
-nyKZ  = not na(time(timeframe.period, "1300-1600", "UTC"))
-bgcolor(lonKZ ? color.new(#2962ff, 88) : na, title="London Killzone")
-bgcolor(nyKZ  ? color.new(#f59e0b, 88) : na, title="New York Killzone")`,
-
-      ema_cross: `//@version=5
-indicator("pipscopetrade1 EMA 20/50 Institutional Trend", overlay=true)
-fastEMA = ta.ema(close, 20)
-slowEMA = ta.ema(close, 50)
-plot(fastEMA, color=color.new(#2962ff, 0), linewidth=2, title="EMA 20")
-plot(slowEMA, color=color.new(#f23645, 0), linewidth=2, title="EMA 50")
-plotshape(ta.crossover(fastEMA, slowEMA), style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small)
-plotshape(ta.crossunder(fastEMA, slowEMA), style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small)`,
-
-      vwap_bands: `//@version=5
-indicator("pipscopetrade1 Institutional VWAP + StdDev", overlay=true)
-vwapVal = ta.vwap(hlc3)
-stdevVal = ta.stdev(close, 20)
-plot(vwapVal, "VWAP", color=color.orange, linewidth=2)
-plot(vwapVal + stdevVal * 1.5, "Upper Band", color=color.new(#2962ff, 40))
-plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
+      golden_zone: '//@version=5\nindicator("pipscopetrade1 0.280–0.382 Golden Zone Sniper", overlay=true)\nlookback = input.int(30, "Swing Lookback")\nhi = ta.highest(high, lookback)\nlo = ta.lowest(low, lookback)\nrng = hi - lo\ngzTop = hi - rng * 0.280\ngzBot = hi - rng * 0.382\np1 = plot(gzTop, "0.280 Zone Top", color=color.new(#f59e0b, 20), linewidth=2)\np2 = plot(gzBot, "0.382 Zone Bottom", color=color.new(#10b981, 20), linewidth=2)\nfill(p1, p2, color=color.new(#f59e0b, 82), title="Golden Zone")\nbullConfirm = close > open and low <= gzTop and close > gzBot\nplotshape(bullConfirm, style=shape.labelup, text="GZ BUY", location=location.belowbar, color=color.emerald, textcolor=color.white, size=size.small)',
+      smc_ob: '//@version=5\nindicator("pipscopetrade1 Institutional Order Block & FVG", overlay=true)\nbullFVG = low > high[2] and close[1] > open[1]\nbearFVG = high < low[2] and close[1] < open[1]\nplotshape(bullFVG, title="Bullish FVG", style=shape.triangleup, location=location.belowbar, color=color.new(#089981, 0), size=size.tiny)\nplotshape(bearFVG, title="Bearish FVG", style=shape.triangledown, location=location.abovebar, color=color.new(#f23645, 0), size=size.tiny)\nbgcolor(bullFVG ? color.new(#089981, 90) : bearFVG ? color.new(#f23645, 90) : na)',
+      killzone_box: '//@version=5\nindicator("pipscopetrade1 London & NY Killzones", overlay=true)\nlonKZ = not na(time(timeframe.period, "0700-1000", "UTC"))\nnyKZ  = not na(time(timeframe.period, "1300-1600", "UTC"))\nbgcolor(lonKZ ? color.new(#2962ff, 88) : na, title="London Killzone")\nbgcolor(nyKZ  ? color.new(#f59e0b, 88) : na, title="New York Killzone")',
+      ema_cross: '//@version=5\nindicator("pipscopetrade1 EMA 20/50 Institutional Trend", overlay=true)\nfastEMA = ta.ema(close, 20)\nslowEMA = ta.ema(close, 50)\nplot(fastEMA, color=color.new(#2962ff, 0), linewidth=2, title="EMA 20")\nplot(slowEMA, color=color.new(#f23645, 0), linewidth=2, title="EMA 50")\nplotshape(ta.crossover(fastEMA, slowEMA), style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small)\nplotshape(ta.crossunder(fastEMA, slowEMA), style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small)',
+      vwap_bands: '//@version=5\nindicator("pipscopetrade1 Institutional VWAP + StdDev", overlay=true)\nvwapVal = ta.vwap(hlc3)\nstdevVal = ta.stdev(close, 20)\nplot(vwapVal, "VWAP", color=color.orange, linewidth=2)\nplot(vwapVal + stdevVal * 1.5, "Upper Band", color=color.new(#2962ff, 40))\nplot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))'
     };
 
     // --- LOAD LIVE CHART WIDGETS ---
-    function createTvWidget(containerId, symbol, interval, studies = [], hideSide = false) {
+    function createTvWidget(containerId, symbol, interval, studies, hideSide) {
       const container = document.getElementById(containerId);
       if (!container) return;
       container.innerHTML = '';
       if (typeof TradingView === 'undefined') {
-        container.innerHTML = '<div class="p-6 text-sm text-tv-muted">Unable to load live chart script. Please refresh.</div>';
+        container.innerHTML = '<div class="p-6 text-sm text-tv-muted">Unable to load live chart script. Please check internet and refresh.</div>';
         return;
       }
       new TradingView.widget({
@@ -1143,12 +1099,12 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
         toolbar_bg: '#1e222d',
         enable_publishing: false,
         withdateranges: true,
-        hide_side_toolbar: hideSide,
+        hide_side_toolbar: hideSide || false,
         allow_symbol_change: true,
         details: false,
         hotlist: false,
         calendar: false,
-        studies: studies,
+        studies: studies || [],
         container_id: containerId
       });
     }
@@ -1156,8 +1112,8 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
     function loadChartWidget() {
       createTvWidget('tv_chart_container', currentSymbol, currentInterval, activeStudies, false);
       const countText = isProActive()
-        ? `${activeStudies.length} ${activeStudies.length === 1 ? 'Study' : 'Studies'} Active`
-        : `${activeStudies.length}/1 Free Study`;
+        ? activeStudies.length + (activeStudies.length === 1 ? ' Study Active' : ' Studies Active')
+        : activeStudies.length + '/1 Free Study';
       document.getElementById('activeStudiesCount').textContent = countText;
     }
 
@@ -1204,7 +1160,7 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       const btn2 = document.getElementById('layoutSplitBtn');
       const btn4 = document.getElementById('layoutQuadBtn');
 
-      [btn1, btn2, btn4].forEach(b => (b.className = 'px-2 py-0.5 rounded text-tv-muted hover:text-white'));
+      [btn1, btn2, btn4].forEach(function(b) { b.className = 'px-2 py-0.5 rounded text-tv-muted hover:text-white'; });
 
       if (mode === '1x') {
         ws.className = 'flex-1 grid grid-cols-1 grid-rows-1 min-w-0 bg-tv-bg relative';
@@ -1229,11 +1185,11 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       }
     }
 
-    document.getElementById('layoutSingleBtn').addEventListener('click', () => setChartLayout('1x'));
-    document.getElementById('closeSplitBtn').addEventListener('click', () => setChartLayout('1x'));
-    document.getElementById('layoutSplitBtn').addEventListener('click', () => setChartLayout('2x'));
-    document.getElementById('layoutQuadBtn').addEventListener('click', () => setChartLayout('4x'));
-    ['splitSymbolSelect', 'splitTfSelect', 'quadSymbol3', 'quadTf3', 'quadSymbol4', 'quadTf4'].forEach(id => {
+    document.getElementById('layoutSingleBtn').addEventListener('click', function() { setChartLayout('1x'); });
+    document.getElementById('closeSplitBtn').addEventListener('click', function() { setChartLayout('1x'); });
+    document.getElementById('layoutSplitBtn').addEventListener('click', function() { setChartLayout('2x'); });
+    document.getElementById('layoutQuadBtn').addEventListener('click', function() { setChartLayout('4x'); });
+    ['splitSymbolSelect', 'splitTfSelect', 'quadSymbol3', 'quadTf3', 'quadSymbol4', 'quadTf4'].forEach(function(id) {
       document.getElementById(id).addEventListener('change', loadSecondaryChartWidget);
     });
 
@@ -1293,14 +1249,14 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       wrap.appendChild(script);
     }
 
-    document.getElementById('sideTabWatchlist').addEventListener('click', () => {
+    document.getElementById('sideTabWatchlist').addEventListener('click', function() {
       document.getElementById('sideTabWatchlist').className = 'flex-1 py-1 rounded bg-tv-panel text-white';
       document.getElementById('sideTabCalendar').className = 'flex-1 py-1 rounded text-tv-muted hover:text-white';
       document.getElementById('marketOverviewWidget').classList.remove('hidden');
       document.getElementById('economicCalendarWidget').classList.add('hidden');
     });
 
-    document.getElementById('sideTabCalendar').addEventListener('click', () => {
+    document.getElementById('sideTabCalendar').addEventListener('click', function() {
       document.getElementById('sideTabCalendar').className = 'flex-1 py-1 rounded bg-tv-panel text-white';
       document.getElementById('sideTabWatchlist').className = 'flex-1 py-1 rounded text-tv-muted hover:text-white';
       document.getElementById('economicCalendarWidget').classList.remove('hidden');
@@ -1309,9 +1265,9 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
     });
 
     // --- SYMBOL & TIMEFRAME HANDLERS (ALL SYMBOLS UNLOCKED) ---
-    document.querySelectorAll('.sym-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.sym-btn').forEach(b => {
+    document.querySelectorAll('.sym-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.sym-btn').forEach(function(b) {
           b.classList.remove('bg-tv-blue', 'text-white');
           b.classList.add('bg-tv-bg', 'text-tv-text');
         });
@@ -1322,21 +1278,21 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       });
     });
 
-    document.getElementById('customSymbolForm').addEventListener('submit', e => {
+    document.getElementById('customSymbolForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const val = document.getElementById('customSymbolInput').value.trim().toUpperCase();
       if (!val) return;
       currentSymbol = val;
-      document.querySelectorAll('.sym-btn').forEach(b => {
+      document.querySelectorAll('.sym-btn').forEach(function(b) {
         b.classList.remove('bg-tv-blue', 'text-white');
         b.classList.add('bg-tv-bg', 'text-tv-text');
       });
       loadChartWidget();
     });
 
-    document.querySelectorAll('.tf-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tf-btn').forEach(b => {
+    document.querySelectorAll('.tf-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tf-btn').forEach(function(b) {
           b.classList.remove('bg-tv-blue', 'text-white');
           b.classList.add('text-tv-muted');
         });
@@ -1348,15 +1304,15 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
     });
 
     // --- INDICATOR STUDIES (1 FREE INDICATOR; 2+ REQUIRE PRO) ---
-    document.querySelectorAll('.study-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+    document.querySelectorAll('.study-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
         const studyId = btn.dataset.study;
-        if (!isProActive() && activeStudies.length >= 1 && !activeStudies.includes(studyId)) {
+        if (!isProActive() && activeStudies.length >= 1 && activeStudies.indexOf(studyId) === -1) {
           openUpgradeModal();
           return;
         }
-        if (activeStudies.includes(studyId)) {
-          activeStudies = activeStudies.filter(s => s !== studyId);
+        if (activeStudies.indexOf(studyId) !== -1) {
+          activeStudies = activeStudies.filter(function(s) { return s !== studyId; });
           btn.classList.remove('active-study');
         } else {
           activeStudies.push(studyId);
@@ -1366,22 +1322,22 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       });
     });
 
-    document.getElementById('toggleIndicatorBarBtn').addEventListener('click', () => {
+    document.getElementById('toggleIndicatorBarBtn').addEventListener('click', function() {
       document.getElementById('indicatorBar').classList.toggle('hidden');
     });
-    document.getElementById('hideIndicatorBarBtn').addEventListener('click', () => {
+    document.getElementById('hideIndicatorBarBtn').addEventListener('click', function() {
       document.getElementById('indicatorBar').classList.add('hidden');
     });
-    document.getElementById('toggleSidebarBtn').addEventListener('click', () => {
+    document.getElementById('toggleSidebarBtn').addEventListener('click', function() {
       document.getElementById('rightSidebar').classList.toggle('hidden');
     });
 
     // --- DISCIPLINE CHECKLIST ---
-    document.querySelectorAll('.disc-chk').forEach(chk => {
-      chk.addEventListener('change', () => {
+    document.querySelectorAll('.disc-chk').forEach(function(chk) {
+      chk.addEventListener('change', function() {
         const checked = document.querySelectorAll('.disc-chk:checked').length;
         const scoreEl = document.getElementById('checklistScore');
-        scoreEl.textContent = `${checked}/4 Ready`;
+        scoreEl.textContent = checked + '/4 Ready';
         scoreEl.className = checked === 4 ? 'text-[10px] font-mono text-emerald-400 font-bold' : 'text-[10px] font-mono text-amber-400';
       });
     });
@@ -1397,7 +1353,7 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
 
       const sym = currencyMode === 'USD' ? '$' : '₹';
       const riskAmt = bal * (riskPct / 100);
-      document.getElementById('outRiskAmt').textContent = `${sym}${riskAmt.toFixed(2)}`;
+      document.getElementById('outRiskAmt').textContent = sym + riskAmt.toFixed(2);
 
       if (!isNaN(entry) && !isNaN(sl) && entry !== sl) {
         if (!isProActive()) {
@@ -1409,26 +1365,26 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
         let sizeText = '';
         if (inst === 'XAUUSD') {
           const lots = riskAmt / (slDist * 100);
-          sizeText = `${lots.toFixed(2)} Lots`;
+          sizeText = lots.toFixed(2) + ' Lots';
         } else if (inst === 'FOREX') {
           const lots = riskAmt / (slDist * 100000);
-          sizeText = `${lots.toFixed(2)} Lots`;
+          sizeText = lots.toFixed(2) + ' Lots';
         } else if (inst === 'NIFTY') {
           const qty = Math.floor(riskAmt / slDist);
-          sizeText = `${qty} Qty (${Math.floor(qty / 75)} Lots)`;
+          sizeText = qty + ' Qty (' + Math.floor(qty / 75) + ' Lots)';
         } else if (inst === 'BANKNIFTY') {
           const qty = Math.floor(riskAmt / slDist);
-          sizeText = `${qty} Qty (${Math.floor(qty / 30)} Lots)`;
+          sizeText = qty + ' Qty (' + Math.floor(qty / 30) + ' Lots)';
         } else {
           const units = riskAmt / slDist;
-          sizeText = `${units.toFixed(4)} Units`;
+          sizeText = units.toFixed(4) + ' Units';
         }
         document.getElementById('outLotSize').textContent = sizeText;
 
         if (!isNaN(tp) && tp !== entry) {
           const tpDist = Math.abs(tp - entry);
           const rr = tpDist / slDist;
-          document.getElementById('outRR').textContent = `1 : ${rr.toFixed(2)}`;
+          document.getElementById('outRR').textContent = '1 : ' + rr.toFixed(2);
         } else {
           document.getElementById('outRR').textContent = '—';
         }
@@ -1438,11 +1394,11 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       }
     }
 
-    ['calcBalance', 'calcRiskPct', 'calcInstrument', 'calcEntry', 'calcSl', 'calcTp'].forEach(id => {
+    ['calcBalance', 'calcRiskPct', 'calcInstrument', 'calcEntry', 'calcSl', 'calcTp'].forEach(function(id) {
       document.getElementById(id).addEventListener('input', updateCalculator);
     });
 
-    document.getElementById('currUsdBtn').addEventListener('click', () => {
+    document.getElementById('currUsdBtn').addEventListener('click', function() {
       currencyMode = 'USD';
       document.getElementById('currUsdBtn').className = 'px-2 py-0.5 rounded bg-tv-blue text-white font-semibold';
       document.getElementById('currInrBtn').className = 'px-2 py-0.5 rounded text-tv-muted hover:text-white';
@@ -1450,7 +1406,7 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       renderJournal();
     });
 
-    document.getElementById('currInrBtn').addEventListener('click', () => {
+    document.getElementById('currInrBtn').addEventListener('click', function() {
       currencyMode = 'INR';
       document.getElementById('currInrBtn').className = 'px-2 py-0.5 rounded bg-tv-blue text-white font-semibold';
       document.getElementById('currUsdBtn').className = 'px-2 py-0.5 rounded text-tv-muted hover:text-white';
@@ -1459,27 +1415,25 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
     });
 
     // --- MT5 / CSV STATEMENT AUTO-IMPORTER (PRO FEATURE) ---
-    document.getElementById('importMt5Label').addEventListener('click', e => {
+    document.getElementById('importMt5Label').addEventListener('click', function(e) {
       if (!isProActive()) {
         e.preventDefault();
         openUpgradeModal();
       }
     });
 
-    document.getElementById('mt5FileInput').addEventListener('change', e => {
+    document.getElementById('mt5FileInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = ev => {
+      reader.onload = function(ev) {
         const text = ev.target.result;
-        const lines = text.split(/
-?
-/).filter(l => l.trim());
+        const lines = text.split(/\r?\n/).filter(function(l) { return l.trim(); });
         let importedCount = 0;
 
-        lines.forEach((line, idx) => {
+        lines.forEach(function(line, idx) {
           if (idx === 0 && /symbol|ticket|time/i.test(line)) return;
-          const cols = line.split(/,|	/).map(c => c.replace(/^"|"$/g, '').trim());
+          const cols = line.split(/,|\t/).map(function(c) { return c.replace(/^"|"$/g, '').trim(); });
           if (cols.length >= 6) {
             const pnlVal = parseFloat(cols[cols.length - 1]);
             if (!isNaN(pnlVal)) {
@@ -1504,7 +1458,7 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
 
         if (importedCount > 0) {
           saveTrades();
-          alert(`Imported ${importedCount} trades from ${file.name}!`);
+          alert('Imported ' + importedCount + ' trades from ' + file.name + '!');
         } else {
           alert('Could not detect valid trade rows. Ensure CSV has Symbol, Side, Size, Entry, and Profit columns.');
         }
@@ -1519,7 +1473,7 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       renderJournal();
     }
 
-    document.getElementById('logTradeBtn').addEventListener('click', () => {
+    document.getElementById('logTradeBtn').addEventListener('click', function() {
       if (!isProActive()) {
         openUpgradeModal();
         return;
@@ -1538,14 +1492,14 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       const newTrade = {
         id: Date.now(),
         dateKey: now.toISOString().slice(0, 10),
-        time: `${now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+        time: now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         symbol: currentSymbol.split(':').pop(),
         side: document.getElementById('calcSide').value,
         size: document.getElementById('outLotSize').textContent,
-        entry,
-        sl,
+        entry: entry,
+        sl: sl,
         tp: isNaN(tp) ? '-' : tp,
-        note: note || `${checks}/4 Rules Checked`,
+        note: note || (checks + '/4 Rules Checked'),
         status: 'OPEN',
         pnl: 0
       };
@@ -1559,7 +1513,7 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       const bal = parseFloat(document.getElementById('calcBalance').value) || 10000;
       const riskPct = parseFloat(document.getElementById('calcRiskPct').value) || 1;
       const riskAmt = bal * (riskPct / 100);
-      trades = trades.map(t => {
+      trades = trades.map(function(t) {
         if (t.id === id) {
           let rr = 2;
           if (t.tp !== '-' && t.entry !== t.sl) {
@@ -1575,7 +1529,7 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
 
     function deleteTrade(id) {
       if (!isProActive()) { openUpgradeModal(); return; }
-      trades = trades.filter(t => t.id !== id);
+      trades = trades.filter(function(t) { return t.id !== id; });
       saveTrades();
     }
 
@@ -1585,35 +1539,35 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       const year = now.getFullYear();
       const month = now.getMonth();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
-      document.getElementById('heatmapMonthTitle').textContent = `${now.toLocaleString('en-US', { month: 'long', year: 'numeric' })} — Daily P&L Heatmap`;
+      document.getElementById('heatmapMonthTitle').textContent = now.toLocaleString('en-US', { month: 'long', year: 'numeric' }) + ' — Daily P&L Heatmap';
 
       const dailyMap = {};
-      closedTrades.forEach(t => {
+      closedTrades.forEach(function(t) {
         const dk = t.dateKey || now.toISOString().slice(0, 10);
         dailyMap[dk] = (dailyMap[dk] || 0) + t.pnl;
       });
 
       let cells = '';
       for (let d = 1; d <= daysInMonth; d++) {
-        const key = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const key = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
         const val = dailyMap[key];
         let cls = 'bg-tv-bg border-tv-border text-tv-muted';
         let label = '—';
         if (val !== undefined) {
           if (val > 0) {
             cls = 'bg-emerald-500/25 border-emerald-500/60 text-emerald-300 font-bold';
-            label = `+${sym}${val.toFixed(0)}`;
+            label = '+' + sym + val.toFixed(0);
           } else if (val < 0) {
             cls = 'bg-rose-500/25 border-rose-500/60 text-rose-300 font-bold';
-            label = `-${sym}${Math.abs(val).toFixed(0)}`;
+            label = '-' + sym + Math.abs(val).toFixed(0);
           } else {
-            label = `${sym}0`;
+            label = sym + '0';
           }
         }
-        cells += `<div class="border rounded p-1.5 flex flex-col justify-between ${cls}">
-          <span class="text-[9px] opacity-75">Day ${d}</span>
-          <span class="truncate mt-0.5">${label}</span>
-        </div>`;
+        cells += '<div class="border rounded p-1.5 flex flex-col justify-between ' + cls + '">' +
+          '<span class="text-[9px] opacity-75">Day ' + d + '</span>' +
+          '<span class="truncate mt-0.5">' + label + '</span>' +
+        '</div>';
       }
       grid.innerHTML = cells;
     }
@@ -1624,27 +1578,27 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       if (!closedTrades.length) {
         polyline.setAttribute('points', '0,35 300,35');
         polyline.setAttribute('stroke', '#089981');
-        peakLabel.textContent = `Peak: ${sym}0.00`;
+        peakLabel.textContent = 'Peak: ' + sym + '0.00';
         return;
       }
-      const chronological = [...closedTrades].reverse();
+      const chronological = closedTrades.slice().reverse();
       let cum = 0;
       const values = [0];
-      chronological.forEach(t => {
+      chronological.forEach(function(t) {
         cum += t.pnl;
         values.push(cum);
       });
-      const maxVal = Math.max(...values, 10);
-      const minVal = Math.min(...values, -10);
+      const maxVal = Math.max.apply(null, values.concat([10]));
+      const minVal = Math.min.apply(null, values.concat([-10]));
       const range = maxVal - minVal || 1;
-      const pts = values.map((v, idx) => {
+      const pts = values.map(function(v, idx) {
         const x = (idx / (values.length - 1)) * 300;
         const y = 65 - ((v - minVal) / range) * 60;
-        return `${x.toFixed(1)},${y.toFixed(1)}`;
+        return x.toFixed(1) + ',' + y.toFixed(1);
       }).join(' ');
       polyline.setAttribute('points', pts);
       polyline.setAttribute('stroke', cum >= 0 ? '#089981' : '#f23645');
-      peakLabel.textContent = `Peak: ${sym}${Math.max(...values).toFixed(2)}`;
+      peakLabel.textContent = 'Peak: ' + sym + Math.max.apply(null, values).toFixed(2);
     }
 
     function renderJournal() {
@@ -1653,70 +1607,69 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       document.getElementById('journalCountBadge').textContent = trades.length;
 
       if (!isProActive() || trades.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="py-6 text-center text-tv-muted font-sans">Free plan includes all live market charts & 1 active indicator. Upgrade to Pro (₹149/mo) to unlock MT5 Auto-Import, Trade Journal, Golden Zone Sniper, Prop Guard & Pine Scripts.</td></tr>`;
+        tbody.innerHTML = '<tr><td colspan="10" class="py-6 text-center text-tv-muted font-sans">Free plan includes all live market charts & 1 active indicator. Upgrade to Pro (₹149/mo) to unlock MT5 Auto-Import, Trade Journal, Golden Zone Sniper, Prop Guard & Pine Scripts.</td></tr>';
       } else {
-        tbody.innerHTML = trades.map(t => {
+        tbody.innerHTML = trades.map(function(t) {
           const sideColor = t.side === 'BUY' ? 'text-tv-green' : 'text-tv-red';
           const pnlColor = t.pnl > 0 ? 'text-tv-green' : (t.pnl < 0 ? 'text-tv-red' : 'text-tv-muted');
-          const pnlFormatted = t.status === 'OPEN' ? '—' : `${t.pnl >= 0 ? '+' : '-'}${sym}${Math.abs(t.pnl).toFixed(2)}`;
-          return `
-            <tr class="border-b border-tv-border/50 hover:bg-tv-hover/40">
-              <td class="py-1.5 px-2 text-tv-muted">${t.time}</td>
-              <td class="py-1.5 px-2 font-bold text-white">${t.symbol}</td>
-              <td class="py-1.5 px-2 font-semibold ${sideColor}">${t.side}</td>
-              <td class="py-1.5 px-2">${t.size}</td>
-              <td class="py-1.5 px-2">${t.entry}</td>
-              <td class="py-1.5 px-2 text-tv-muted">${t.sl} / ${t.tp}</td>
-              <td class="py-1.5 px-2 font-sans text-tv-text max-w-[140px] truncate" title="${t.note || ''}">${t.note || '—'}</td>
-              <td class="py-1.5 px-2">
-                <span class="px-1.5 py-0.5 rounded text-[10px] ${t.status === 'OPEN' ? 'bg-tv-blue/20 text-tv-blue' : (t.status === 'WIN' ? 'bg-tv-green/20 text-tv-green' : 'bg-tv-red/20 text-tv-red')}">${t.status}</span>
-              </td>
-              <td class="py-1.5 px-2 font-semibold ${pnlColor}">${pnlFormatted}</td>
-              <td class="py-1.5 px-2 text-right space-x-1">
-                ${t.status === 'OPEN' ? `
-                  <button onclick="closeTrade(${t.id}, true)" class="px-1.5 py-0.5 bg-tv-green/20 hover:bg-tv-green/40 text-tv-green rounded text-[10px]">TP Hit</button>
-                  <button onclick="closeTrade(${t.id}, false)" class="px-1.5 py-0.5 bg-tv-red/20 hover:bg-tv-red/40 text-tv-red rounded text-[10px]">SL Hit</button>
-                ` : ''}
-                <button onclick="deleteTrade(${t.id})" class="px-1.5 py-0.5 bg-tv-bg hover:bg-tv-red/30 text-tv-muted hover:text-white rounded text-[10px]">Del</button>
-              </td>
-            </tr>
-          `;
+          const pnlFormatted = t.status === 'OPEN' ? '—' : ((t.pnl >= 0 ? '+' : '-') + sym + Math.abs(t.pnl).toFixed(2));
+          const statusCls = t.status === 'OPEN' ? 'bg-tv-blue/20 text-tv-blue' : (t.status === 'WIN' ? 'bg-tv-green/20 text-tv-green' : 'bg-tv-red/20 text-tv-red');
+          const openBtns = t.status === 'OPEN'
+            ? '<button onclick="closeTrade(' + t.id + ', true)" class="px-1.5 py-0.5 bg-tv-green/20 hover:bg-tv-green/40 text-tv-green rounded text-[10px]">TP Hit</button> ' +
+              '<button onclick="closeTrade(' + t.id + ', false)" class="px-1.5 py-0.5 bg-tv-red/20 hover:bg-tv-red/40 text-tv-red rounded text-[10px]">SL Hit</button> '
+            : '';
+
+          return '<tr class="border-b border-tv-border/50 hover:bg-tv-hover/40">' +
+            '<td class="py-1.5 px-2 text-tv-muted">' + t.time + '</td>' +
+            '<td class="py-1.5 px-2 font-bold text-white">' + t.symbol + '</td>' +
+            '<td class="py-1.5 px-2 font-semibold ' + sideColor + '">' + t.side + '</td>' +
+            '<td class="py-1.5 px-2">' + t.size + '</td>' +
+            '<td class="py-1.5 px-2">' + t.entry + '</td>' +
+            '<td class="py-1.5 px-2 text-tv-muted">' + t.sl + ' / ' + t.tp + '</td>' +
+            '<td class="py-1.5 px-2 font-sans text-tv-text max-w-[140px] truncate">' + (t.note || '—') + '</td>' +
+            '<td class="py-1.5 px-2"><span class="px-1.5 py-0.5 rounded text-[10px] ' + statusCls + '">' + t.status + '</span></td>' +
+            '<td class="py-1.5 px-2 font-semibold ' + pnlColor + '">' + pnlFormatted + '</td>' +
+            '<td class="py-1.5 px-2 text-right space-x-1">' + openBtns +
+              '<button onclick="deleteTrade(' + t.id + ')" class="px-1.5 py-0.5 bg-tv-bg hover:bg-tv-red/30 text-tv-muted hover:text-white rounded text-[10px]">Del</button>' +
+            '</td></tr>';
         }).join('');
       }
 
-      const closed = trades.filter(t => t.status !== 'OPEN');
-      const wins = closed.filter(t => t.pnl > 0);
-      const losses = closed.filter(t => t.pnl < 0);
-      const grossProfit = wins.reduce((a, b) => a + b.pnl, 0);
-      const grossLoss = Math.abs(losses.reduce((a, b) => a + b.pnl, 0));
-      const netPnl = closed.reduce((a, b) => a + b.pnl, 0);
+      const closed = trades.filter(function(t) { return t.status !== 'OPEN'; });
+      const wins = closed.filter(function(t) { return t.pnl > 0; });
+      const losses = closed.filter(function(t) { return t.pnl < 0; });
+      const grossProfit = wins.reduce(function(a, b) { return a + b.pnl; }, 0);
+      const grossLoss = Math.abs(losses.reduce(function(a, b) { return a + b.pnl; }, 0));
+      const netPnl = closed.reduce(function(a, b) { return a + b.pnl; }, 0);
       const winRate = closed.length ? ((wins.length / closed.length) * 100) : 0;
       const pf = grossLoss > 0 ? (grossProfit / grossLoss) : (grossProfit > 0 ? grossProfit : 0);
 
-      const netStr = `${netPnl >= 0 ? '+' : '-'}${sym}${Math.abs(netPnl).toFixed(2)}`;
+      const netStr = (netPnl >= 0 ? '+' : '-') + sym + Math.abs(netPnl).toFixed(2);
       document.getElementById('topNetPnl').textContent = netStr;
       document.getElementById('topNetPnl').className = netPnl >= 0 ? 'text-tv-green' : 'text-tv-red';
-      document.getElementById('topWinRate').textContent = `${winRate.toFixed(1)}%`;
+      document.getElementById('topWinRate').textContent = winRate.toFixed(1) + '%';
 
       document.getElementById('statTotalTrades').textContent = closed.length;
-      document.getElementById('statWinRate').textContent = `${winRate.toFixed(1)}%`;
+      document.getElementById('statWinRate').textContent = winRate.toFixed(1) + '%';
       document.getElementById('statProfitFactor').textContent = pf.toFixed(2);
       document.getElementById('statNetPnl').textContent = netStr;
-      document.getElementById('statNetPnl').className = `text-lg font-bold mt-0.5 ${netPnl >= 0 ? 'text-tv-green' : 'text-tv-red'}`;
+      document.getElementById('statNetPnl').className = 'text-lg font-bold mt-0.5 ' + (netPnl >= 0 ? 'text-tv-green' : 'text-tv-red');
 
       renderEquityCurve(closed, sym);
       renderHeatmap(closed, sym);
       updatePropGuard();
     }
 
-    document.getElementById('exportCsvBtn').addEventListener('click', () => {
+    document.getElementById('exportCsvBtn').addEventListener('click', function() {
       if (!isProActive()) {
         openUpgradeModal();
         return;
       }
       if (!trades.length) return;
       const headers = ['Time,Symbol,Side,Size,Entry,SL,TP,Note,Status,PnL'];
-      const rows = trades.map(t => `${t.time},${t.symbol},${t.side},"${t.size}",${t.entry},${t.sl},${t.tp},"${(t.note || '').replace(/"/g, '')}",${t.status},${t.pnl}`);
+      const rows = trades.map(function(t) {
+        return t.time + ',' + t.symbol + ',' + t.side + ',"' + t.size + '",' + t.entry + ',' + t.sl + ',' + t.tp + ',"' + (t.note || '').replace(/"/g, '') + '",' + t.status + ',' + t.pnl;
+      });
       const blob = new Blob([headers.concat(rows).join('\n')], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1731,24 +1684,24 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
         openUpgradeModal();
         return;
       }
-      document.querySelectorAll('.btab-btn').forEach(b => {
+      document.querySelectorAll('.btab-btn').forEach(function(b) {
         b.classList.remove('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue');
         b.classList.add('font-medium', 'text-tv-muted');
       });
-      const activeBtn = document.querySelector(`.btab-btn[data-btab="${tabName}"]`);
+      const activeBtn = document.querySelector('.btab-btn[data-btab="' + tabName + '"]');
       if (activeBtn) {
         activeBtn.classList.remove('font-medium', 'text-tv-muted');
         activeBtn.classList.add('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue');
       }
-      document.querySelectorAll('.btab-content').forEach(c => c.classList.add('hidden'));
-      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+      document.querySelectorAll('.btab-content').forEach(function(c) { c.classList.add('hidden'); });
+      document.getElementById('tab-' + tabName).classList.remove('hidden');
     }
 
-    document.querySelectorAll('.btab-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchBottomTab(btn.dataset.btab));
+    document.querySelectorAll('.btab-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() { switchBottomTab(btn.dataset.btab); });
     });
 
-    document.getElementById('openPineModalBtn').addEventListener('click', () => {
+    document.getElementById('openPineModalBtn').addEventListener('click', function() {
       switchBottomTab('pine');
     });
 
@@ -1756,26 +1709,26 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
     const pineSelect = document.getElementById('pineTemplateSelect');
     pineEditor.value = localStorage.getItem('pipscopetrade1_custom_pine') || pineTemplates.golden_zone;
 
-    pineSelect.addEventListener('change', () => {
+    pineSelect.addEventListener('change', function() {
       pineEditor.value = pineTemplates[pineSelect.value] || '';
     });
 
-    document.getElementById('copyPineBtn').addEventListener('click', () => {
+    document.getElementById('copyPineBtn').addEventListener('click', function() {
       navigator.clipboard.writeText(pineEditor.value);
       const btn = document.getElementById('copyPineBtn');
       btn.textContent = 'Copied!';
-      setTimeout(() => (btn.textContent = 'Copy Pine Script v5'), 1500);
+      setTimeout(function() { btn.textContent = 'Copy Pine Script v5'; }, 1500);
     });
 
-    document.getElementById('savePineBtn').addEventListener('click', () => {
+    document.getElementById('savePineBtn').addEventListener('click', function() {
       localStorage.setItem('pipscopetrade1_custom_pine', pineEditor.value);
       const btn = document.getElementById('savePineBtn');
       btn.textContent = 'Saved!';
-      setTimeout(() => (btn.textContent = 'Save Custom Script'), 1500);
+      setTimeout(function() { btn.textContent = 'Save Custom Script'; }, 1500);
     });
 
     // --- INIT ---
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', function() {
       updateProUI();
       checkGoogleSheetApproval();
       updateSessionsAndClock();
