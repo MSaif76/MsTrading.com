@@ -90,7 +90,7 @@
       </form>
     </div>
 
-    <!-- Right Controls: Multi-Chart Layout + Timeframes + AI Fib + Upgrade -->
+    <!-- Right Controls: Multi-Chart Layout + Timeframes + Upgrade -->
     <div class="flex items-center gap-2 shrink-0">
       <!-- 1x vs 2x vs 4x Pro Grid Screen -->
       <div class="hidden md:flex items-center bg-tv-bg p-0.5 rounded border border-tv-border text-[11px] font-mono">
@@ -876,7 +876,7 @@
       setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
     });
 
-    // --- SUBMIT UTR TO GOOGLE SHEET (GET METHOD) OR ADMIN UNLOCK ---
+    // --- SUBMIT UTR TO GOOGLE SHEET (NO-CORS + IMAGE BEACON FALLBACK) ---
     document.getElementById('verifyUpiBtn').addEventListener('click', async function() {
       const utr = document.getElementById('utrInput').value.trim();
       const contact = document.getElementById('payerContactInput').value.trim() || 'Guest User';
@@ -916,34 +916,34 @@
       btn.disabled = true;
       btn.textContent = 'Sending...';
 
-      try {
-        if (GOOGLE_SHEET_SCRIPT_URL && GOOGLE_SHEET_SCRIPT_URL.indexOf('PASTE_YOUR') === -1) {
-          const submitUrl = GOOGLE_SHEET_SCRIPT_URL +
-            '?action=submit' +
-            '&userId=' + encodeURIComponent(contact) +
-            '&plan=' + encodeURIComponent(planLabel) +
-            '&amount=' + encodeURIComponent(amount) +
-            '&utr=' + encodeURIComponent(utr);
+      if (GOOGLE_SHEET_SCRIPT_URL && GOOGLE_SHEET_SCRIPT_URL.indexOf('PASTE_YOUR') === -1) {
+        const submitUrl = GOOGLE_SHEET_SCRIPT_URL +
+          '?action=submit' +
+          '&userId=' + encodeURIComponent(contact) +
+          '&plan=' + encodeURIComponent(planLabel) +
+          '&amount=' + encodeURIComponent(amount) +
+          '&utr=' + encodeURIComponent(utr) +
+          '&_t=' + Date.now();
+        try {
           await fetch(submitUrl, { mode: 'no-cors' });
+        } catch (fetchErr) {
+          const beacon = new Image();
+          beacon.src = submitUrl;
         }
-
-        localStorage.setItem('pipscopetrade1_pending_utr', JSON.stringify({
-          utr: utr,
-          plan: selectedPlan,
-          submittedAt: Date.now()
-        }));
-
-        updateProUI();
-        statusEl.textContent = 'UTR ' + utr + ' submitted! Once verified in admin sheet (5–10 mins), refresh page to unlock Pro.';
-        statusEl.classList.remove('hidden');
-        alert('UTR Submitted! Your payment is being verified. Pro features will unlock automatically once approved.');
-      } catch (e) {
-        errEl.textContent = 'Network error submitting UTR. Please check connection and retry.';
-        errEl.classList.remove('hidden');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Submit';
       }
+
+      localStorage.setItem('pipscopetrade1_pending_utr', JSON.stringify({
+        utr: utr,
+        plan: selectedPlan,
+        submittedAt: Date.now()
+      }));
+
+      updateProUI();
+      statusEl.textContent = 'UTR ' + utr + ' submitted! Once verified in admin sheet (5–10 mins), refresh page to unlock Pro.';
+      statusEl.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Submit';
+      alert('UTR Submitted! Your payment is being verified. Pro features will unlock automatically once approved.');
     });
 
     // --- RIGHT SIDEBAR PRO TOOL TABS ---
