@@ -924,7 +924,7 @@
             '&plan=' + encodeURIComponent(planLabel) +
             '&amount=' + encodeURIComponent(amount) +
             '&utr=' + encodeURIComponent(utr);
-          await fetch(submitUrl);
+          await fetch(submitUrl, { mode: 'no-cors' });
         }
 
         localStorage.setItem('pipscopetrade1_pending_utr', JSON.stringify({
