@@ -484,6 +484,7 @@
           <input id="mt5FileInput" type="file" accept=".csv,.html,.htm" class="hidden" />
         </label>
         <button id="exportCsvBtn" class="px-2 py-0.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-[11px] font-sans text-tv-text">Export CSV 🔒</button>
+        <button id="toggleBottomPanelBtn" class="px-2 py-0.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-[11px] font-sans text-tv-muted hover:text-white">Hide</button>
       </div>
     </div>
 
@@ -1325,7 +1326,12 @@
     document.getElementById('toggleSidebarBtn').addEventListener('click', function() {
       document.getElementById('rightSidebar').classList.toggle('hidden');
     });
-
+document.getElementById('toggleBottomPanelBtn').addEventListener('click', function() {
+      const panel = document.getElementById('bottomPanel');
+      const isHidden = panel.classList.toggle('hidden');
+      this.textContent = isHidden ? 'Show' : 'Hide';
+    });
+    
     // --- DISCIPLINE CHECKLIST ---
     document.querySelectorAll('.disc-chk').forEach(function(chk) {
       chk.addEventListener('change', function() {
