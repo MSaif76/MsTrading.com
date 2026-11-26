@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pipscopetrade1 — Institutional Live Charting & Prop Trading Terminal</title>
+  <title>pipscopetrade1 — Institutional TradingView Terminal & Cloud Journal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,30 +39,21 @@
   </script>
   <style>
     * { box-sizing: border-box; }
-    body {
-      background-color: #131722;
-      color: #d1d4dc;
-      font-family: 'Inter', sans-serif;
-      overflow: hidden;
-      user-select: none;
-    }
+    body { background-color: #131722; color: #d1d4dc; font-family: 'Inter', sans-serif; overflow: hidden; user-select: none; }
     input, textarea, select { user-select: text; }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: #131722; }
     ::-webkit-scrollbar-thumb { background: #2a2e39; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #363a45; }
-    .active-study {
-      background-color: rgba(41, 98, 255, 0.18);
-      border-color: #2962ff;
-      color: #ffffff;
-    }
+    .active-study { background-color: rgba(41, 98, 255, 0.2); border-color: #2962ff; color: #ffffff; }
+    .tool-active { background-color: #2962ff; color: #ffffff; }
   </style>
 </head>
 <body class="h-screen w-screen flex flex-col bg-tv-bg text-tv-text">
 
-  <!-- TOP NAVIGATION BAR -->
-  <header class="h-12 bg-tv-panel border-b border-tv-border px-3 flex items-center justify-between gap-2 shrink-0 z-20">
-    <!-- Brand + Quick Symbols (ALL UNLOCKED FOR FREE) -->
+  <!-- TOP INSTITUTIONAL HEADER BAR -->
+  <header class="h-12 bg-tv-panel border-b border-tv-border px-2.5 flex items-center justify-between gap-2 shrink-0 z-30">
+    <!-- Left: Brand + Quick Pairs + Search -->
     <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
       <div class="flex items-center gap-2 pr-2 border-r border-tv-border shrink-0">
         <div class="w-7 h-7 rounded bg-gradient-to-br from-emerald-500 to-tv-blue flex items-center justify-center font-mono font-bold text-white text-xs shadow">
@@ -72,7 +63,7 @@
         <span id="planStatusBadge" class="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded">FREE</span>
       </div>
 
-      <!-- Quick Symbol Pills (All Unlocked) -->
+      <!-- Quick Symbol Pills -->
       <div id="symbolPills" class="flex items-center gap-1 shrink-0">
         <button data-symbol="OANDA:XAUUSD" class="sym-btn px-2 py-1 text-xs font-mono font-semibold rounded bg-tv-blue text-white transition">XAUUSD</button>
         <button data-symbol="FX:EURUSD" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">EURUSD</button>
@@ -83,24 +74,17 @@
         <button data-symbol="NSE:BANKNIFTY" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text transition">BANKNIFTY</button>
       </div>
 
-      <!-- Custom Exchange:Symbol Search (Unlocked) -->
-      <form id="customSymbolForm" class="flex items-center gap-1 ml-1 shrink-0">
-        <input id="customSymbolInput" type="text" placeholder="e.g. NASDAQ:AAPL" class="w-32 bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-2 py-1 text-xs font-mono text-white outline-none" />
+      <!-- Exchange:Symbol Search -->
+      <form id="customSymbolForm" class="flex items-center gap-1 shrink-0">
+        <input id="customSymbolInput" type="text" placeholder="NASDAQ:NVDA" class="w-28 bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-2 py-1 text-xs font-mono text-white outline-none" />
         <button type="submit" class="px-2 py-1 bg-tv-hover hover:bg-tv-blue text-white text-xs font-medium rounded transition">Go</button>
       </form>
     </div>
 
-    <!-- Right Controls: Multi-Chart Layout + Timeframes + Upgrade -->
-    <div class="flex items-center gap-2 shrink-0">
-      <!-- 1x vs 2x vs 4x Pro Grid Screen -->
-      <div class="hidden md:flex items-center bg-tv-bg p-0.5 rounded border border-tv-border text-[11px] font-mono">
-        <button id="layoutSingleBtn" title="Single Chart View" class="px-2 py-0.5 rounded bg-tv-blue text-white font-semibold">1x</button>
-        <button id="layoutSplitBtn" title="Dual Split-Screen Chart (Pro)" class="px-2 py-0.5 rounded text-tv-muted hover:text-white">2x 🔒</button>
-        <button id="layoutQuadBtn" title="4-Chart Institutional Grid (Pro)" class="px-2 py-0.5 rounded text-tv-muted hover:text-white">4x 🔒</button>
-      </div>
-
-      <!-- Timeframe Pills -->
-      <div id="tfPills" class="hidden xl:flex items-center gap-0.5 bg-tv-bg p-0.5 rounded border border-tv-border">
+    <!-- Right: Timeframes + Layouts + Alerts + Login/Profile + Pro -->
+    <div class="flex items-center gap-1.5 shrink-0">
+      <!-- Timeframes -->
+      <div id="tfPills" class="hidden 2xl:flex items-center gap-0.5 bg-tv-bg p-0.5 rounded border border-tv-border">
         <button data-tf="1" class="tf-btn px-2 py-0.5 text-xs font-mono rounded bg-tv-blue text-white">1m</button>
         <button data-tf="5" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">5m</button>
         <button data-tf="15" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">15m</button>
@@ -109,93 +93,151 @@
         <button data-tf="D" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">1D</button>
       </div>
 
-      <button id="openUpgradeBtn" class="px-2.5 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black rounded shadow-lg flex items-center gap-1 transition">
-        <span>⚡ Unlock Pro ₹149</span>
+      <!-- Multi-Chart 1x / 2x / 4x -->
+      <div class="hidden md:flex items-center bg-tv-bg p-0.5 rounded border border-tv-border text-[11px] font-mono">
+        <button id="layoutSingleBtn" class="px-2 py-0.5 rounded bg-tv-blue text-white font-semibold">1x</button>
+        <button id="layoutSplitBtn" class="px-2 py-0.5 rounded text-tv-muted hover:text-white">2x 🔒</button>
+        <button id="layoutQuadBtn" class="px-2 py-0.5 rounded text-tv-muted hover:text-white">4x 🔒</button>
+      </div>
+
+      <!-- Saved Chart Layouts Dropdown -->
+      <button id="openLayoutModalBtn" title="Save & Load Chart Templates" class="hidden sm:flex items-center gap-1 px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white transition">
+        <span>☁️ Layouts</span>
       </button>
 
-      <button id="toggleIndicatorBarBtn" class="px-2.5 py-1 text-xs font-medium bg-tv-bg hover:bg-tv-hover border border-tv-border rounded flex items-center gap-1.5 text-white transition">
+      <!-- Price Alert Bell -->
+      <button id="openAlertModalBtn" title="Set Sound Price Alerts" class="px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white flex items-center gap-1 transition">
+        <span>🔔</span>
+        <span id="alertCountBadge" class="font-mono text-[10px] text-amber-400">0</span>
+      </button>
+
+      <!-- Paper Trading Floating Toggle -->
+      <button id="togglePaperPanelBtn" title="Toggle Instant Buy/Sell Panel" class="hidden lg:flex items-center gap-1 px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-emerald-400 font-semibold transition">
+        <span>⇄ Trade</span>
+      </button>
+
+      <!-- Indicators Toggle -->
+      <button id="toggleIndicatorBarBtn" class="px-2 py-1 text-xs font-medium bg-tv-bg hover:bg-tv-hover border border-tv-border rounded flex items-center gap-1 text-white transition">
         <span class="text-tv-blue font-mono font-bold">fx</span>
-        <span class="hidden sm:inline">Indicators & Pine</span>
+        <span class="hidden xl:inline">Indicators</span>
       </button>
 
-      <button id="toggleSidebarBtn" title="Toggle Pro Calculators & Prop Guard" class="p-1.5 bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white transition">
+      <!-- Upgrade Pro CTA -->
+      <button id="openUpgradeBtn" class="px-2.5 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black rounded shadow flex items-center gap-1 transition">
+        <span>⚡ Pro ₹149</span>
+      </button>
+
+      <!-- USER LOGIN / ACCOUNT PROFILE BUTTON -->
+      <button id="authHeaderBtn" class="px-2.5 py-1 text-xs font-semibold bg-tv-blue hover:bg-tv-blueHover text-white rounded flex items-center gap-1.5 transition">
+        <span id="authHeaderAvatar" class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">👤</span>
+        <span id="authHeaderText">Sign In</span>
+      </button>
+
+      <!-- Right Sidebar Toggle -->
+      <button id="toggleSidebarBtn" title="Toggle Right Sidebar" class="p-1.5 bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <line x1="15" y1="3" x2="15" y2="21" />
+          <rect x="3" y="3" width="18" height="18" rx="2" /><line x1="15" y1="3" x2="15" y2="21" />
         </svg>
       </button>
     </div>
   </header>
 
-  <!-- MARKET SESSION KILLZONE & CLOCK BAR -->
-  <div class="bg-tv-deep border-b border-tv-border px-3 py-1 flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono shrink-0">
+  <!-- SESSION KILLZONES & CLOUD SYNC STATUS BAR -->
+  <div class="bg-tv-deep border-b border-tv-border px-3 py-1 flex items-center justify-between gap-2 text-[11px] font-mono shrink-0">
     <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
-      <span class="text-tv-muted font-sans font-semibold uppercase tracking-wider text-[10px]">Global Sessions:</span>
-      <span id="sessSydney" class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> Sydney</span>
-      <span id="sessTokyo" class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> Tokyo</span>
-      <span id="sessLondon" class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> London</span>
-      <span id="sessNewYork" class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> New York</span>
+      <span class="text-tv-muted font-sans font-semibold uppercase tracking-wider text-[10px]">Sessions:</span>
+      <span id="sessSydney" class="flex items-center gap-1">Sydney</span>
+      <span id="sessTokyo" class="flex items-center gap-1">Tokyo</span>
+      <span id="sessLondon" class="flex items-center gap-1">London</span>
+      <span id="sessNewYork" class="flex items-center gap-1">New York</span>
       <span id="killzoneBadge" class="hidden sm:inline-block px-1.5 py-0.2 rounded bg-tv-panel text-tv-muted text-[10px]">Checking liquidity...</span>
     </div>
-    <div class="flex items-center gap-3 text-tv-text">
+    <div class="flex items-center gap-3">
+      <span id="cloudSyncIndicator" class="text-[10px] text-tv-muted">☁️ Local Mode (Sign in to Cloud Sync)</span>
       <span id="liveClockIst" class="text-emerald-400 font-semibold">--:--:-- IST</span>
-      <span id="liveClockUtc" class="hidden md:inline text-tv-muted">--:-- UTC</span>
     </div>
   </div>
 
-  <!-- INDICATOR STUDY MANAGER BAR (ONLY 1 INDICATOR FREE; MULTI-STACK REQUIRE PRO) -->
-  <div id="indicatorBar" class="bg-tv-panel/70 border-b border-tv-border px-3 py-1.5 flex flex-wrap items-center justify-between gap-2 shrink-0">
+  <!-- INDICATOR STUDY MANAGER BAR -->
+  <div id="indicatorBar" class="bg-tv-panel/80 border-b border-tv-border px-3 py-1.5 flex flex-wrap items-center justify-between gap-2 shrink-0">
     <div class="flex items-center gap-1.5 flex-wrap">
-      <span class="text-[11px] font-semibold uppercase tracking-wider text-tv-muted mr-1 flex items-center gap-1">
-        <span class="text-tv-blue font-mono">fx</span> Live Studies:
-      </span>
+      <span class="text-[11px] font-semibold uppercase tracking-wider text-tv-muted mr-1"><span class="text-tv-blue font-mono">fx</span> Studies:</span>
       <button data-study="MASimple@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">SMA</button>
       <button data-study="MAExp@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">EMA</button>
       <button data-study="RSI@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">RSI</button>
       <button data-study="MACD@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">MACD</button>
-      <button data-study="BB@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">Bollinger Bands</button>
+      <button data-study="BB@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">Bollinger</button>
       <button data-study="VWAP@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">VWAP</button>
       <button data-study="Volume@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">Volume</button>
       <button data-study="ATR@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">ATR</button>
+      <button data-study="IchimokuCloud@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue transition">Ichimoku</button>
     </div>
 
     <div class="flex items-center gap-2">
-      <span id="activeStudiesCount" class="text-[11px] font-mono text-tv-blue mr-2">0/1 Free Study</span>
-      <button id="openPineModalBtn" class="px-2.5 py-0.5 text-xs font-medium bg-tv-green/20 hover:bg-tv-green/30 text-tv-green border border-tv-green/40 rounded transition">
-        SMC & Gold Pine Scripts 🔒
+      <span id="activeStudiesCount" class="text-[11px] font-mono text-tv-blue">0/1 Free Study</span>
+      <button id="openPineModalBtn" class="px-2 py-0.5 text-xs font-medium bg-tv-green/20 hover:bg-tv-green/30 text-tv-green border border-tv-green/40 rounded transition">
+        SMC & Gold Pine v5 🔒
       </button>
       <button id="hideIndicatorBarBtn" class="text-xs text-tv-muted hover:text-white px-1">Hide</button>
     </div>
   </div>
 
-  <!-- MAIN WORKSPACE -->
+  <!-- MAIN TRADINGVIEW WORKSPACE -->
   <div class="flex-1 flex min-h-0 overflow-hidden">
-    <!-- CENTER LIVE CHART AREA (1x, 2x SPLIT, OR 4x QUAD GRID) -->
+
+    <!-- LEFT VERTICAL DRAWING & QUICK TOOLS SIDEBAR (TRADINGVIEW STYLE) -->
+    <nav class="w-10 bg-tv-panel border-r border-tv-border flex flex-col items-center py-2 gap-1.5 shrink-0 z-20">
+      <button title="Crosshair Cursor" class="tv-left-tool tool-active w-7 h-7 rounded flex items-center justify-center text-xs hover:bg-tv-hover transition">╋</button>
+      <button data-quicktool="fib" title="Golden Zone Fib Retracement" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover transition">📐</button>
+      <button data-quicktool="calc" title="Long / Short Position Risk Tool" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover transition">⚖️</button>
+      <button data-quicktool="prop" title="Prop Firm Drawdown Guard" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover transition">🛡️</button>
+      <button data-quicktool="alert" title="Create Price Alert" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover transition">🔔</button>
+      <button data-quicktool="screener" title="Market Screener" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover transition">🔍</button>
+      <div class="w-5 border-t border-tv-border my-1"></div>
+      <button id="toggleFullChartBtn" title="Maximize Chart (Hide Side & Bottom Panels)" class="w-7 h-7 rounded flex items-center justify-center text-xs text-amber-400 hover:bg-tv-hover transition">⛶</button>
+    </nav>
+
+    <!-- CENTER CHART GRID (1x, 2x SPLIT, 4x QUAD) -->
     <main id="chartWorkspace" class="flex-1 grid grid-cols-1 grid-rows-1 min-w-0 bg-tv-bg relative">
-      <!-- Primary Chart 1 -->
+      <!-- FLOATING TRADINGVIEW INSTANT BUY / SELL PAPER TRADING PANEL -->
+      <div id="floatingOrderPanel" class="hidden absolute top-3 left-14 z-20 bg-tv-panel/95 backdrop-blur border border-tv-border rounded-lg shadow-2xl p-2 flex items-center gap-2 font-mono text-xs">
+        <button id="instantSellBtn" class="px-3 py-1.5 bg-tv-red hover:bg-rose-500 text-white font-bold rounded shadow transition flex flex-col items-center leading-tight">
+          <span class="text-[9px] opacity-80">SELL MKT</span>
+          <span id="floatSymbolSell">XAUUSD</span>
+        </button>
+        <div class="flex flex-col items-center px-1">
+          <span class="text-[9px] text-tv-muted">LOTS</span>
+          <input id="floatLotInput" type="number" step="0.01" value="0.10" class="w-14 bg-tv-deep border border-tv-border rounded px-1 py-0.5 text-center text-white outline-none" />
+        </div>
+        <button id="instantBuyBtn" class="px-3 py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white font-bold rounded shadow transition flex flex-col items-center leading-tight">
+          <span class="text-[9px] opacity-80">BUY MKT</span>
+          <span id="floatSymbolBuy">XAUUSD</span>
+        </button>
+        <button id="closeFloatOrderBtn" class="text-tv-muted hover:text-white px-1 text-xs">✕</button>
+      </div>
+
+      <!-- Chart 1 -->
       <div id="primaryChartWrap" class="flex flex-col min-w-0 min-h-0 h-full w-full">
         <div id="tv_chart_container" class="flex-1 w-full h-full"></div>
       </div>
 
-      <!-- Secondary Split Chart 2 (Pro 2x / 4x) -->
+      <!-- Chart 2 (Pro 2x / 4x) -->
       <div id="secondaryChartWrap" class="hidden flex-col min-w-0 min-h-0 h-full w-full border-l-2 border-tv-border">
-        <div class="h-7 bg-tv-deep border-b border-tv-border px-2.5 flex items-center justify-between text-[11px] font-mono shrink-0">
+        <div class="h-7 bg-tv-deep border-b border-tv-border px-2 flex items-center justify-between text-[11px] font-mono shrink-0">
           <div class="flex items-center gap-1.5">
             <span class="text-emerald-400 font-semibold">CHART 2:</span>
             <select id="splitSymbolSelect" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
-              <option value="OANDA:XAUUSD">XAUUSD (Gold)</option>
-              <option value="TVC:DXY" selected>DXY (US Dollar Index)</option>
+              <option value="TVC:DXY" selected>DXY (Dollar Index)</option>
+              <option value="OANDA:XAUUSD">XAUUSD</option>
               <option value="FX:EURUSD">EURUSD</option>
               <option value="BINANCE:BTCUSDT">BTCUSDT</option>
               <option value="NSE:NIFTY">NIFTY 50</option>
-              <option value="NSE:BANKNIFTY">BANKNIFTY</option>
             </select>
             <select id="splitTfSelect" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
               <option value="5">5m</option>
               <option value="15" selected>15m</option>
               <option value="60">1H</option>
               <option value="240">4H</option>
-              <option value="D">1D</option>
             </select>
           </div>
           <button id="closeSplitBtn" class="text-tv-muted hover:text-white">✕ 1x</button>
@@ -203,87 +245,75 @@
         <div id="tv_chart_container_2" class="flex-1 w-full h-full"></div>
       </div>
 
-      <!-- Chart 3 (Pro 4x Grid) -->
+      <!-- Chart 3 (Pro 4x) -->
       <div id="thirdChartWrap" class="hidden flex-col min-w-0 min-h-0 h-full w-full border-t-2 border-tv-border">
-        <div class="h-7 bg-tv-deep border-b border-tv-border px-2.5 flex items-center justify-between text-[11px] font-mono shrink-0">
-          <div class="flex items-center gap-1.5">
-            <span class="text-sky-400 font-semibold">CHART 3:</span>
-            <select id="quadSymbol3" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
-              <option value="FX:EURUSD" selected>EURUSD</option>
-              <option value="OANDA:XAUUSD">XAUUSD</option>
-              <option value="NSE:NIFTY">NIFTY 50</option>
-              <option value="BINANCE:BTCUSDT">BTCUSDT</option>
-            </select>
-            <select id="quadTf3" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
-              <option value="15">15m</option>
-              <option value="60" selected>1H</option>
-              <option value="240">4H</option>
-            </select>
-          </div>
+        <div class="h-7 bg-tv-deep border-b border-tv-border px-2 flex items-center gap-1.5 text-[11px] font-mono shrink-0">
+          <span class="text-sky-400 font-semibold">CHART 3:</span>
+          <select id="quadSymbol3" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
+            <option value="FX:EURUSD" selected>EURUSD</option>
+            <option value="OANDA:XAUUSD">XAUUSD</option>
+            <option value="NSE:NIFTY">NIFTY 50</option>
+          </select>
+          <select id="quadTf3" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
+            <option value="15">15m</option>
+            <option value="60" selected>1H</option>
+          </select>
         </div>
         <div id="tv_chart_container_3" class="flex-1 w-full h-full"></div>
       </div>
 
-      <!-- Chart 4 (Pro 4x Grid) -->
+      <!-- Chart 4 (Pro 4x) -->
       <div id="fourthChartWrap" class="hidden flex-col min-w-0 min-h-0 h-full w-full border-t-2 border-l-2 border-tv-border">
-        <div class="h-7 bg-tv-deep border-b border-tv-border px-2.5 flex items-center justify-between text-[11px] font-mono shrink-0">
-          <div class="flex items-center gap-1.5">
-            <span class="text-amber-400 font-semibold">CHART 4:</span>
-            <select id="quadSymbol4" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
-              <option value="NSE:BANKNIFTY" selected>BANKNIFTY</option>
-              <option value="NSE:NIFTY">NIFTY 50</option>
-              <option value="OANDA:XAUUSD">XAUUSD</option>
-              <option value="FX:GBPUSD">GBPUSD</option>
-            </select>
-            <select id="quadTf4" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
-              <option value="5" selected>5m</option>
-              <option value="15">15m</option>
-              <option value="60">1H</option>
-            </select>
-          </div>
+        <div class="h-7 bg-tv-deep border-b border-tv-border px-2 flex items-center gap-1.5 text-[11px] font-mono shrink-0">
+          <span class="text-amber-400 font-semibold">CHART 4:</span>
+          <select id="quadSymbol4" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
+            <option value="NSE:BANKNIFTY" selected>BANKNIFTY</option>
+            <option value="OANDA:XAUUSD">XAUUSD</option>
+            <option value="FX:GBPUSD">GBPUSD</option>
+          </select>
+          <select id="quadTf4" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-white outline-none">
+            <option value="5" selected>5m</option>
+            <option value="15">15m</option>
+          </select>
         </div>
         <div id="tv_chart_container_4" class="flex-1 w-full h-full"></div>
       </div>
     </main>
 
-    <!-- RIGHT SIDEBAR: PRO TOOLS (RISK CALC, FIB GOLDEN ZONE, PROP FIRM GUARD) + FREE WATCHLIST -->
+    <!-- RIGHT SIDEBAR: PRO CALCULATORS + CUSTOM WATCHLIST + ECONOMIC NEWS -->
     <aside id="rightSidebar" class="w-80 bg-tv-panel border-l border-tv-border flex flex-col shrink-0 overflow-y-auto">
-      <!-- Sidebar Mode Switcher -->
       <div class="p-2 bg-tv-deep border-b border-tv-border grid grid-cols-3 gap-1 text-[10px] font-semibold">
         <button id="toolTabCalc" class="py-1.5 rounded bg-tv-blue text-white">Risk & Lot 🔒</button>
         <button id="toolTabFib" class="py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white">Golden Zone 🔒</button>
         <button id="toolTabProp" class="py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white">Prop Guard 🔒</button>
       </div>
 
-      <!-- TOOL 1: POSITION & RISK CALCULATOR (PRO) -->
+      <!-- TOOL 1: RISK & POSITION CALCULATOR -->
       <div id="panelToolCalc" class="p-3 border-b border-tv-border">
         <div class="flex items-center justify-between mb-2">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1">
-            <span>Position & Lot Calculator</span>
-            <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
-          </h2>
-          <div class="flex bg-tv-bg rounded border border-tv-border p-0.5 text-[11px] font-mono">
-            <button id="currUsdBtn" class="px-2 py-0.5 rounded bg-tv-blue text-white font-semibold">USD ($)</button>
-            <button id="currInrBtn" class="px-2 py-0.5 rounded text-tv-muted hover:text-white">INR (₹)</button>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-white">Position & Lot Calc <span class="pro-lock-tag text-amber-400">🔒</span></h2>
+          <div class="flex bg-tv-bg rounded border border-tv-border p-0.5 text-[10px] font-mono">
+            <button id="currUsdBtn" class="px-1.5 py-0.5 rounded bg-tv-blue text-white font-semibold">USD</button>
+            <button id="currInrBtn" class="px-1.5 py-0.5 rounded text-tv-muted hover:text-white">INR</button>
           </div>
         </div>
 
         <div class="space-y-2 text-xs">
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-[11px] text-tv-muted mb-0.5">Account Balance</label>
+              <label class="block text-[10px] text-tv-muted mb-0.5">Balance</label>
               <input id="calcBalance" type="number" value="10000" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue" />
             </div>
             <div>
-              <label class="block text-[11px] text-tv-muted mb-0.5">Risk %</label>
+              <label class="block text-[10px] text-tv-muted mb-0.5">Risk %</label>
               <input id="calcRiskPct" type="number" step="0.1" value="1.0" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue" />
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-[11px] text-tv-muted mb-0.5">Instrument</label>
-              <select id="calcInstrument" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue">
+              <label class="block text-[10px] text-tv-muted mb-0.5">Instrument</label>
+              <select id="calcInstrument" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none">
                 <option value="XAUUSD">XAUUSD (Gold)</option>
                 <option value="FOREX">Forex Pair</option>
                 <option value="CRYPTO">Crypto</option>
@@ -292,8 +322,8 @@
               </select>
             </div>
             <div>
-              <label class="block text-[11px] text-tv-muted mb-0.5">Direction</label>
-              <select id="calcSide" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue">
+              <label class="block text-[10px] text-tv-muted mb-0.5">Direction</label>
+              <select id="calcSide" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none">
                 <option value="BUY">BUY / LONG</option>
                 <option value="SELL">SELL / SHORT</option>
               </select>
@@ -302,154 +332,78 @@
 
           <div class="grid grid-cols-3 gap-1.5">
             <div>
-              <label class="block text-[11px] text-tv-muted mb-0.5">Entry</label>
-              <input id="calcEntry" type="number" step="any" placeholder="2650.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue" />
+              <label class="block text-[10px] text-tv-muted mb-0.5">Entry</label>
+              <input id="calcEntry" type="number" step="any" placeholder="2650.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" />
             </div>
             <div>
-              <label class="block text-[11px] text-tv-muted mb-0.5">Stop Loss</label>
-              <input id="calcSl" type="number" step="any" placeholder="2645.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue" />
+              <label class="block text-[10px] text-tv-muted mb-0.5">Stop Loss</label>
+              <input id="calcSl" type="number" step="any" placeholder="2645.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" />
             </div>
             <div>
-              <label class="block text-[11px] text-tv-muted mb-0.5">Take Profit</label>
-              <input id="calcTp" type="number" step="any" placeholder="2662.50" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-tv-blue" />
+              <label class="block text-[10px] text-tv-muted mb-0.5">Take Profit</label>
+              <input id="calcTp" type="number" step="any" placeholder="2662.50" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" />
             </div>
           </div>
 
-          <!-- Pre-Trade Discipline Checklist & Note -->
-          <div class="bg-tv-deep/80 border border-tv-border rounded p-2 space-y-1.5">
-            <div class="flex items-center justify-between">
-              <span class="text-[10px] font-semibold uppercase tracking-wider text-tv-muted">Pre-Trade Checklist</span>
-              <span id="checklistScore" class="text-[10px] font-mono text-amber-400">0/4 Ready</span>
-            </div>
-            <div class="grid grid-cols-2 gap-1 text-[11px] text-tv-text">
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue"> HTF Trend Aligned</label>
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue"> Risk ≤ 2%</label>
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue"> Clear of Red News</label>
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue"> R:R ≥ 1:2</label>
-            </div>
-            <input id="calcNote" type="text" placeholder="Setup note (e.g. Golden Zone sweep)..." class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 text-[11px] text-white outline-none focus:border-tv-blue" />
-          </div>
+          <input id="calcNote" type="text" placeholder="Setup note (e.g. 0.280 Golden Zone)..." class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 text-[11px] text-white outline-none" />
 
-          <!-- Calculated Output Box -->
-          <div class="bg-tv-bg border border-tv-border rounded p-2 space-y-1 font-mono">
-            <div class="flex justify-between">
-              <span class="text-tv-muted">Risk Amount:</span>
-              <span id="outRiskAmt" class="text-tv-red font-semibold">$100.00</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-tv-muted">Position / Lot Size:</span>
-              <span id="outLotSize" class="text-white font-bold">Pro Feature 🔒</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-tv-muted">Risk : Reward:</span>
-              <span id="outRR" class="text-tv-green font-semibold">—</span>
-            </div>
+          <div class="bg-tv-bg border border-tv-border rounded p-2 space-y-1 font-mono text-[11px]">
+            <div class="flex justify-between"><span class="text-tv-muted">Risk Amount:</span><span id="outRiskAmt" class="text-tv-red font-semibold">$100.00</span></div>
+            <div class="flex justify-between"><span class="text-tv-muted">Lot Size:</span><span id="outLotSize" class="text-white font-bold">Pro Feature 🔒</span></div>
+            <div class="flex justify-between"><span class="text-tv-muted">Risk : Reward:</span><span id="outRR" class="text-tv-green font-semibold">—</span></div>
           </div>
 
           <button id="logTradeBtn" class="w-full py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white font-semibold rounded transition">
-            + Log Trade to Journal <span class="pro-lock-tag text-[10px] text-amber-300">🔒</span>
+            + Log Trade to Cloud Journal <span class="pro-lock-tag text-amber-300">🔒</span>
           </button>
         </div>
       </div>
 
-      <!-- TOOL 2: INSTITUTIONAL GOLDEN ZONE (0.280 - 0.382 & 0.618) FIB CALCULATOR (PRO) -->
-      <div id="panelToolFib" class="hidden p-3 border-b border-tv-border space-y-2.5 text-xs">
-        <div class="flex items-center justify-between">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">Golden Zone & Fib Sniper</h2>
-          <span class="pro-lock-tag text-[10px] text-amber-400">PRO 🔒</span>
-        </div>
-        <p class="text-[11px] text-tv-muted">Enter impulse Swing Low & High to auto-calculate Sniper Golden Zone entries & 1-click fill Risk Calculator.</p>
-
+      <!-- TOOL 2: GOLDEN ZONE SNIPER -->
+      <div id="panelToolFib" class="hidden p-3 border-b border-tv-border space-y-2 text-xs">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">0.280–0.382 Golden Zone Sniper</h2>
         <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[11px] text-tv-muted mb-0.5">Swing Low</label>
-            <input id="fibLow" type="number" step="any" placeholder="2620.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-amber-400" />
-          </div>
-          <div>
-            <label class="block text-[11px] text-tv-muted mb-0.5">Swing High</label>
-            <input id="fibHigh" type="number" step="any" placeholder="2660.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none focus:border-amber-400" />
-          </div>
+          <div><label class="block text-[10px] text-tv-muted">Swing Low</label><input id="fibLow" type="number" step="any" placeholder="2620.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
+          <div><label class="block text-[10px] text-tv-muted">Swing High</label><input id="fibHigh" type="number" step="any" placeholder="2660.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
         </div>
-
         <select id="fibTrend" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none">
           <option value="BULL">Bullish Impulse (Buy Pullback)</option>
           <option value="BEAR">Bearish Impulse (Sell Pullback)</option>
         </select>
-
         <div class="bg-tv-bg border border-amber-500/30 rounded p-2 space-y-1 font-mono text-[11px]">
-          <div class="flex justify-between text-amber-300 font-bold">
-            <span>0.280 – 0.382 Sniper Zone:</span>
-            <span id="fibSniperZone">—</span>
-          </div>
-          <div class="flex justify-between text-tv-text">
-            <span>0.500 Equilibrium:</span>
-            <span id="fibHalfLevel">—</span>
-          </div>
-          <div class="flex justify-between text-emerald-400">
-            <span>0.618 Golden Pocket:</span>
-            <span id="fibGoldenLevel">—</span>
-          </div>
-          <div class="flex justify-between text-sky-400">
-            <span>-0.272 Extension Target:</span>
-            <span id="fibTargetLevel">—</span>
-          </div>
+          <div class="flex justify-between text-amber-300 font-bold"><span>0.280–0.382 Zone:</span><span id="fibSniperZone">—</span></div>
+          <div class="flex justify-between"><span>0.500 Equilibrium:</span><span id="fibHalfLevel">—</span></div>
+          <div class="flex justify-between text-emerald-400"><span>0.618 Golden Pocket:</span><span id="fibGoldenLevel">—</span></div>
+          <div class="flex justify-between text-sky-400"><span>-0.272 Extension:</span><span id="fibTargetLevel">—</span></div>
         </div>
-
-        <button id="applyFibToCalcBtn" class="w-full py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded transition">
-          ⚡ Send Golden Zone to Calculator
-        </button>
+        <button id="applyFibToCalcBtn" class="w-full py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded transition">⚡ Send to Calculator</button>
       </div>
 
-      <!-- TOOL 3: PROP FIRM DRAWDOWN GUARD (FTMO / FUNDEDNEXT) (PRO) -->
-      <div id="panelToolProp" class="hidden p-3 border-b border-tv-border space-y-2.5 text-xs">
-        <div class="flex items-center justify-between">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Prop Firm Drawdown Guard</h2>
-          <span class="pro-lock-tag text-[10px] text-amber-400">PRO 🔒</span>
-        </div>
+      <!-- TOOL 3: PROP FIRM DRAWDOWN GUARD -->
+      <div id="panelToolProp" class="hidden p-3 border-b border-tv-border space-y-2 text-xs">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Prop Firm Drawdown Guard</h2>
         <div class="grid grid-cols-3 gap-1.5">
+          <div><label class="block text-[10px] text-tv-muted">Account ($)</label><input id="propAccSize" type="number" value="10000" class="w-full bg-tv-bg border border-tv-border rounded px-1.5 py-1 font-mono text-white outline-none" /></div>
+          <div><label class="block text-[10px] text-tv-muted">Max DD %</label><input id="propDailyMax" type="number" value="5" class="w-full bg-tv-bg border border-tv-border rounded px-1.5 py-1 font-mono text-white outline-none" /></div>
+          <div><label class="block text-[10px] text-tv-muted">Target %</label><input id="propTargetPct" type="number" value="8" class="w-full bg-tv-bg border border-tv-border rounded px-1.5 py-1 font-mono text-white outline-none" /></div>
+        </div>
+        <div class="bg-tv-bg border border-tv-border rounded p-2 space-y-2 font-mono text-[11px]">
           <div>
-            <label class="block text-[10px] text-tv-muted">Challenge ($)</label>
-            <input id="propAccSize" type="number" value="10000" class="w-full bg-tv-bg border border-tv-border rounded px-1.5 py-1 font-mono text-white outline-none" />
+            <div class="flex justify-between mb-1"><span class="text-tv-muted">Target Progress:</span><span id="propTargetText" class="text-emerald-400 font-bold">$0 / $800</span></div>
+            <div class="w-full h-1.5 bg-tv-deep rounded overflow-hidden"><div id="propTargetBar" class="h-full bg-emerald-500" style="width: 0%"></div></div>
           </div>
           <div>
-            <label class="block text-[10px] text-tv-muted">Daily Loss %</label>
-            <input id="propDailyMax" type="number" value="5" class="w-full bg-tv-bg border border-tv-border rounded px-1.5 py-1 font-mono text-white outline-none" />
-          </div>
-          <div>
-            <label class="block text-[10px] text-tv-muted">Target %</label>
-            <input id="propTargetPct" type="number" value="8" class="w-full bg-tv-bg border border-tv-border rounded px-1.5 py-1 font-mono text-white outline-none" />
+            <div class="flex justify-between mb-1"><span class="text-tv-muted">DD Buffer Left:</span><span id="propDdText" class="text-amber-300 font-bold">$500.00 Safe</span></div>
+            <div class="w-full h-1.5 bg-tv-deep rounded overflow-hidden"><div id="propDdBar" class="h-full bg-tv-blue" style="width: 100%"></div></div>
           </div>
         </div>
-
-        <div class="bg-tv-bg border border-tv-border rounded p-2.5 space-y-2 font-mono text-[11px]">
-          <div>
-            <div class="flex justify-between mb-1">
-              <span class="text-tv-muted">Profit Target Progress:</span>
-              <span id="propTargetText" class="text-emerald-400 font-bold">$0 / $800</span>
-            </div>
-            <div class="w-full h-2 bg-tv-deep rounded overflow-hidden">
-              <div id="propTargetBar" class="h-full bg-emerald-500 transition-all" style="width: 0%"></div>
-            </div>
-          </div>
-
-          <div>
-            <div class="flex justify-between mb-1">
-              <span class="text-tv-muted">Max Drawdown Buffer Left:</span>
-              <span id="propDdText" class="text-amber-300 font-bold">$500.00 Safe</span>
-            </div>
-            <div class="w-full h-2 bg-tv-deep rounded overflow-hidden">
-              <div id="propDdBar" class="h-full bg-tv-blue transition-all" style="width: 100%"></div>
-            </div>
-          </div>
-        </div>
-        <p class="text-[10px] text-tv-muted">Auto-updates from your closed trades in the Trade Journal to prevent rule breaches.</p>
       </div>
 
-      <!-- Watchlist & Economic Calendar Tabs (Live Market Data Unlocked) -->
-      <div class="flex-1 flex flex-col min-h-[250px] p-3">
+      <!-- WATCHLIST & ECONOMIC CALENDAR -->
+      <div class="flex-1 flex flex-col min-h-[220px] p-3">
         <div class="flex items-center gap-1 bg-tv-bg p-0.5 rounded border border-tv-border mb-2 text-[11px] font-semibold">
-          <button id="sideTabWatchlist" class="flex-1 py-1 rounded bg-tv-panel text-white">Live Watchlist</button>
-          <button id="sideTabCalendar" class="flex-1 py-1 rounded text-tv-muted hover:text-white">Economic News</button>
+          <button id="sideTabWatchlist" class="flex-1 py-1 rounded bg-tv-panel text-white">Watchlist</button>
+          <button id="sideTabCalendar" class="flex-1 py-1 rounded text-tv-muted hover:text-white">News Calendar</button>
         </div>
         <div id="marketOverviewWidget" class="flex-1 w-full rounded overflow-hidden border border-tv-border"></div>
         <div id="economicCalendarWidget" class="hidden flex-1 w-full rounded overflow-hidden border border-tv-border"></div>
@@ -457,28 +411,30 @@
     </aside>
   </div>
 
-  <!-- BOTTOM PANEL: TRADE JOURNAL, P&L CALENDAR HEATMAP, ANALYTICS & PINE STUDIO -->
+  <!-- BOTTOM PANEL: JOURNAL, HEATMAP, ANALYTICS, SCREENER & PINE STUDIO -->
   <section id="bottomPanel" class="h-48 bg-tv-panel border-t border-tv-border flex flex-col shrink-0 z-10">
-    <!-- Bottom Tabs -->
     <div class="h-8 px-3 border-b border-tv-border flex items-center justify-between bg-tv-deep overflow-x-auto no-scrollbar">
-      <div class="flex items-center gap-4 text-xs shrink-0">
+      <div class="flex items-center gap-3.5 text-xs shrink-0">
         <button data-btab="journal" class="btab-btn font-semibold text-white border-b-2 border-tv-blue py-1.5">
           Trade Journal <span id="journalCountBadge" class="ml-1 px-1.5 py-0.2 bg-tv-blue/20 text-tv-blue rounded font-mono text-[10px]">0</span> <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
         </button>
         <button data-btab="heatmap" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">
-          P&L Calendar Heatmap <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
+          P&L Heatmap <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
         </button>
         <button data-btab="analytics" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">
-          Equity Curve & Stats <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
+          Equity Curve <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
+        </button>
+        <button data-btab="screener" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">
+          Market Screener
         </button>
         <button data-btab="pine" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5 flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-tv-green"></span> Institutional Pine v5 Library <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-tv-green"></span> Pine v5 Library <span class="pro-lock-tag text-[10px] text-amber-400">🔒</span>
         </button>
       </div>
 
       <div class="flex items-center gap-2 text-xs font-mono shrink-0">
         <span class="text-tv-muted">Net P&L: <strong id="topNetPnl" class="text-tv-green">+$0.00</strong></span>
-        <span class="text-tv-muted">Win Rate: <strong id="topWinRate" class="text-white">0.0%</strong></span>
+        <span class="text-tv-muted hidden sm:inline">Win: <strong id="topWinRate" class="text-white">0.0%</strong></span>
         <label id="importMt5Label" class="cursor-pointer px-2 py-0.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 rounded text-[11px] font-sans text-emerald-300">
           Import MT5/CSV 🔒
           <input id="mt5FileInput" type="file" accept=".csv,.html,.htm" class="hidden" />
@@ -488,74 +444,41 @@
       </div>
     </div>
 
-    <!-- Tab 1: Trade Journal Table -->
+    <!-- Tab 1: Trade Journal -->
     <div id="tab-journal" class="btab-content flex-1 overflow-auto p-2">
       <table class="w-full text-left border-collapse text-xs font-mono">
         <thead>
           <tr class="text-[11px] text-tv-muted border-b border-tv-border">
-            <th class="py-1 px-2">Date / Time</th>
-            <th class="py-1 px-2">Symbol</th>
-            <th class="py-1 px-2">Side</th>
-            <th class="py-1 px-2">Size</th>
-            <th class="py-1 px-2">Entry</th>
-            <th class="py-1 px-2">SL / TP</th>
-            <th class="py-1 px-2">Setup Note</th>
-            <th class="py-1 px-2">Status</th>
-            <th class="py-1 px-2">P&L</th>
-            <th class="py-1 px-2 text-right">Actions</th>
+            <th class="py-1 px-2">Time</th><th class="py-1 px-2">Symbol</th><th class="py-1 px-2">Side</th><th class="py-1 px-2">Size</th><th class="py-1 px-2">Entry</th><th class="py-1 px-2">SL / TP</th><th class="py-1 px-2">Note</th><th class="py-1 px-2">Status</th><th class="py-1 px-2">P&L</th><th class="py-1 px-2 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody id="journalTableBody">
-          <tr>
-            <td colspan="10" class="py-6 text-center text-tv-muted font-sans">
-              Free plan includes all live market charts & 1 active indicator. Upgrade to Pro (₹149/mo) to unlock MT5 Auto-Import, Trade Journal, Golden Zone Sniper, Prop Guard & Pine Scripts.
-            </td>
-          </tr>
-        </tbody>
+        <tbody id="journalTableBody"></tbody>
       </table>
     </div>
 
-    <!-- Tab 2: P&L Calendar Heatmap (TradeZella Style) -->
+    <!-- Tab 2: P&L Heatmap -->
     <div id="tab-heatmap" class="btab-content hidden flex-1 overflow-auto p-3">
       <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-bold text-white" id="heatmapMonthTitle">Monthly P&L Performance Heatmap</span>
+        <span class="text-xs font-bold text-white" id="heatmapMonthTitle">Monthly P&L Heatmap</span>
         <div class="flex items-center gap-3 text-[11px] font-mono">
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500/80 inline-block"></span> Profit Day</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500/80 inline-block"></span> Loss Day</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-tv-bg border border-tv-border inline-block"></span> No Trades</span>
+          <span class="text-emerald-400">■ Profit</span><span class="text-rose-400">■ Loss</span>
         </div>
       </div>
       <div id="heatmapGrid" class="grid grid-cols-7 sm:grid-cols-10 lg:grid-cols-16 gap-1.5 font-mono text-[10px]"></div>
     </div>
 
-    <!-- Tab 3: Performance Analytics & Equity Curve -->
+    <!-- Tab 3: Equity Curve -->
     <div id="tab-analytics" class="btab-content hidden flex-1 overflow-auto p-3">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 h-full">
-        <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-2.5 font-mono content-start">
-          <div class="bg-tv-bg border border-tv-border rounded p-2.5">
-            <div class="text-[11px] text-tv-muted font-sans">Closed Trades</div>
-            <div id="statTotalTrades" class="text-lg font-bold text-white mt-0.5">0</div>
-          </div>
-          <div class="bg-tv-bg border border-tv-border rounded p-2.5">
-            <div class="text-[11px] text-tv-muted font-sans">Win Rate %</div>
-            <div id="statWinRate" class="text-lg font-bold text-tv-green mt-0.5">0.0%</div>
-          </div>
-          <div class="bg-tv-bg border border-tv-border rounded p-2.5">
-            <div class="text-[11px] text-tv-muted font-sans">Profit Factor</div>
-            <div id="statProfitFactor" class="text-lg font-bold text-white mt-0.5">0.00</div>
-          </div>
-          <div class="bg-tv-bg border border-tv-border rounded p-2.5">
-            <div class="text-[11px] text-tv-muted font-sans">Net P&L</div>
-            <div id="statNetPnl" class="text-lg font-bold text-tv-green mt-0.5">$0.00</div>
-          </div>
+        <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono content-start">
+          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Closed Trades</div><div id="statTotalTrades" class="text-base font-bold text-white">0</div></div>
+          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Win Rate</div><div id="statWinRate" class="text-base font-bold text-tv-green">0.0%</div></div>
+          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Profit Factor</div><div id="statProfitFactor" class="text-base font-bold text-white">0.00</div></div>
+          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Net P&L</div><div id="statNetPnl" class="text-base font-bold text-tv-green">$0.00</div></div>
         </div>
-        <!-- Live SVG Equity Curve -->
         <div class="bg-tv-bg border border-tv-border rounded p-2 flex flex-col justify-between">
-          <div class="flex items-center justify-between text-[11px] text-tv-muted">
-            <span>Cumulative Equity Curve</span>
-            <span id="equityPeakLabel" class="font-mono text-emerald-400">Peak: $0.00</span>
-          </div>
-          <svg id="equityCurveSvg" viewBox="0 0 300 70" class="w-full h-16 overflow-visible mt-1">
+          <div class="flex justify-between text-[10px] text-tv-muted"><span>Equity Curve</span><span id="equityPeakLabel" class="font-mono text-emerald-400">Peak: $0.00</span></div>
+          <svg viewBox="0 0 300 70" class="w-full h-14 overflow-visible">
             <line x1="0" y1="35" x2="300" y2="35" stroke="#2b2b43" stroke-dasharray="3,3" stroke-width="1" />
             <polyline id="equityPolyline" fill="none" stroke="#089981" stroke-width="2" points="0,35 300,35" />
           </svg>
@@ -563,120 +486,204 @@
       </div>
     </div>
 
-    <!-- Tab 4: Institutional Pine Script v5 Studio -->
+    <!-- Tab 4: Live TradingView Forex/Crypto Screener -->
+    <div id="tab-screener" class="btab-content hidden flex-1 overflow-hidden">
+      <div id="tvScreenerContainer" class="w-full h-full"></div>
+    </div>
+
+    <!-- Tab 5: Pine v5 Studio -->
     <div id="tab-pine" class="btab-content hidden flex-1 overflow-hidden p-2 flex gap-2">
       <div class="w-56 flex flex-col gap-1.5 shrink-0">
         <select id="pineTemplateSelect" class="bg-tv-bg border border-tv-border rounded px-2 py-1 text-xs text-white outline-none">
-          <option value="golden_zone">🔥 Gold 0.280–0.382 Golden Zone Strategy</option>
-          <option value="smc_ob">🏦 SMC Order Blocks & FVG Detector</option>
-          <option value="killzone_box">⏰ London & NY Killzone Liquidity Box</option>
-          <option value="ema_cross">📈 EMA 20/50 Institutional Crossover</option>
-          <option value="vwap_bands">📊 Institutional VWAP + StdDev Bands</option>
+          <option value="golden_zone">🔥 Gold 0.280–0.382 Golden Zone</option>
+          <option value="smc_ob">🏦 SMC Order Blocks & FVG</option>
+          <option value="killzone_box">⏰ London & NY Killzones</option>
+          <option value="ema_cross">📈 EMA 20/50 Crossover</option>
         </select>
-        <button id="copyPineBtn" class="px-2 py-1 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-medium rounded transition">
-          Copy Pine Script v5
-        </button>
-        <button id="savePineBtn" class="px-2 py-1 bg-tv-bg hover:bg-tv-hover border border-tv-border text-tv-text text-xs rounded transition">
-          Save Custom Script
-        </button>
+        <button id="copyPineBtn" class="px-2 py-1 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-medium rounded">Copy Pine v5</button>
+        <button id="savePineBtn" class="px-2 py-1 bg-tv-bg hover:bg-tv-hover border border-tv-border text-tv-text text-xs rounded">Save Script</button>
       </div>
       <textarea id="pineEditor" spellcheck="false" class="flex-1 bg-tv-deep border border-tv-border rounded p-2 font-mono text-xs text-emerald-300 outline-none resize-none"></textarea>
     </div>
   </section>
 
-  <!-- FOOTER ATTRIBUTION -->
+  <!-- FOOTER BAR (WITH QUICK RESTORE BUTTON WHEN BOTTOM PANEL IS HIDDEN) -->
   <footer class="h-5 bg-tv-deep border-t border-tv-border px-3 flex items-center justify-between text-[10px] text-tv-muted shrink-0">
-    <span>pipscopetrade1 Terminal — Institutional Prop & Gold Trading Workspace</span>
-    <span>Charts & market data powered by <a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer" class="text-tv-blue hover:underline">TradingView</a></span>
+    <div class="flex items-center gap-3">
+      <span>pipscopetrade1 Terminal</span>
+      <button id="footerShowBottomBtn" class="hidden text-tv-blue hover:underline font-semibold">▲ Show Bottom Panel</button>
+    </div>
+    <span>Market data powered by <a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer" class="text-tv-blue hover:underline">TradingView</a></span>
   </footer>
 
-  <!-- HIGH-CONVERTING UPGRADE / UPI PAYMENT MODAL (MONTHLY ₹149 & YEARLY ₹1,649) -->
+  <!-- ========================================================= -->
+  <!-- MODAL 1: USER LOGIN / SIGN UP / CLOUD PROFILE & LOGOUT    -->
+  <!-- ========================================================= -->
+  <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-tv-panel border border-tv-border rounded-xl max-w-md w-full overflow-hidden shadow-2xl">
+      <div class="px-5 py-3.5 border-b border-tv-border flex items-center justify-between bg-tv-deep">
+        <h3 id="authModalTitle" class="text-sm font-bold text-white">👤 Trader Account & Cloud Sync</h3>
+        <button id="closeAuthModalBtn" class="text-tv-muted hover:text-white text-lg">✕</button>
+      </div>
+
+      <!-- LOGGED OUT VIEW (LOGIN / SIGN UP TABS) -->
+      <div id="authLoggedOutView" class="p-5 space-y-3">
+        <div class="grid grid-cols-2 bg-tv-bg p-1 rounded border border-tv-border text-xs font-semibold">
+          <button id="tabLoginMode" class="py-1.5 rounded bg-tv-blue text-white">Sign In</button>
+          <button id="tabSignupMode" class="py-1.5 rounded text-tv-muted hover:text-white">Create Account</button>
+        </div>
+
+        <div id="signupNameWrap" class="hidden">
+          <label class="block text-[11px] text-tv-muted mb-1">Full Name</label>
+          <input id="authNameInput" type="text" placeholder="e.g. Mohammad Saif" class="w-full bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-3 py-2 text-xs text-white outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-[11px] text-tv-muted mb-1">Email Address</label>
+          <input id="authEmailInput" type="email" placeholder="you@gmail.com" class="w-full bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-3 py-2 text-xs text-white outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-[11px] text-tv-muted mb-1">Password</label>
+          <input id="authPassInput" type="password" placeholder="••••••••" class="w-full bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-3 py-2 text-xs text-white outline-none" />
+        </div>
+
+        <p id="authFeedbackMsg" class="text-xs text-tv-red hidden"></p>
+
+        <button id="submitAuthBtn" class="w-full py-2 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-bold rounded transition">
+          Sign In & Sync Cloud
+        </button>
+        <p class="text-[11px] text-tv-muted text-center">Your Pro plan, Trade Journal & Saved Layouts sync automatically across all devices.</p>
+      </div>
+
+      <!-- LOGGED IN PROFILE VIEW -->
+      <div id="authLoggedInView" class="hidden p-5 space-y-3 text-xs">
+        <div class="bg-tv-bg border border-tv-border rounded-lg p-3 flex items-center justify-between">
+          <div>
+            <div id="profUserName" class="font-bold text-white text-sm">Trader</div>
+            <div id="profUserEmail" class="text-tv-muted font-mono text-[11px]">email@example.com</div>
+          </div>
+          <span id="profPlanBadge" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono font-bold">FREE</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 font-mono text-[11px]">
+          <div class="bg-tv-deep border border-tv-border rounded p-2">
+            <span class="text-tv-muted block font-sans">Cloud Trades:</span>
+            <strong id="profTradeCount" class="text-white text-sm">0</strong>
+          </div>
+          <div class="bg-tv-deep border border-tv-border rounded p-2">
+            <span class="text-tv-muted block font-sans">Saved Layouts:</span>
+            <strong id="profLayoutCount" class="text-white text-sm">0</strong>
+          </div>
+        </div>
+
+        <button id="manualSyncNowBtn" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded transition">
+          ☁️ Sync Data to Cloud Now
+        </button>
+
+        <button id="logoutUserBtn" class="w-full py-2 bg-tv-red/20 hover:bg-tv-red text-tv-red hover:text-white border border-tv-red/40 font-semibold rounded transition">
+          Log Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 2: SAVED CHART TEMPLATES / LAYOUTS                  -->
+  <!-- ========================================================= -->
+  <div id="layoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-tv-panel border border-tv-border rounded-xl max-w-md w-full overflow-hidden shadow-2xl">
+      <div class="px-4 py-3 border-b border-tv-border flex items-center justify-between bg-tv-deep">
+        <h3 class="text-sm font-bold text-white">☁️ Saved Chart Layouts & Templates</h3>
+        <button id="closeLayoutModalBtn" class="text-tv-muted hover:text-white">✕</button>
+      </div>
+      <div class="p-4 space-y-3 text-xs">
+        <div class="flex gap-1.5">
+          <input id="newLayoutNameInput" type="text" placeholder="e.g. Gold 15m Scalping Setup" class="flex-1 bg-tv-bg border border-tv-border rounded px-2.5 py-1.5 text-white outline-none" />
+          <button id="saveCurrentLayoutBtn" class="px-3 py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white font-semibold rounded">Save Current</button>
+        </div>
+        <div id="savedLayoutsList" class="space-y-1.5 max-h-56 overflow-y-auto"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 3: SOUND PRICE ALERTS MANAGER                       -->
+  <!-- ========================================================= -->
+  <div id="alertModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-tv-panel border border-tv-border rounded-xl max-w-md w-full overflow-hidden shadow-2xl">
+      <div class="px-4 py-3 border-b border-tv-border flex items-center justify-between bg-tv-deep">
+        <h3 class="text-sm font-bold text-white">🔔 Sound Price Alerts</h3>
+        <button id="closeAlertModalBtn" class="text-tv-muted hover:text-white">✕</button>
+      </div>
+      <div class="p-4 space-y-3 text-xs">
+        <div class="grid grid-cols-3 gap-1.5">
+          <input id="alertSymInput" type="text" value="XAUUSD" class="bg-tv-bg border border-tv-border rounded px-2 py-1.5 font-mono text-white outline-none" />
+          <input id="alertPriceInput" type="number" step="any" placeholder="Target Price" class="bg-tv-bg border border-tv-border rounded px-2 py-1.5 font-mono text-white outline-none" />
+          <button id="addPriceAlertBtn" class="bg-amber-500 hover:bg-amber-400 text-black font-bold rounded">+ Add Alert</button>
+        </div>
+        <div id="priceAlertsList" class="space-y-1.5 max-h-48 overflow-y-auto font-mono"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 4: PRO UPGRADE & UPI PAYMENT                        -->
+  <!-- ========================================================= -->
   <div id="upgradeModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4 overflow-y-auto">
     <div class="bg-tv-panel border border-tv-border rounded-xl max-w-3xl w-full overflow-hidden shadow-2xl my-auto">
-      <!-- Modal Header -->
-      <div class="px-5 py-3.5 border-b border-tv-border flex items-center justify-between bg-gradient-to-r from-tv-deep via-[#151c2c] to-tv-deep">
+      <div class="px-5 py-3.5 border-b border-tv-border flex items-center justify-between bg-tv-deep">
         <div>
           <h3 class="text-base font-extrabold text-white flex items-center gap-2">
             <span>⚡ Upgrade to pipscopetrade1 PRO</span>
             <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">Less than ₹5/day</span>
           </h3>
-          <p class="text-xs text-tv-muted mt-0.5">Everything a serious Gold, Forex & Prop Trader needs — at 1/10th the price of TradingView & TradeZella.</p>
+          <p class="text-xs text-tv-muted mt-0.5">All institutional charts, multi-screen layouts, cloud journal & Pine scripts.</p>
         </div>
         <button id="closeUpgradeModalBtn" class="text-tv-muted hover:text-white text-lg px-2">✕</button>
       </div>
 
-      <!-- Modal Body -->
       <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
-        <!-- Left: Value Comparison + Plan Selection -->
         <div class="space-y-3">
           <div class="text-xs font-semibold uppercase tracking-wider text-tv-muted">1. Choose Your Pro Plan</div>
-
-          <!-- Monthly Plan Card (₹149) -->
           <div id="planMonthlyCard" class="plan-card cursor-pointer p-3 rounded-lg border-2 border-tv-blue bg-tv-blue/10 transition">
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-white text-sm">Monthly Pro</span>
-              <span class="font-mono font-bold text-lg text-white">₹149<span class="text-xs text-tv-muted font-normal">/month</span></span>
-            </div>
-            <p class="text-[11px] text-tv-muted mt-0.5">Full institutional toolkit • No auto-debit</p>
+            <div class="flex items-center justify-between"><span class="font-bold text-white text-sm">Monthly Pro</span><span class="font-mono font-bold text-lg text-white">₹149<span class="text-xs text-tv-muted font-normal">/mo</span></span></div>
+            <p class="text-[11px] text-tv-muted mt-0.5">Full institutional toolkit • Cloud Sync</p>
           </div>
-
-          <!-- Yearly Plan Card (₹1,649) -->
           <div id="planYearlyCard" class="plan-card cursor-pointer p-3 rounded-lg border border-tv-border bg-tv-bg hover:border-emerald-500/60 transition relative">
-            <span class="absolute -top-2.5 right-3 px-2 py-0.5 bg-emerald-500 text-black font-bold text-[10px] rounded-full">MOST POPULAR • SAVE ₹139</span>
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-white text-sm">Yearly Pro</span>
-              <span class="font-mono font-bold text-lg text-emerald-400">₹1,649<span class="text-xs text-tv-muted font-normal">/year</span></span>
-            </div>
-            <p class="text-[11px] text-tv-muted mt-0.5">Just ₹137/month • Priority Pine scripts & updates</p>
+            <span class="absolute -top-2.5 right-3 px-2 py-0.5 bg-emerald-500 text-black font-bold text-[10px] rounded-full">SAVE ₹139</span>
+            <div class="flex items-center justify-between"><span class="font-bold text-white text-sm">Yearly Pro</span><span class="font-mono font-bold text-lg text-emerald-400">₹1,649<span class="text-xs text-tv-muted font-normal">/yr</span></span></div>
+            <p class="text-[11px] text-tv-muted mt-0.5">Just ₹137/month • Priority Pine scripts</p>
           </div>
-
-          <!-- Complete Pro Toolkit Checklist -->
-          <div class="bg-tv-deep border border-tv-border rounded-lg p-3 space-y-1.5">
-            <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider">What You Unlock Immediately:</div>
-            <ul class="text-[11px] space-y-1.5 text-tv-text">
-              <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <span><strong>2x Split & 4x Multi-Chart Grid</strong> (Free allows 1x chart)</span></li>
-              <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <span><strong>Unlimited Indicators Stack</strong> (Free allows only 1 indicator)</span></li>
-              <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <span><strong>MT5 / XM Statement Auto-Importer</strong> + P&L Heatmap</span></li>
-              <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <span><strong>0.280–0.382 Golden Zone Sniper</strong> & Lot Size Calculator</span></li>
-              <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <span><strong>Prop Firm Drawdown Guard</strong> (FTMO / FundedNext Tracker)</span></li>
-              <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <span><strong>SMC Order Block & Gold Pine v5 Library</strong></span></li>
-            </ul>
-          </div>
+          <ul class="text-[11px] space-y-1.5 text-tv-text bg-tv-deep border border-tv-border rounded-lg p-3">
+            <li>✓ <strong>2x Split & 4x Multi-Chart Grid</strong></li>
+            <li>✓ <strong>Unlimited Indicators Stack</strong></li>
+            <li>✓ <strong>MT5 / XM Statement Auto-Importer</strong> + P&L Heatmap</li>
+            <li>✓ <strong>0.280–0.382 Golden Zone Sniper</strong> & Prop Guard</li>
+            <li>✓ <strong>Cross-Device Cloud Sync</strong> when signed in</li>
+          </ul>
         </div>
 
-        <!-- Right: UPI QR & Payment Verification -->
         <div class="bg-tv-bg border border-tv-border rounded-lg p-4 flex flex-col items-center text-center justify-between">
           <div class="w-full">
             <div class="text-xs font-semibold uppercase tracking-wider text-tv-muted mb-2">2. Scan & Pay via Any UPI App</div>
-
-            <!-- Dynamic QR Image -->
-            <div class="bg-white p-2 rounded-lg shadow-md inline-block">
-              <img id="upiQrImg" src="" alt="UPI QR Code" class="w-36 h-36 object-contain" />
-            </div>
-
+            <div class="bg-white p-2 rounded-lg shadow-md inline-block"><img id="upiQrImg" src="" alt="UPI QR" class="w-36 h-36 object-contain" /></div>
             <div class="mt-2 font-mono text-xs">
-              <div class="text-tv-muted">Payable Amount: <strong id="upiPayAmount" class="text-white text-sm">₹149.00</strong></div>
+              <div class="text-tv-muted">Payable: <strong id="upiPayAmount" class="text-white text-sm">₹149.00</strong></div>
               <div class="text-[11px] text-tv-muted mt-0.5 flex items-center justify-center gap-1.5">
                 <span>UPI ID: <strong id="displayUpiId" class="text-emerald-400">pipscopetrade1@naviaxis</strong></span>
-                <button id="copyUpiIdBtn" class="px-1.5 py-0.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-[10px] text-white font-sans">Copy</button>
+                <button id="copyUpiIdBtn" class="px-1.5 py-0.5 bg-tv-panel border border-tv-border rounded text-[10px] text-white font-sans">Copy</button>
               </div>
             </div>
-
-            <!-- Mobile UPI Intent Button -->
-            <a id="upiIntentLink" href="#" class="mt-2 w-full py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded transition block">
-              📱 Open UPI App (GPay / PhonePe / Paytm)
-            </a>
+            <a id="upiIntentLink" href="#" class="mt-2 w-full py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded block">📱 Open UPI App</a>
           </div>
 
-          <!-- UTR Verification Box -->
           <div class="w-full mt-2.5 pt-2.5 border-t border-tv-border text-left space-y-1.5">
-            <label class="block text-[11px] text-tv-muted">3. Enter Your Name / Email & 12-Digit UTR Number:</label>
-            <input id="payerContactInput" type="text" placeholder="Your Name or Email (e.g. rahul@gmail.com)" class="w-full bg-tv-deep border border-tv-border focus:border-tv-blue rounded px-2.5 py-1 text-xs text-white outline-none" />
+            <label class="block text-[11px] text-tv-muted">3. Email & 12-Digit UTR Number:</label>
+            <input id="payerContactInput" type="text" placeholder="Your Email (auto-filled if signed in)" class="w-full bg-tv-deep border border-tv-border rounded px-2.5 py-1 text-xs text-white outline-none" />
             <div class="flex gap-1.5">
-              <input id="utrInput" type="text" maxlength="16" placeholder="12-Digit UTR (e.g. 632918475612)" class="flex-1 bg-tv-deep border border-tv-border focus:border-tv-blue rounded px-2.5 py-1.5 text-xs font-mono text-white outline-none" />
-              <button id="verifyUpiBtn" class="px-3 py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-semibold rounded transition">
-                Submit
-              </button>
+              <input id="utrInput" type="text" maxlength="16" placeholder="12-Digit UTR" class="flex-1 bg-tv-deep border border-tv-border rounded px-2.5 py-1.5 text-xs font-mono text-white outline-none" />
+              <button id="verifyUpiBtn" class="px-3 py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-semibold rounded">Submit</button>
             </div>
             <p id="upiStatusMsg" class="text-[11px] text-amber-400 mt-1 hidden"></p>
             <p id="upiErrorMsg" class="text-[11px] text-tv-red mt-1 hidden"></p>
@@ -688,7 +695,7 @@
 
   <script>
     // =========================================================
-    // MERCHANT UPI & GOOGLE SHEET VERIFICATION CONFIGURATION
+    // CONFIGURATION
     // =========================================================
     const MERCHANT_UPI_ID = 'pipscopetrade1@naviaxis';
     const MERCHANT_NAME = 'pipscopetrade1';
@@ -702,14 +709,198 @@
     let activeStudies = [];
     let currencyMode = 'USD';
     let selectedPlan = 'monthly';
+    let authMode = 'login';
+
+    let currentUser = JSON.parse(localStorage.getItem('pipscopetrade1_user') || 'null');
     let proSubscription = JSON.parse(localStorage.getItem('pipscopetrade1_pro_sub') || 'null');
     let trades = JSON.parse(localStorage.getItem('pipscopetrade1_trades_v1') || '[]');
+    let savedLayouts = JSON.parse(localStorage.getItem('pipscopetrade1_layouts') || '[]');
+    let priceAlerts = JSON.parse(localStorage.getItem('pipscopetrade1_alerts') || '[]');
 
     function isProActive() {
-      if (!proSubscription) return false;
-      return Date.now() < proSubscription.expiresAt;
+      if (currentUser && currentUser.expiresAt && Date.now() < currentUser.expiresAt) return true;
+      if (proSubscription && Date.now() < proSubscription.expiresAt) return true;
+      return false;
     }
 
+    // --- CLOUD SYNC HELPER ---
+    async function syncUserToCloud() {
+      if (!currentUser || !currentUser.email) return;
+      const ind = document.getElementById('cloudSyncIndicator');
+      ind.textContent = '☁️ Syncing...';
+      ind.className = 'text-[10px] text-amber-400';
+
+      const exp = Math.max(currentUser.expiresAt || 0, (proSubscription && proSubscription.expiresAt) || 0);
+      const plan = exp > Date.now() ? 'PRO' : 'FREE';
+      currentUser.plan = plan;
+      currentUser.expiresAt = exp;
+      localStorage.setItem('pipscopetrade1_user', JSON.stringify(currentUser));
+
+      const syncUrl = GOOGLE_SHEET_SCRIPT_URL +
+        '?action=sync' +
+        '&email=' + encodeURIComponent(currentUser.email) +
+        '&plan=' + encodeURIComponent(plan) +
+        '&expiresAt=' + encodeURIComponent(exp) +
+        '&trades=' + encodeURIComponent(JSON.stringify(trades.slice(0, 40))) +
+        '&layouts=' + encodeURIComponent(JSON.stringify(savedLayouts.slice(0, 15))) +
+        '&_t=' + Date.now();
+
+      try {
+        await fetch(syncUrl, { mode: 'no-cors' });
+      } catch (e) {
+        new Image().src = syncUrl;
+      }
+      ind.textContent = '☁️ Cloud Synced (' + currentUser.email + ')';
+      ind.className = 'text-[10px] text-emerald-400';
+    }
+
+    // --- AUTHENTICATION (SIGN UP, LOGIN, LOGOUT) ---
+    function updateAuthUI() {
+      const hdrText = document.getElementById('authHeaderText');
+      const hdrAvatar = document.getElementById('authHeaderAvatar');
+      const cloudInd = document.getElementById('cloudSyncIndicator');
+
+      if (currentUser) {
+        hdrText.textContent = currentUser.name.split(' ')[0];
+        hdrAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+        cloudInd.textContent = '☁️ Cloud Synced (' + currentUser.email + ')';
+        cloudInd.className = 'text-[10px] text-emerald-400';
+        document.getElementById('payerContactInput').value = currentUser.email;
+      } else {
+        hdrText.textContent = 'Sign In';
+        hdrAvatar.textContent = '👤';
+        cloudInd.textContent = '☁️ Local Mode (Sign in to Cloud Sync)';
+        cloudInd.className = 'text-[10px] text-tv-muted';
+      }
+    }
+
+    function openAuthModal() {
+      const outView = document.getElementById('authLoggedOutView');
+      const inView = document.getElementById('authLoggedInView');
+      document.getElementById('authFeedbackMsg').classList.add('hidden');
+
+      if (currentUser) {
+        outView.classList.add('hidden');
+        inView.classList.remove('hidden');
+        document.getElementById('profUserName').textContent = currentUser.name;
+        document.getElementById('profUserEmail').textContent = currentUser.email;
+        document.getElementById('profPlanBadge').textContent = isProActive() ? 'PRO ACTIVE' : 'FREE PLAN';
+        document.getElementById('profTradeCount').textContent = trades.length;
+        document.getElementById('profLayoutCount').textContent = savedLayouts.length;
+      } else {
+        inView.classList.add('hidden');
+        outView.classList.remove('hidden');
+      }
+      document.getElementById('authModal').classList.remove('hidden');
+      document.getElementById('authModal').classList.add('flex');
+    }
+
+    document.getElementById('authHeaderBtn').addEventListener('click', openAuthModal);
+    document.getElementById('closeAuthModalBtn').addEventListener('click', function() {
+      document.getElementById('authModal').classList.add('hidden');
+      document.getElementById('authModal').classList.remove('flex');
+    });
+
+    document.getElementById('tabLoginMode').addEventListener('click', function() {
+      authMode = 'login';
+      this.className = 'py-1.5 rounded bg-tv-blue text-white';
+      document.getElementById('tabSignupMode').className = 'py-1.5 rounded text-tv-muted hover:text-white';
+      document.getElementById('signupNameWrap').classList.add('hidden');
+      document.getElementById('submitAuthBtn').textContent = 'Sign In & Sync Cloud';
+    });
+
+    document.getElementById('tabSignupMode').addEventListener('click', function() {
+      authMode = 'signup';
+      this.className = 'py-1.5 rounded bg-tv-blue text-white';
+      document.getElementById('tabLoginMode').className = 'py-1.5 rounded text-tv-muted hover:text-white';
+      document.getElementById('signupNameWrap').classList.remove('hidden');
+      document.getElementById('submitAuthBtn').textContent = 'Create Free Account';
+    });
+
+    document.getElementById('submitAuthBtn').addEventListener('click', async function() {
+      const email = document.getElementById('authEmailInput').value.trim().toLowerCase();
+      const password = document.getElementById('authPassInput').value.trim();
+      const name = document.getElementById('authNameInput').value.trim() || email.split('@')[0];
+      const msgEl = document.getElementById('authFeedbackMsg');
+      const btn = this;
+
+      msgEl.classList.add('hidden');
+      if (!email || !password) {
+        msgEl.textContent = 'Please enter both Email and Password.';
+        msgEl.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = authMode === 'signup' ? 'Creating Account...' : 'Signing In...';
+
+      try {
+        const url = GOOGLE_SHEET_SCRIPT_URL +
+          '?action=' + authMode +
+          '&name=' + encodeURIComponent(name) +
+          '&email=' + encodeURIComponent(email) +
+          '&password=' + encodeURIComponent(password);
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.status === 'ok' && data.user) {
+          currentUser = data.user;
+          localStorage.setItem('pipscopetrade1_user', JSON.stringify(currentUser));
+
+          if (data.user.expiresAt && data.user.expiresAt > Date.now()) {
+            proSubscription = { plan: 'cloud', activatedAt: Date.now(), expiresAt: data.user.expiresAt };
+            localStorage.setItem('pipscopetrade1_pro_sub', JSON.stringify(proSubscription));
+          }
+          if (Array.isArray(data.user.trades) && data.user.trades.length > 0) {
+            trades = data.user.trades;
+            localStorage.setItem('pipscopetrade1_trades_v1', JSON.stringify(trades));
+          }
+          if (Array.isArray(data.user.layouts) && data.user.layouts.length > 0) {
+            savedLayouts = data.user.layouts;
+            localStorage.setItem('pipscopetrade1_layouts', JSON.stringify(savedLayouts));
+          }
+
+          updateAuthUI();
+          updateProUI();
+          renderJournal();
+          updateCalculator();
+          document.getElementById('authModal').classList.add('hidden');
+          document.getElementById('authModal').classList.remove('flex');
+        } else {
+          msgEl.textContent = data.message || 'Authentication failed. Check credentials.';
+          msgEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        msgEl.textContent = 'Connection error. Please ensure Apps Script is deployed as Anyone.';
+        msgEl.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = authMode === 'signup' ? 'Create Free Account' : 'Sign In & Sync Cloud';
+      }
+    });
+
+    document.getElementById('manualSyncNowBtn').addEventListener('click', async function() {
+      this.textContent = 'Syncing...';
+      await syncUserToCloud();
+      this.textContent = '✓ Synced to Cloud!';
+      setTimeout(() => { this.textContent = '☁️ Sync Data to Cloud Now'; }, 1500);
+    });
+
+    document.getElementById('logoutUserBtn').addEventListener('click', function() {
+      currentUser = null;
+      proSubscription = null;
+      localStorage.removeItem('pipscopetrade1_user');
+      localStorage.removeItem('pipscopetrade1_pro_sub');
+      updateAuthUI();
+      updateProUI();
+      renderJournal();
+      updateCalculator();
+      document.getElementById('authModal').classList.add('hidden');
+      document.getElementById('authModal').classList.remove('flex');
+    });
+
+    // --- PRO UI UPDATER ---
     function updateProUI() {
       const pro = isProActive();
       const badge = document.getElementById('planStatusBadge');
@@ -717,13 +908,14 @@
       const pendingUtr = localStorage.getItem('pipscopetrade1_pending_utr');
 
       if (pro) {
-        const expDate = new Date(proSubscription.expiresAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-        badge.textContent = 'PRO • Till ' + expDate;
+        const exp = (currentUser && currentUser.expiresAt) || (proSubscription && proSubscription.expiresAt) || (Date.now() + 30 * 86400000);
+        const expDate = new Date(exp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+        badge.textContent = 'PRO • ' + expDate;
         badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded';
-        upgradeBtn.innerHTML = '<span>★ Pro Active</span>';
-        upgradeBtn.className = 'px-2.5 py-1 text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded flex items-center gap-1';
+        upgradeBtn.innerHTML = '<span>★ Pro</span>';
+        upgradeBtn.className = 'px-2 py-1 text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded';
 
-        document.querySelectorAll('.pro-lock-tag').forEach(function(el) { el.classList.add('hidden'); });
+        document.querySelectorAll('.pro-lock-tag').forEach(el => el.classList.add('hidden'));
         document.getElementById('exportCsvBtn').textContent = 'Export CSV';
         document.getElementById('importMt5Label').childNodes[0].textContent = 'Import MT5/CSV ';
         document.getElementById('layoutSplitBtn').textContent = '2x';
@@ -731,618 +923,438 @@
         document.getElementById('toolTabCalc').textContent = 'Risk & Lot';
         document.getElementById('toolTabFib').textContent = 'Golden Zone';
         document.getElementById('toolTabProp').textContent = 'Prop Guard';
-        document.getElementById('openPineModalBtn').textContent = 'SMC & Gold Pine Scripts →';
-        document.getElementById('activeStudiesCount').textContent = activeStudies.length + (activeStudies.length === 1 ? ' Study Active' : ' Studies Active');
-      } else if (pendingUtr) {
-        badge.textContent = 'VERIFYING UTR...';
-        badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/40 rounded animate-pulse';
-        upgradeBtn.innerHTML = '<span>⏳ Check UTR Status</span>';
+        document.getElementById('openPineModalBtn').textContent = 'SMC & Gold Pine v5 →';
+        document.getElementById('activeStudiesCount').textContent = activeStudies.length + ' Studies Active';
+      } else {
+        badge.textContent = pendingUtr ? 'VERIFYING...' : 'FREE';
+        badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded';
+        upgradeBtn.innerHTML = '<span>⚡ Pro ₹149</span>';
+        upgradeBtn.className = 'px-2.5 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 text-black rounded shadow';
+        document.querySelectorAll('.pro-lock-tag').forEach(el => el.classList.remove('hidden'));
       }
     }
 
-    // --- AUTO-CHECK GOOGLE SHEET APPROVAL FOR PENDING UTR ---
+    // --- CHECK UTR APPROVAL ---
     async function checkGoogleSheetApproval() {
       if (isProActive()) return;
       const pendingData = JSON.parse(localStorage.getItem('pipscopetrade1_pending_utr') || 'null');
       if (!pendingData || !pendingData.utr) return;
-      if (!GOOGLE_SHEET_SCRIPT_URL || GOOGLE_SHEET_SCRIPT_URL.indexOf('PASTE_YOUR') !== -1) return;
 
       try {
         const res = await fetch(GOOGLE_SHEET_SCRIPT_URL + '?action=check&utr=' + encodeURIComponent(pendingData.utr));
         const data = await res.json();
-
         if (data.status === 'Approved') {
           const days = pendingData.plan === 'yearly' ? 365 : 30;
-          proSubscription = {
-            plan: pendingData.plan,
-            utr: pendingData.utr,
-            activatedAt: Date.now(),
-            expiresAt: Date.now() + days * 24 * 60 * 60 * 1000
-          };
+          const exp = Date.now() + days * 86400000;
+          proSubscription = { plan: pendingData.plan, utr: pendingData.utr, activatedAt: Date.now(), expiresAt: exp };
           localStorage.setItem('pipscopetrade1_pro_sub', JSON.stringify(proSubscription));
           localStorage.removeItem('pipscopetrade1_pending_utr');
+          if (currentUser) {
+            currentUser.plan = 'PRO';
+            currentUser.expiresAt = exp;
+            await syncUserToCloud();
+          }
           updateProUI();
           updateCalculator();
           renderJournal();
-          alert('Payment Approved! All pipscopetrade1 Pro features are now unlocked.');
-        } else if (data.status === 'Rejected') {
-          localStorage.removeItem('pipscopetrade1_pending_utr');
-          const badge = document.getElementById('planStatusBadge');
-          badge.textContent = 'FREE';
-          badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded';
-          document.getElementById('openUpgradeBtn').innerHTML = '<span>⚡ Unlock Pro ₹149</span>';
-          alert('Your UTR verification was rejected (invalid/unreceived payment). Please submit a valid 12-digit UTR.');
         }
-      } catch (err) {
-        console.warn('UTR verification check skipped:', err);
-      }
+      } catch (e) {}
     }
 
-    // --- LIVE CLOCK & GLOBAL SESSION TRACKER ---
+    // --- SAVED CHART TEMPLATES / LAYOUTS ---
+    function renderSavedLayouts() {
+      const list = document.getElementById('savedLayoutsList');
+      if (!savedLayouts.length) {
+        list.innerHTML = '<div class="text-tv-muted text-center py-4">No saved chart templates yet. Set your symbol, timeframe & indicators and click Save Current.</div>';
+        return;
+      }
+      list.innerHTML = savedLayouts.map((l, idx) => `
+        <div class="bg-tv-bg border border-tv-border rounded p-2 flex items-center justify-between">
+          <div>
+            <div class="font-bold text-white">${l.name}</div>
+            <div class="text-[10px] font-mono text-tv-muted">${l.symbol} • ${l.interval}m • ${l.studies.length} studies</div>
+          </div>
+          <div class="flex gap-1">
+            <button onclick="loadSavedLayout(${idx})" class="px-2 py-1 bg-tv-blue text-white rounded text-[10px] font-semibold">Load</button>
+            <button onclick="deleteSavedLayout(${idx})" class="px-2 py-1 bg-tv-deep text-tv-muted hover:text-tv-red rounded text-[10px]">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.loadSavedLayout = function(idx) {
+      const l = savedLayouts[idx];
+      if (!l) return;
+      currentSymbol = l.symbol;
+      currentInterval = l.interval;
+      activeStudies = l.studies || [];
+      loadChartWidget();
+      document.getElementById('layoutModal').classList.add('hidden');
+      document.getElementById('layoutModal').classList.remove('flex');
+    };
+
+    window.deleteSavedLayout = function(idx) {
+      savedLayouts.splice(idx, 1);
+      localStorage.setItem('pipscopetrade1_layouts', JSON.stringify(savedLayouts));
+      renderSavedLayouts();
+      syncUserToCloud();
+    };
+
+    document.getElementById('openLayoutModalBtn').addEventListener('click', function() {
+      renderSavedLayouts();
+      document.getElementById('layoutModal').classList.remove('hidden');
+      document.getElementById('layoutModal').classList.add('flex');
+    });
+    document.getElementById('closeLayoutModalBtn').addEventListener('click', function() {
+      document.getElementById('layoutModal').classList.add('hidden');
+      document.getElementById('layoutModal').classList.remove('flex');
+    });
+    document.getElementById('saveCurrentLayoutBtn').addEventListener('click', function() {
+      const name = document.getElementById('newLayoutNameInput').value.trim() || (currentSymbol.split(':').pop() + ' Setup');
+      savedLayouts.unshift({ name: name, symbol: currentSymbol, interval: currentInterval, studies: [...activeStudies] });
+      localStorage.setItem('pipscopetrade1_layouts', JSON.stringify(savedLayouts));
+      document.getElementById('newLayoutNameInput').value = '';
+      renderSavedLayouts();
+      syncUserToCloud();
+    });
+
+    // --- SOUND PRICE ALERTS ---
+    function playAlertBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.25);
+      } catch (e) {}
+    }
+
+    function renderAlerts() {
+      document.getElementById('alertCountBadge').textContent = priceAlerts.length;
+      const list = document.getElementById('priceAlertsList');
+      if (!priceAlerts.length) {
+        list.innerHTML = '<div class="text-tv-muted text-center py-3 font-sans">No active price alerts.</div>';
+        return;
+      }
+      list.innerHTML = priceAlerts.map((a, i) => `
+        <div class="bg-tv-bg border border-tv-border rounded p-2 flex items-center justify-between">
+          <span><strong class="text-white">${a.symbol}</strong> @ <span class="text-amber-400">${a.price}</span></span>
+          <button onclick="removePriceAlert(${i})" class="text-tv-muted hover:text-tv-red">Delete</button>
+        </div>
+      `).join('');
+    }
+
+    window.removePriceAlert = function(idx) {
+      priceAlerts.splice(idx, 1);
+      localStorage.setItem('pipscopetrade1_alerts', JSON.stringify(priceAlerts));
+      renderAlerts();
+    };
+
+    document.getElementById('openAlertModalBtn').addEventListener('click', function() {
+      document.getElementById('alertSymInput').value = currentSymbol.split(':').pop();
+      renderAlerts();
+      document.getElementById('alertModal').classList.remove('hidden');
+      document.getElementById('alertModal').classList.add('flex');
+    });
+    document.getElementById('closeAlertModalBtn').addEventListener('click', function() {
+      document.getElementById('alertModal').classList.add('hidden');
+      document.getElementById('alertModal').classList.remove('flex');
+    });
+    document.getElementById('addPriceAlertBtn').addEventListener('click', function() {
+      const sym = document.getElementById('alertSymInput').value.trim().toUpperCase();
+      const price = parseFloat(document.getElementById('alertPriceInput').value);
+      if (!sym || isNaN(price)) return;
+      priceAlerts.push({ symbol: sym, price: price });
+      localStorage.setItem('pipscopetrade1_alerts', JSON.stringify(priceAlerts));
+      document.getElementById('alertPriceInput').value = '';
+      playAlertBeep();
+      renderAlerts();
+    });
+
+    // --- FLOATING PAPER TRADING INSTANT BUY / SELL ---
+    document.getElementById('togglePaperPanelBtn').addEventListener('click', function() {
+      const p = document.getElementById('floatingOrderPanel');
+      p.classList.toggle('hidden');
+      const shortSym = currentSymbol.split(':').pop();
+      document.getElementById('floatSymbolBuy').textContent = shortSym;
+      document.getElementById('floatSymbolSell').textContent = shortSym;
+    });
+    document.getElementById('closeFloatOrderBtn').addEventListener('click', function() {
+      document.getElementById('floatingOrderPanel').classList.add('hidden');
+    });
+
+    function executeInstantPaperTrade(side) {
+      if (!isProActive()) { openUpgradeModal(); return; }
+      const lots = document.getElementById('floatLotInput').value || '0.10';
+      const now = new Date();
+      trades.unshift({
+        id: Date.now(),
+        dateKey: now.toISOString().slice(0, 10),
+        time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        symbol: currentSymbol.split(':').pop(),
+        side: side,
+        size: lots + ' Lots',
+        entry: 'Market',
+        sl: '-',
+        tp: '-',
+        note: 'Instant Paper Order',
+        status: 'OPEN',
+        pnl: 0
+      });
+      saveTrades();
+      playAlertBeep();
+    }
+    document.getElementById('instantBuyBtn').addEventListener('click', () => executeInstantPaperTrade('BUY'));
+    document.getElementById('instantSellBtn').addEventListener('click', () => executeInstantPaperTrade('SELL'));
+
+    // --- LEFT TOOLBAR QUICK SHORTCUTS ---
+    document.querySelectorAll('.tv-left-tool').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tv-left-tool').forEach(b => b.classList.remove('tool-active'));
+        this.classList.add('tool-active');
+        const qt = this.dataset.quicktool;
+        if (qt === 'fib') { document.getElementById('rightSidebar').classList.remove('hidden'); switchRightTool('fib'); }
+        if (qt === 'calc') { document.getElementById('rightSidebar').classList.remove('hidden'); switchRightTool('calc'); }
+        if (qt === 'prop') { document.getElementById('rightSidebar').classList.remove('hidden'); switchRightTool('prop'); }
+        if (qt === 'alert') { document.getElementById('openAlertModalBtn').click(); }
+        if (qt === 'screener') {
+          document.getElementById('bottomPanel').classList.remove('hidden');
+          document.getElementById('footerShowBottomBtn').classList.add('hidden');
+          switchBottomTab('screener');
+        }
+      });
+    });
+
+    document.getElementById('toggleFullChartBtn').addEventListener('click', function() {
+      const side = document.getElementById('rightSidebar');
+      const bot = document.getElementById('bottomPanel');
+      const bothHidden = side.classList.contains('hidden') && bot.classList.contains('hidden');
+      if (bothHidden) {
+        side.classList.remove('hidden');
+        bot.classList.remove('hidden');
+        document.getElementById('footerShowBottomBtn').classList.add('hidden');
+      } else {
+        side.classList.add('hidden');
+        bot.classList.add('hidden');
+        document.getElementById('footerShowBottomBtn').classList.remove('hidden');
+      }
+    });
+
+    // --- BOTTOM PANEL HIDE / SHOW ---
+    document.getElementById('toggleBottomPanelBtn').addEventListener('click', function() {
+      document.getElementById('bottomPanel').classList.add('hidden');
+      document.getElementById('footerShowBottomBtn').classList.remove('hidden');
+    });
+    document.getElementById('footerShowBottomBtn').addEventListener('click', function() {
+      document.getElementById('bottomPanel').classList.remove('hidden');
+      this.classList.add('hidden');
+    });
+
+    // --- CLOCK & SESSIONS ---
     function updateSessionsAndClock() {
       const now = new Date();
       document.getElementById('liveClockIst').textContent = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false }) + ' IST';
-      document.getElementById('liveClockUtc').textContent = now.toISOString().substr(11, 5) + ' UTC';
-
       const utcHour = now.getUTCHours();
-      const sydneyOpen = utcHour >= 22 || utcHour < 7;
-      const tokyoOpen = utcHour >= 0 && utcHour < 9;
-      const londonOpen = utcHour >= 8 && utcHour < 17;
-      const nyOpen = utcHour >= 13 && utcHour < 22;
+      const sydney = utcHour >= 22 || utcHour < 7;
+      const tokyo = utcHour >= 0 && utcHour < 9;
+      const london = utcHour >= 8 && utcHour < 17;
+      const ny = utcHour >= 13 && utcHour < 22;
 
-      function setSessBadge(elId, label, isOpen) {
-        const el = document.getElementById(elId);
-        if (!el) return;
-        el.innerHTML = isOpen
-          ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> <span class="text-white font-semibold">' + label + '</span>'
-          : '<span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> <span class="text-tv-muted">' + label + '</span>';
-      }
-
-      setSessBadge('sessSydney', 'Sydney', sydneyOpen);
-      setSessBadge('sessTokyo', 'Tokyo', tokyoOpen);
-      setSessBadge('sessLondon', 'London', londonOpen);
-      setSessBadge('sessNewYork', 'New York', nyOpen);
+      const badge = (id, name, open) => {
+        document.getElementById(id).innerHTML = open
+          ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> <span class="text-white font-semibold">${name}</span>`
+          : `<span class="w-1.5 h-1.5 rounded-full bg-tv-muted"></span> <span class="text-tv-muted">${name}</span>`;
+      };
+      badge('sessSydney', 'Sydney', sydney);
+      badge('sessTokyo', 'Tokyo', tokyo);
+      badge('sessLondon', 'London', london);
+      badge('sessNewYork', 'New York', ny);
 
       const kz = document.getElementById('killzoneBadge');
-      if (londonOpen && nyOpen) {
-        kz.textContent = '🔥 London-NY Overlap (Peak Volume)';
-        kz.className = 'hidden sm:inline-block px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px]';
-      } else if (londonOpen || nyOpen) {
-        kz.textContent = '⚡ High Liquidity Session Active';
-        kz.className = 'hidden sm:inline-block px-1.5 py-0.2 rounded bg-tv-blue/20 text-tv-blue text-[10px]';
-      } else {
-        kz.textContent = 'Asian / Off-Peak Range';
-        kz.className = 'hidden sm:inline-block px-1.5 py-0.2 rounded bg-tv-panel text-tv-muted text-[10px]';
-      }
+      kz.textContent = (london && ny) ? '🔥 London-NY Overlap' : (london || ny) ? '⚡ High Liquidity' : 'Asian Session';
     }
     setInterval(updateSessionsAndClock, 1000);
 
-    // --- UPI MODAL & QR GENERATOR (₹149 MONTHLY / ₹1,649 YEARLY) ---
+    // --- UPI MODAL & UTR ---
     function updateUpiDetails() {
       const amount = selectedPlan === 'monthly' ? '149.00' : '1649.00';
-      const displayAmt = selectedPlan === 'monthly' ? '₹149.00' : '₹1,649.00';
-      const note = selectedPlan === 'monthly' ? 'pipscopetrade1 Pro Monthly' : 'pipscopetrade1 Pro Yearly';
-      const upiUrl = 'upi://pay?pa=' + encodeURIComponent(MERCHANT_UPI_ID) + '&pn=' + encodeURIComponent(MERCHANT_NAME) + '&am=' + amount + '&cu=INR&tn=' + encodeURIComponent(note);
-      const qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(upiUrl);
-
-      document.getElementById('upiQrImg').src = qrApiUrl;
-      document.getElementById('upiPayAmount').textContent = displayAmt;
-      document.getElementById('displayUpiId').textContent = MERCHANT_UPI_ID;
+      const upiUrl = `upi://pay?pa=${encodeURIComponent(MERCHANT_UPI_ID)}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${amount}&cu=INR`;
+      document.getElementById('upiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUrl)}`;
+      document.getElementById('upiPayAmount').textContent = selectedPlan === 'monthly' ? '₹149.00' : '₹1,649.00';
       document.getElementById('upiIntentLink').href = upiUrl;
-
-      const mCard = document.getElementById('planMonthlyCard');
-      const yCard = document.getElementById('planYearlyCard');
-      if (selectedPlan === 'monthly') {
-        mCard.className = 'plan-card cursor-pointer p-3 rounded-lg border-2 border-tv-blue bg-tv-blue/10 transition';
-        yCard.className = 'plan-card cursor-pointer p-3 rounded-lg border border-tv-border bg-tv-bg hover:border-emerald-500/60 transition relative';
-      } else {
-        yCard.className = 'plan-card cursor-pointer p-3 rounded-lg border-2 border-emerald-500 bg-emerald-500/10 transition relative';
-        mCard.className = 'plan-card cursor-pointer p-3 rounded-lg border border-tv-border bg-tv-bg hover:border-tv-blue/60 transition';
-      }
     }
 
     function openUpgradeModal() {
       updateUpiDetails();
-      const pending = JSON.parse(localStorage.getItem('pipscopetrade1_pending_utr') || 'null');
-      const statusEl = document.getElementById('upiStatusMsg');
-      if (pending && !isProActive()) {
-        statusEl.textContent = 'UTR ' + pending.utr + ' is pending verification. Checking status automatically...';
-        statusEl.classList.remove('hidden');
-        checkGoogleSheetApproval();
-      }
       document.getElementById('upgradeModal').classList.remove('hidden');
       document.getElementById('upgradeModal').classList.add('flex');
     }
-
-    function closeUpgradeModal() {
+    document.getElementById('openUpgradeBtn').addEventListener('click', openUpgradeModal);
+    document.getElementById('closeUpgradeModalBtn').addEventListener('click', () => {
       document.getElementById('upgradeModal').classList.add('hidden');
       document.getElementById('upgradeModal').classList.remove('flex');
-    }
-
-    document.getElementById('openUpgradeBtn').addEventListener('click', openUpgradeModal);
-    document.getElementById('closeUpgradeModalBtn').addEventListener('click', closeUpgradeModal);
-    document.getElementById('planMonthlyCard').addEventListener('click', function() {
-      selectedPlan = 'monthly';
-      updateUpiDetails();
     });
-    document.getElementById('planYearlyCard').addEventListener('click', function() {
-      selectedPlan = 'yearly';
-      updateUpiDetails();
-    });
-
+    document.getElementById('planMonthlyCard').addEventListener('click', () => { selectedPlan = 'monthly'; updateUpiDetails(); });
+    document.getElementById('planYearlyCard').addEventListener('click', () => { selectedPlan = 'yearly'; updateUpiDetails(); });
     document.getElementById('copyUpiIdBtn').addEventListener('click', function() {
       navigator.clipboard.writeText(MERCHANT_UPI_ID);
-      const btn = document.getElementById('copyUpiIdBtn');
-      btn.textContent = 'Copied!';
-      setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
+      this.textContent = 'Copied!';
+      setTimeout(() => { this.textContent = 'Copy'; }, 1500);
     });
 
-    // --- SUBMIT UTR TO GOOGLE SHEET (NO-CORS + IMAGE BEACON FALLBACK) ---
     document.getElementById('verifyUpiBtn').addEventListener('click', async function() {
       const utr = document.getElementById('utrInput').value.trim();
-      const contact = document.getElementById('payerContactInput').value.trim() || 'Guest User';
+      const contact = document.getElementById('payerContactInput').value.trim() || (currentUser && currentUser.email) || 'Guest User';
       const errEl = document.getElementById('upiErrorMsg');
       const statusEl = document.getElementById('upiStatusMsg');
-      const btn = document.getElementById('verifyUpiBtn');
-
       errEl.classList.add('hidden');
-      statusEl.classList.add('hidden');
 
       if (utr === ADMIN_SECRET_CODE) {
-        proSubscription = {
-          plan: 'admin',
-          utr: ADMIN_SECRET_CODE,
-          activatedAt: Date.now(),
-          expiresAt: Date.now() + 3650 * 24 * 60 * 60 * 1000
-        };
+        const exp = Date.now() + 3650 * 86400000;
+        proSubscription = { plan: 'admin', utr: ADMIN_SECRET_CODE, activatedAt: Date.now(), expiresAt: exp };
         localStorage.setItem('pipscopetrade1_pro_sub', JSON.stringify(proSubscription));
-        localStorage.removeItem('pipscopetrade1_pending_utr');
-        updateProUI();
-        updateCalculator();
-        renderJournal();
-        closeUpgradeModal();
-        alert('Admin Access Granted: All pipscopetrade1 Pro features unlocked!');
+        if (currentUser) { currentUser.plan = 'PRO'; currentUser.expiresAt = exp; await syncUserToCloud(); }
+        updateProUI(); updateCalculator(); renderJournal();
+        document.getElementById('upgradeModal').classList.add('hidden');
+        alert('Admin Pro Unlocked & Cloud Synced!');
         return;
       }
 
       if (!/^\d{12}$/.test(utr)) {
-        errEl.textContent = 'Please enter a valid 12-digit UPI Ref / UTR number.';
+        errEl.textContent = 'Enter a valid 12-digit UTR number.';
         errEl.classList.remove('hidden');
         return;
       }
 
       const amount = selectedPlan === 'monthly' ? 149 : 1649;
       const planLabel = selectedPlan === 'monthly' ? 'Pro Monthly (₹149)' : 'Pro Yearly (₹1,649)';
+      const submitUrl = `${GOOGLE_SHEET_SCRIPT_URL}?action=submit&userId=${encodeURIComponent(contact)}&plan=${encodeURIComponent(planLabel)}&amount=${amount}&utr=${encodeURIComponent(utr)}&_t=${Date.now()}`;
 
-      btn.disabled = true;
-      btn.textContent = 'Sending...';
+      try { await fetch(submitUrl, { mode: 'no-cors' }); } catch (e) { new Image().src = submitUrl; }
 
-      if (GOOGLE_SHEET_SCRIPT_URL && GOOGLE_SHEET_SCRIPT_URL.indexOf('PASTE_YOUR') === -1) {
-        const submitUrl = GOOGLE_SHEET_SCRIPT_URL +
-          '?action=submit' +
-          '&userId=' + encodeURIComponent(contact) +
-          '&plan=' + encodeURIComponent(planLabel) +
-          '&amount=' + encodeURIComponent(amount) +
-          '&utr=' + encodeURIComponent(utr) +
-          '&_t=' + Date.now();
-        try {
-          await fetch(submitUrl, { mode: 'no-cors' });
-        } catch (fetchErr) {
-          const beacon = new Image();
-          beacon.src = submitUrl;
-        }
-      }
-
-      localStorage.setItem('pipscopetrade1_pending_utr', JSON.stringify({
-        utr: utr,
-        plan: selectedPlan,
-        submittedAt: Date.now()
-      }));
-
+      localStorage.setItem('pipscopetrade1_pending_utr', JSON.stringify({ utr, plan: selectedPlan, submittedAt: Date.now() }));
       updateProUI();
-      statusEl.textContent = 'UTR ' + utr + ' submitted! Once verified in admin sheet (5–10 mins), refresh page to unlock Pro.';
+      statusEl.textContent = `UTR ${utr} submitted! Refresh page once approved in admin sheet.`;
       statusEl.classList.remove('hidden');
-      btn.disabled = false;
-      btn.textContent = 'Submit';
-      alert('UTR Submitted! Your payment is being verified. Pro features will unlock automatically once approved.');
     });
 
-    // --- RIGHT SIDEBAR PRO TOOL TABS ---
+    // --- RIGHT TOOLS, CHARTS, SCREENER, JOURNAL ---
     function switchRightTool(toolName) {
-      if ((toolName === 'fib' || toolName === 'prop') && !isProActive()) {
-        openUpgradeModal();
-        return;
-      }
-      ['Calc', 'Fib', 'Prop'].forEach(function(t) {
-        const btn = document.getElementById('toolTab' + t);
-        const panel = document.getElementById('panelTool' + t);
-        if (t.toLowerCase() === toolName) {
-          btn.className = 'py-1.5 rounded bg-tv-blue text-white';
-          panel.classList.remove('hidden');
-        } else {
-          btn.className = 'py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white';
-          panel.classList.add('hidden');
-        }
+      if ((toolName === 'fib' || toolName === 'prop') && !isProActive()) { openUpgradeModal(); return; }
+      ['Calc', 'Fib', 'Prop'].forEach(t => {
+        const active = t.toLowerCase() === toolName;
+        document.getElementById('toolTab' + t).className = active ? 'py-1.5 rounded bg-tv-blue text-white' : 'py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white';
+        document.getElementById('panelTool' + t).classList.toggle('hidden', !active);
       });
     }
+    document.getElementById('toolTabCalc').addEventListener('click', () => switchRightTool('calc'));
+    document.getElementById('toolTabFib').addEventListener('click', () => switchRightTool('fib'));
+    document.getElementById('toolTabProp').addEventListener('click', () => switchRightTool('prop'));
 
-    document.getElementById('toolTabCalc').addEventListener('click', function() { switchRightTool('calc'); });
-    document.getElementById('toolTabFib').addEventListener('click', function() { switchRightTool('fib'); });
-    document.getElementById('toolTabProp').addEventListener('click', function() { switchRightTool('prop'); });
-
-    // --- GOLDEN ZONE (0.280 - 0.382) FIB SNIPER CALCULATOR ---
-    let computedFibSetup = null;
-    function updateFibGoldenZone() {
-      const low = parseFloat(document.getElementById('fibLow').value);
-      const high = parseFloat(document.getElementById('fibHigh').value);
-      const trend = document.getElementById('fibTrend').value;
-
-      if (isNaN(low) || isNaN(high) || high <= low) {
-        document.getElementById('fibSniperZone').textContent = '—';
-        document.getElementById('fibHalfLevel').textContent = '—';
-        document.getElementById('fibGoldenLevel').textContent = '—';
-        document.getElementById('fibTargetLevel').textContent = '—';
-        computedFibSetup = null;
-        return;
-      }
-
-      const diff = high - low;
-      let z280, z382, half, g618, target, sl;
-      if (trend === 'BULL') {
-        z280 = high - diff * 0.280;
-        z382 = high - diff * 0.382;
-        half = high - diff * 0.500;
-        g618 = high - diff * 0.618;
-        target = high + diff * 0.272;
-        sl = g618 - diff * 0.08;
-      } else {
-        z280 = low + diff * 0.280;
-        z382 = low + diff * 0.382;
-        half = low + diff * 0.500;
-        g618 = low + diff * 0.618;
-        target = low - diff * 0.272;
-        sl = g618 + diff * 0.08;
-      }
-
-      document.getElementById('fibSniperZone').textContent = z280.toFixed(2) + ' – ' + z382.toFixed(2);
-      document.getElementById('fibHalfLevel').textContent = half.toFixed(2);
-      document.getElementById('fibGoldenLevel').textContent = g618.toFixed(2);
-      document.getElementById('fibTargetLevel').textContent = target.toFixed(2);
-
-      computedFibSetup = {
-        side: trend === 'BULL' ? 'BUY' : 'SELL',
-        entry: +((z280 + z382) / 2).toFixed(2),
-        sl: +sl.toFixed(2),
-        tp: +target.toFixed(2)
-      };
-    }
-
-    ['fibLow', 'fibHigh', 'fibTrend'].forEach(function(id) {
-      document.getElementById(id).addEventListener('input', updateFibGoldenZone);
-    });
-
-    document.getElementById('applyFibToCalcBtn').addEventListener('click', function() {
-      if (!isProActive()) { openUpgradeModal(); return; }
-      if (!computedFibSetup) {
-        alert('Please enter valid Swing Low and Swing High first.');
-        return;
-      }
-      document.getElementById('calcSide').value = computedFibSetup.side;
-      document.getElementById('calcEntry').value = computedFibSetup.entry;
-      document.getElementById('calcSl').value = computedFibSetup.sl;
-      document.getElementById('calcTp').value = computedFibSetup.tp;
-      document.getElementById('calcNote').value = '0.280-0.382 Golden Zone Pullback';
-      switchRightTool('calc');
-      updateCalculator();
-    });
-
-    // --- PROP FIRM DRAWDOWN GUARD ---
-    function updatePropGuard() {
-      const accSize = parseFloat(document.getElementById('propAccSize').value) || 10000;
-      const maxDdPct = parseFloat(document.getElementById('propDailyMax').value) || 5;
-      const targetPct = parseFloat(document.getElementById('propTargetPct').value) || 8;
-
-      const maxDdAmt = accSize * (maxDdPct / 100);
-      const targetAmt = accSize * (targetPct / 100);
-
-      const closed = trades.filter(function(t) { return t.status !== 'OPEN'; });
-      const netPnl = closed.reduce(function(a, b) { return a + b.pnl; }, 0);
-
-      const progressPct = Math.max(0, Math.min(100, (netPnl / targetAmt) * 100));
-      const ddUsed = netPnl < 0 ? Math.abs(netPnl) : 0;
-      const ddRemaining = Math.max(0, maxDdAmt - ddUsed);
-      const ddBufferPct = Math.max(0, Math.min(100, (ddRemaining / maxDdAmt) * 100));
-
-      document.getElementById('propTargetText').textContent = '$' + netPnl.toFixed(0) + ' / $' + targetAmt.toFixed(0);
-      document.getElementById('propTargetBar').style.width = progressPct + '%';
-
-      document.getElementById('propDdText').textContent = '$' + ddRemaining.toFixed(2) + ' Safe';
-      document.getElementById('propDdBar').style.width = ddBufferPct + '%';
-      document.getElementById('propDdBar').className = ddBufferPct < 30 ? 'h-full bg-tv-red transition-all' : 'h-full bg-tv-blue transition-all';
-    }
-
-    ['propAccSize', 'propDailyMax', 'propTargetPct'].forEach(function(id) {
-      document.getElementById(id).addEventListener('input', updatePropGuard);
-    });
-
-    // --- INSTITUTIONAL PINE SCRIPT V5 LIBRARY ---
-    const pineTemplates = {
-      golden_zone: '//@version=5\nindicator("pipscopetrade1 0.280–0.382 Golden Zone Sniper", overlay=true)\nlookback = input.int(30, "Swing Lookback")\nhi = ta.highest(high, lookback)\nlo = ta.lowest(low, lookback)\nrng = hi - lo\ngzTop = hi - rng * 0.280\ngzBot = hi - rng * 0.382\np1 = plot(gzTop, "0.280 Zone Top", color=color.new(#f59e0b, 20), linewidth=2)\np2 = plot(gzBot, "0.382 Zone Bottom", color=color.new(#10b981, 20), linewidth=2)\nfill(p1, p2, color=color.new(#f59e0b, 82), title="Golden Zone")\nbullConfirm = close > open and low <= gzTop and close > gzBot\nplotshape(bullConfirm, style=shape.labelup, text="GZ BUY", location=location.belowbar, color=color.emerald, textcolor=color.white, size=size.small)',
-      smc_ob: '//@version=5\nindicator("pipscopetrade1 Institutional Order Block & FVG", overlay=true)\nbullFVG = low > high[2] and close[1] > open[1]\nbearFVG = high < low[2] and close[1] < open[1]\nplotshape(bullFVG, title="Bullish FVG", style=shape.triangleup, location=location.belowbar, color=color.new(#089981, 0), size=size.tiny)\nplotshape(bearFVG, title="Bearish FVG", style=shape.triangledown, location=location.abovebar, color=color.new(#f23645, 0), size=size.tiny)\nbgcolor(bullFVG ? color.new(#089981, 90) : bearFVG ? color.new(#f23645, 90) : na)',
-      killzone_box: '//@version=5\nindicator("pipscopetrade1 London & NY Killzones", overlay=true)\nlonKZ = not na(time(timeframe.period, "0700-1000", "UTC"))\nnyKZ  = not na(time(timeframe.period, "1300-1600", "UTC"))\nbgcolor(lonKZ ? color.new(#2962ff, 88) : na, title="London Killzone")\nbgcolor(nyKZ  ? color.new(#f59e0b, 88) : na, title="New York Killzone")',
-      ema_cross: '//@version=5\nindicator("pipscopetrade1 EMA 20/50 Institutional Trend", overlay=true)\nfastEMA = ta.ema(close, 20)\nslowEMA = ta.ema(close, 50)\nplot(fastEMA, color=color.new(#2962ff, 0), linewidth=2, title="EMA 20")\nplot(slowEMA, color=color.new(#f23645, 0), linewidth=2, title="EMA 50")\nplotshape(ta.crossover(fastEMA, slowEMA), style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small)\nplotshape(ta.crossunder(fastEMA, slowEMA), style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small)',
-      vwap_bands: '//@version=5\nindicator("pipscopetrade1 Institutional VWAP + StdDev", overlay=true)\nvwapVal = ta.vwap(hlc3)\nstdevVal = ta.stdev(close, 20)\nplot(vwapVal, "VWAP", color=color.orange, linewidth=2)\nplot(vwapVal + stdevVal * 1.5, "Upper Band", color=color.new(#2962ff, 40))\nplot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))'
-    };
-
-    // --- LOAD LIVE CHART WIDGETS ---
     function createTvWidget(containerId, symbol, interval, studies, hideSide) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      container.innerHTML = '';
-      if (typeof TradingView === 'undefined') {
-        container.innerHTML = '<div class="p-6 text-sm text-tv-muted">Unable to load live chart script. Please check internet and refresh.</div>';
-        return;
-      }
+      const el = document.getElementById(containerId);
+      if (!el || typeof TradingView === 'undefined') return;
+      el.innerHTML = '';
       new TradingView.widget({
-        autosize: true,
-        symbol: symbol,
-        interval: interval,
-        timezone: 'Asia/Kolkata',
-        theme: 'dark',
-        style: '1',
-        locale: 'en',
-        toolbar_bg: '#1e222d',
-        enable_publishing: false,
-        withdateranges: true,
-        hide_side_toolbar: hideSide || false,
-        allow_symbol_change: true,
-        details: false,
-        hotlist: false,
-        calendar: false,
-        studies: studies || [],
-        container_id: containerId
+        autosize: true, symbol, interval, timezone: 'Asia/Kolkata', theme: 'dark', style: '1', locale: 'en',
+        toolbar_bg: '#1e222d', enable_publishing: false, withdateranges: true, hide_side_toolbar: hideSide || false,
+        allow_symbol_change: true, studies: studies || [], container_id: containerId
       });
     }
 
     function loadChartWidget() {
       createTvWidget('tv_chart_container', currentSymbol, currentInterval, activeStudies, false);
-      const countText = isProActive()
-        ? activeStudies.length + (activeStudies.length === 1 ? ' Study Active' : ' Studies Active')
-        : activeStudies.length + '/1 Free Study';
-      document.getElementById('activeStudiesCount').textContent = countText;
+      document.getElementById('activeStudiesCount').textContent = isProActive() ? `${activeStudies.length} Studies Active` : `${activeStudies.length}/1 Free Study`;
+      const shortSym = currentSymbol.split(':').pop();
+      document.getElementById('floatSymbolBuy').textContent = shortSym;
+      document.getElementById('floatSymbolSell').textContent = shortSym;
     }
 
     function loadSecondaryChartWidget() {
       if (layoutMode === '1x') return;
-      createTvWidget(
-        'tv_chart_container_2',
-        document.getElementById('splitSymbolSelect').value,
-        document.getElementById('splitTfSelect').value,
-        [],
-        true
-      );
+      createTvWidget('tv_chart_container_2', document.getElementById('splitSymbolSelect').value, document.getElementById('splitTfSelect').value, [], true);
       if (layoutMode === '4x') {
-        createTvWidget(
-          'tv_chart_container_3',
-          document.getElementById('quadSymbol3').value,
-          document.getElementById('quadTf3').value,
-          [],
-          true
-        );
-        createTvWidget(
-          'tv_chart_container_4',
-          document.getElementById('quadSymbol4').value,
-          document.getElementById('quadTf4').value,
-          [],
-          true
-        );
+        createTvWidget('tv_chart_container_3', document.getElementById('quadSymbol3').value, document.getElementById('quadTf3').value, [], true);
+        createTvWidget('tv_chart_container_4', document.getElementById('quadSymbol4').value, document.getElementById('quadTf4').value, [], true);
       }
     }
 
-    // --- MULTI-CHART LAYOUT SWITCHER (1x FREE, 2x & 4x PRO) ---
     function setChartLayout(mode) {
-      if ((mode === '2x' || mode === '4x') && !isProActive()) {
-        openUpgradeModal();
-        return;
-      }
+      if ((mode === '2x' || mode === '4x') && !isProActive()) { openUpgradeModal(); return; }
       layoutMode = mode;
       const ws = document.getElementById('chartWorkspace');
-      const c2 = document.getElementById('secondaryChartWrap');
-      const c3 = document.getElementById('thirdChartWrap');
-      const c4 = document.getElementById('fourthChartWrap');
-
-      const btn1 = document.getElementById('layoutSingleBtn');
-      const btn2 = document.getElementById('layoutSplitBtn');
-      const btn4 = document.getElementById('layoutQuadBtn');
-
-      [btn1, btn2, btn4].forEach(function(b) { b.className = 'px-2 py-0.5 rounded text-tv-muted hover:text-white'; });
-
-      if (mode === '1x') {
-        ws.className = 'flex-1 grid grid-cols-1 grid-rows-1 min-w-0 bg-tv-bg relative';
-        c2.classList.add('hidden'); c2.classList.remove('flex');
-        c3.classList.add('hidden'); c3.classList.remove('flex');
-        c4.classList.add('hidden'); c4.classList.remove('flex');
-        btn1.className = 'px-2 py-0.5 rounded bg-tv-blue text-white font-semibold';
-      } else if (mode === '2x') {
-        ws.className = 'flex-1 grid grid-cols-2 grid-rows-1 min-w-0 bg-tv-bg relative';
-        c2.classList.remove('hidden'); c2.classList.add('flex');
-        c3.classList.add('hidden'); c3.classList.remove('flex');
-        c4.classList.add('hidden'); c4.classList.remove('flex');
-        btn2.className = 'px-2 py-0.5 rounded bg-tv-blue text-white font-semibold';
-        loadSecondaryChartWidget();
-      } else if (mode === '4x') {
-        ws.className = 'flex-1 grid grid-cols-2 grid-rows-2 min-w-0 bg-tv-bg relative';
-        c2.classList.remove('hidden'); c2.classList.add('flex');
-        c3.classList.remove('hidden'); c3.classList.add('flex');
-        c4.classList.remove('hidden'); c4.classList.add('flex');
-        btn4.className = 'px-2 py-0.5 rounded bg-tv-blue text-white font-semibold';
-        loadSecondaryChartWidget();
-      }
+      const c2 = document.getElementById('secondaryChartWrap'), c3 = document.getElementById('thirdChartWrap'), c4 = document.getElementById('fourthChartWrap');
+      [c2, c3, c4].forEach(c => { c.classList.add('hidden'); c.classList.remove('flex'); });
+      if (mode === '1x') ws.className = 'flex-1 grid grid-cols-1 grid-rows-1 min-w-0 bg-tv-bg relative';
+      if (mode === '2x') { ws.className = 'flex-1 grid grid-cols-2 grid-rows-1 min-w-0 bg-tv-bg relative'; c2.classList.remove('hidden'); c2.classList.add('flex'); loadSecondaryChartWidget(); }
+      if (mode === '4x') { ws.className = 'flex-1 grid grid-cols-2 grid-rows-2 min-w-0 bg-tv-bg relative'; [c2, c3, c4].forEach(c => { c.classList.remove('hidden'); c.classList.add('flex'); }); loadSecondaryChartWidget(); }
     }
+    document.getElementById('layoutSingleBtn').addEventListener('click', () => setChartLayout('1x'));
+    document.getElementById('closeSplitBtn').addEventListener('click', () => setChartLayout('1x'));
+    document.getElementById('layoutSplitBtn').addEventListener('click', () => setChartLayout('2x'));
+    document.getElementById('layoutQuadBtn').addEventListener('click', () => setChartLayout('4x'));
+    ['splitSymbolSelect', 'splitTfSelect', 'quadSymbol3', 'quadTf3', 'quadSymbol4', 'quadTf4'].forEach(id => document.getElementById(id).addEventListener('change', loadSecondaryChartWidget));
 
-    document.getElementById('layoutSingleBtn').addEventListener('click', function() { setChartLayout('1x'); });
-    document.getElementById('closeSplitBtn').addEventListener('click', function() { setChartLayout('1x'); });
-    document.getElementById('layoutSplitBtn').addEventListener('click', function() { setChartLayout('2x'); });
-    document.getElementById('layoutQuadBtn').addEventListener('click', function() { setChartLayout('4x'); });
-    ['splitSymbolSelect', 'splitTfSelect', 'quadSymbol3', 'quadTf3', 'quadSymbol4', 'quadTf4'].forEach(function(id) {
-      document.getElementById(id).addEventListener('change', loadSecondaryChartWidget);
-    });
-
-    // --- LOAD WATCHLIST & ECONOMIC CALENDAR WIDGETS (FREE) ---
     function loadWatchlistWidget() {
       const wrap = document.getElementById('marketOverviewWidget');
       wrap.innerHTML = '';
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
-      script.async = true;
-      script.innerHTML = JSON.stringify({
-        colorTheme: 'dark',
-        dateRange: '1D',
-        showChart: false,
-        locale: 'en',
-        width: '100%',
-        height: '100%',
-        isTransparent: true,
-        showSymbolLogo: true,
-        tabs: [
-          {
-            title: 'Watchlist',
-            symbols: [
-              { s: 'OANDA:XAUUSD', d: 'Gold / USD' },
-              { s: 'FX:EURUSD', d: 'EUR / USD' },
-              { s: 'FX:GBPUSD', d: 'GBP / USD' },
-              { s: 'BINANCE:BTCUSDT', d: 'Bitcoin' },
-              { s: 'NSE:NIFTY', d: 'NIFTY 50' },
-              { s: 'NSE:BANKNIFTY', d: 'BANKNIFTY' }
-            ]
-          }
-        ]
+      const s = document.createElement('script');
+      s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+      s.async = true;
+      s.innerHTML = JSON.stringify({
+        colorTheme: 'dark', dateRange: '1D', showChart: false, locale: 'en', width: '100%', height: '100%', isTransparent: true,
+        tabs: [{ title: 'Watchlist', symbols: [{ s: 'OANDA:XAUUSD', d: 'Gold' }, { s: 'FX:EURUSD', d: 'EURUSD' }, { s: 'BINANCE:BTCUSDT', d: 'BTC' }, { s: 'NSE:NIFTY', d: 'NIFTY' }] }]
       });
-      wrap.appendChild(script);
+      wrap.appendChild(s);
     }
 
-    let calendarLoaded = false;
-    function loadCalendarWidget() {
-      if (calendarLoaded) return;
-      calendarLoaded = true;
-      const wrap = document.getElementById('economicCalendarWidget');
-      wrap.innerHTML = '';
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
-      script.async = true;
-      script.innerHTML = JSON.stringify({
-        colorTheme: 'dark',
-        isTransparent: true,
-        width: '100%',
-        height: '100%',
-        locale: 'en',
-        importanceFilter: '0,1',
-        currencyFilter: 'USD,EUR,GBP,INR,JPY'
-      });
-      wrap.appendChild(script);
+    let screenerLoaded = false;
+    function loadScreenerWidget() {
+      if (screenerLoaded) return;
+      screenerLoaded = true;
+      const wrap = document.getElementById('tvScreenerContainer');
+      const s = document.createElement('script');
+      s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
+      s.async = true;
+      s.innerHTML = JSON.stringify({ width: '100%', height: '100%', defaultColumn: 'overview', defaultScreen: 'general', market: 'forex', showToolbar: true, colorTheme: 'dark', locale: 'en', isTransparent: true });
+      wrap.appendChild(s);
     }
 
-    document.getElementById('sideTabWatchlist').addEventListener('click', function() {
-      document.getElementById('sideTabWatchlist').className = 'flex-1 py-1 rounded bg-tv-panel text-white';
-      document.getElementById('sideTabCalendar').className = 'flex-1 py-1 rounded text-tv-muted hover:text-white';
-      document.getElementById('marketOverviewWidget').classList.remove('hidden');
-      document.getElementById('economicCalendarWidget').classList.add('hidden');
-    });
-
-    document.getElementById('sideTabCalendar').addEventListener('click', function() {
-      document.getElementById('sideTabCalendar').className = 'flex-1 py-1 rounded bg-tv-panel text-white';
-      document.getElementById('sideTabWatchlist').className = 'flex-1 py-1 rounded text-tv-muted hover:text-white';
-      document.getElementById('economicCalendarWidget').classList.remove('hidden');
-      document.getElementById('marketOverviewWidget').classList.add('hidden');
-      loadCalendarWidget();
-    });
-
-    // --- SYMBOL & TIMEFRAME HANDLERS (ALL SYMBOLS UNLOCKED) ---
-    document.querySelectorAll('.sym-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.sym-btn').forEach(function(b) {
-          b.classList.remove('bg-tv-blue', 'text-white');
-          b.classList.add('bg-tv-bg', 'text-tv-text');
-        });
-        btn.classList.remove('bg-tv-bg', 'text-tv-text');
-        btn.classList.add('bg-tv-blue', 'text-white');
-        currentSymbol = btn.dataset.symbol;
-        loadChartWidget();
-      });
-    });
+    document.querySelectorAll('.sym-btn').forEach(btn => btn.addEventListener('click', function() {
+      document.querySelectorAll('.sym-btn').forEach(b => { b.classList.remove('bg-tv-blue', 'text-white'); b.classList.add('bg-tv-bg', 'text-tv-text'); });
+      this.classList.add('bg-tv-blue', 'text-white');
+      currentSymbol = this.dataset.symbol;
+      loadChartWidget();
+    }));
 
     document.getElementById('customSymbolForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const val = document.getElementById('customSymbolInput').value.trim().toUpperCase();
-      if (!val) return;
-      currentSymbol = val;
-      document.querySelectorAll('.sym-btn').forEach(function(b) {
-        b.classList.remove('bg-tv-blue', 'text-white');
-        b.classList.add('bg-tv-bg', 'text-tv-text');
-      });
+      if (val) { currentSymbol = val; loadChartWidget(); }
+    });
+
+    document.querySelectorAll('.tf-btn').forEach(btn => btn.addEventListener('click', function() {
+      document.querySelectorAll('.tf-btn').forEach(b => { b.classList.remove('bg-tv-blue', 'text-white'); b.classList.add('text-tv-muted'); });
+      this.classList.add('bg-tv-blue', 'text-white');
+      currentInterval = this.dataset.tf;
       loadChartWidget();
-    });
+    }));
 
-    document.querySelectorAll('.tf-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.tf-btn').forEach(function(b) {
-          b.classList.remove('bg-tv-blue', 'text-white');
-          b.classList.add('text-tv-muted');
-        });
-        btn.classList.remove('text-tv-muted');
-        btn.classList.add('bg-tv-blue', 'text-white');
-        currentInterval = btn.dataset.tf;
-        loadChartWidget();
-      });
-    });
+    document.querySelectorAll('.study-btn').forEach(btn => btn.addEventListener('click', function() {
+      const id = this.dataset.study;
+      if (!isProActive() && activeStudies.length >= 1 && !activeStudies.includes(id)) { openUpgradeModal(); return; }
+      if (activeStudies.includes(id)) { activeStudies = activeStudies.filter(s => s !== id); this.classList.remove('active-study'); }
+      else { activeStudies.push(id); this.classList.add('active-study'); }
+      loadChartWidget();
+    }));
 
-    // --- INDICATOR STUDIES (1 FREE INDICATOR; 2+ REQUIRE PRO) ---
-    document.querySelectorAll('.study-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        const studyId = btn.dataset.study;
-        if (!isProActive() && activeStudies.length >= 1 && activeStudies.indexOf(studyId) === -1) {
-          openUpgradeModal();
-          return;
-        }
-        if (activeStudies.indexOf(studyId) !== -1) {
-          activeStudies = activeStudies.filter(function(s) { return s !== studyId; });
-          btn.classList.remove('active-study');
-        } else {
-          activeStudies.push(studyId);
-          btn.classList.add('active-study');
-        }
-        loadChartWidget();
-      });
-    });
+    document.getElementById('toggleIndicatorBarBtn').addEventListener('click', () => document.getElementById('indicatorBar').classList.toggle('hidden'));
+    document.getElementById('hideIndicatorBarBtn').addEventListener('click', () => document.getElementById('indicatorBar').classList.add('hidden'));
+    document.getElementById('toggleSidebarBtn').addEventListener('click', () => document.getElementById('rightSidebar').classList.toggle('hidden'));
 
-    document.getElementById('toggleIndicatorBarBtn').addEventListener('click', function() {
-      document.getElementById('indicatorBar').classList.toggle('hidden');
-    });
-    document.getElementById('hideIndicatorBarBtn').addEventListener('click', function() {
-      document.getElementById('indicatorBar').classList.add('hidden');
-    });
-    document.getElementById('toggleSidebarBtn').addEventListener('click', function() {
-      document.getElementById('rightSidebar').classList.toggle('hidden');
-    });
-document.getElementById('toggleBottomPanelBtn').addEventListener('click', function() {
-      const panel = document.getElementById('bottomPanel');
-      const isHidden = panel.classList.toggle('hidden');
-      this.textContent = isHidden ? 'Show' : 'Hide';
-    });
-    
-    // --- DISCIPLINE CHECKLIST ---
-    document.querySelectorAll('.disc-chk').forEach(function(chk) {
-      chk.addEventListener('change', function() {
-        const checked = document.querySelectorAll('.disc-chk:checked').length;
-        const scoreEl = document.getElementById('checklistScore');
-        scoreEl.textContent = checked + '/4 Ready';
-        scoreEl.className = checked === 4 ? 'text-[10px] font-mono text-emerald-400 font-bold' : 'text-[10px] font-mono text-amber-400';
-      });
-    });
-
-    // --- CALCULATOR (PRO FEATURE) ---
+    // --- CALCULATOR & JOURNAL ---
     function updateCalculator() {
       const bal = parseFloat(document.getElementById('calcBalance').value) || 0;
       const riskPct = parseFloat(document.getElementById('calcRiskPct').value) || 0;
@@ -1350,385 +1362,107 @@ document.getElementById('toggleBottomPanelBtn').addEventListener('click', functi
       const entry = parseFloat(document.getElementById('calcEntry').value);
       const sl = parseFloat(document.getElementById('calcSl').value);
       const tp = parseFloat(document.getElementById('calcTp').value);
-
       const sym = currencyMode === 'USD' ? '$' : '₹';
       const riskAmt = bal * (riskPct / 100);
       document.getElementById('outRiskAmt').textContent = sym + riskAmt.toFixed(2);
 
       if (!isNaN(entry) && !isNaN(sl) && entry !== sl) {
-        if (!isProActive()) {
-          document.getElementById('outLotSize').textContent = 'Pro Feature 🔒';
-          document.getElementById('outRR').textContent = 'Pro 🔒';
-          return;
-        }
-        const slDist = Math.abs(entry - sl);
-        let sizeText = '';
-        if (inst === 'XAUUSD') {
-          const lots = riskAmt / (slDist * 100);
-          sizeText = lots.toFixed(2) + ' Lots';
-        } else if (inst === 'FOREX') {
-          const lots = riskAmt / (slDist * 100000);
-          sizeText = lots.toFixed(2) + ' Lots';
-        } else if (inst === 'NIFTY') {
-          const qty = Math.floor(riskAmt / slDist);
-          sizeText = qty + ' Qty (' + Math.floor(qty / 75) + ' Lots)';
-        } else if (inst === 'BANKNIFTY') {
-          const qty = Math.floor(riskAmt / slDist);
-          sizeText = qty + ' Qty (' + Math.floor(qty / 30) + ' Lots)';
-        } else {
-          const units = riskAmt / slDist;
-          sizeText = units.toFixed(4) + ' Units';
-        }
-        document.getElementById('outLotSize').textContent = sizeText;
-
-        if (!isNaN(tp) && tp !== entry) {
-          const tpDist = Math.abs(tp - entry);
-          const rr = tpDist / slDist;
-          document.getElementById('outRR').textContent = '1 : ' + rr.toFixed(2);
-        } else {
-          document.getElementById('outRR').textContent = '—';
-        }
-      } else {
-        document.getElementById('outLotSize').textContent = isProActive() ? 'Enter Entry & SL' : 'Pro Feature 🔒';
-        document.getElementById('outRR').textContent = '—';
+        if (!isProActive()) { document.getElementById('outLotSize').textContent = 'Pro Feature 🔒'; return; }
+        const dist = Math.abs(entry - sl);
+        document.getElementById('outLotSize').textContent = inst === 'XAUUSD' ? (riskAmt / (dist * 100)).toFixed(2) + ' Lots' : (riskAmt / (dist * 100000)).toFixed(2) + ' Lots';
+        document.getElementById('outRR').textContent = (!isNaN(tp) && tp !== entry) ? '1 : ' + (Math.abs(tp - entry) / dist).toFixed(2) : '—';
       }
     }
+    ['calcBalance', 'calcRiskPct', 'calcInstrument', 'calcEntry', 'calcSl', 'calcTp'].forEach(id => document.getElementById(id).addEventListener('input', updateCalculator));
 
-    ['calcBalance', 'calcRiskPct', 'calcInstrument', 'calcEntry', 'calcSl', 'calcTp'].forEach(function(id) {
-      document.getElementById(id).addEventListener('input', updateCalculator);
-    });
-
-    document.getElementById('currUsdBtn').addEventListener('click', function() {
-      currencyMode = 'USD';
-      document.getElementById('currUsdBtn').className = 'px-2 py-0.5 rounded bg-tv-blue text-white font-semibold';
-      document.getElementById('currInrBtn').className = 'px-2 py-0.5 rounded text-tv-muted hover:text-white';
-      updateCalculator();
-      renderJournal();
-    });
-
-    document.getElementById('currInrBtn').addEventListener('click', function() {
-      currencyMode = 'INR';
-      document.getElementById('currInrBtn').className = 'px-2 py-0.5 rounded bg-tv-blue text-white font-semibold';
-      document.getElementById('currUsdBtn').className = 'px-2 py-0.5 rounded text-tv-muted hover:text-white';
-      updateCalculator();
-      renderJournal();
-    });
-
-    // --- MT5 / CSV STATEMENT AUTO-IMPORTER (PRO FEATURE) ---
-    document.getElementById('importMt5Label').addEventListener('click', function(e) {
-      if (!isProActive()) {
-        e.preventDefault();
-        openUpgradeModal();
-      }
-    });
-
-    document.getElementById('mt5FileInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(ev) {
-        const text = ev.target.result;
-        const lines = text.split(/\r?\n/).filter(function(l) { return l.trim(); });
-        let importedCount = 0;
-
-        lines.forEach(function(line, idx) {
-          if (idx === 0 && /symbol|ticket|time/i.test(line)) return;
-          const cols = line.split(/,|\t/).map(function(c) { return c.replace(/^"|"$/g, '').trim(); });
-          if (cols.length >= 6) {
-            const pnlVal = parseFloat(cols[cols.length - 1]);
-            if (!isNaN(pnlVal)) {
-              trades.unshift({
-                id: Date.now() + idx,
-                dateKey: new Date().toISOString().slice(0, 10),
-                time: cols[0].slice(0, 16),
-                symbol: (cols[1] || 'XAUUSD').toUpperCase(),
-                side: /sell/i.test(cols[2]) ? 'SELL' : 'BUY',
-                size: cols[3] || '0.10',
-                entry: parseFloat(cols[4]) || 0,
-                sl: '-',
-                tp: '-',
-                note: 'MT5/CSV Import',
-                status: pnlVal >= 0 ? 'WIN' : 'LOSS',
-                pnl: +pnlVal.toFixed(2)
-              });
-              importedCount++;
-            }
-          }
-        });
-
-        if (importedCount > 0) {
-          saveTrades();
-          alert('Imported ' + importedCount + ' trades from ' + file.name + '!');
-        } else {
-          alert('Could not detect valid trade rows. Ensure CSV has Symbol, Side, Size, Entry, and Profit columns.');
-        }
-        e.target.value = '';
-      };
-      reader.readAsText(file);
-    });
-
-    // --- JOURNAL, P&L HEATMAP, EQUITY CURVE & PROP GUARD ---
     function saveTrades() {
       localStorage.setItem('pipscopetrade1_trades_v1', JSON.stringify(trades));
       renderJournal();
+      syncUserToCloud();
     }
 
     document.getElementById('logTradeBtn').addEventListener('click', function() {
-      if (!isProActive()) {
-        openUpgradeModal();
-        return;
-      }
+      if (!isProActive()) { openUpgradeModal(); return; }
       const entry = parseFloat(document.getElementById('calcEntry').value);
       const sl = parseFloat(document.getElementById('calcSl').value);
       const tp = parseFloat(document.getElementById('calcTp').value);
-      const note = document.getElementById('calcNote').value.trim();
-      const checks = document.querySelectorAll('.disc-chk:checked').length;
-
-      if (isNaN(entry) || isNaN(sl)) {
-        alert('Please enter valid Entry and Stop Loss prices first.');
-        return;
-      }
+      if (isNaN(entry) || isNaN(sl)) return;
       const now = new Date();
-      const newTrade = {
-        id: Date.now(),
-        dateKey: now.toISOString().slice(0, 10),
-        time: now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        symbol: currentSymbol.split(':').pop(),
-        side: document.getElementById('calcSide').value,
-        size: document.getElementById('outLotSize').textContent,
-        entry: entry,
-        sl: sl,
-        tp: isNaN(tp) ? '-' : tp,
-        note: note || (checks + '/4 Rules Checked'),
-        status: 'OPEN',
-        pnl: 0
-      };
-      trades.unshift(newTrade);
-      document.getElementById('calcNote').value = '';
+      trades.unshift({
+        id: Date.now(), dateKey: now.toISOString().slice(0, 10), time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        symbol: currentSymbol.split(':').pop(), side: document.getElementById('calcSide').value, size: document.getElementById('outLotSize').textContent,
+        entry, sl, tp: isNaN(tp) ? '-' : tp, note: document.getElementById('calcNote').value.trim(), status: 'OPEN', pnl: 0
+      });
       saveTrades();
     });
 
-    function closeTrade(id, isWin) {
-      if (!isProActive()) { openUpgradeModal(); return; }
+    window.closeTrade = function(id, isWin) {
       const bal = parseFloat(document.getElementById('calcBalance').value) || 10000;
-      const riskPct = parseFloat(document.getElementById('calcRiskPct').value) || 1;
-      const riskAmt = bal * (riskPct / 100);
-      trades = trades.map(function(t) {
+      const riskAmt = bal * ((parseFloat(document.getElementById('calcRiskPct').value) || 1) / 100);
+      trades = trades.map(t => {
         if (t.id === id) {
-          let rr = 2;
-          if (t.tp !== '-' && t.entry !== t.sl) {
-            rr = Math.abs(t.tp - t.entry) / Math.abs(t.entry - t.sl);
-          }
+          const rr = (t.tp !== '-' && t.entry !== t.sl) ? Math.abs(t.tp - t.entry) / Math.abs(t.entry - t.sl) : 2;
           t.status = isWin ? 'WIN' : 'LOSS';
           t.pnl = isWin ? +(riskAmt * rr).toFixed(2) : +(-riskAmt).toFixed(2);
         }
         return t;
       });
       saveTrades();
-    }
+    };
 
-    function deleteTrade(id) {
-      if (!isProActive()) { openUpgradeModal(); return; }
-      trades = trades.filter(function(t) { return t.id !== id; });
+    window.deleteTrade = function(id) {
+      trades = trades.filter(t => t.id !== id);
       saveTrades();
-    }
-
-    function renderHeatmap(closedTrades, sym) {
-      const grid = document.getElementById('heatmapGrid');
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      document.getElementById('heatmapMonthTitle').textContent = now.toLocaleString('en-US', { month: 'long', year: 'numeric' }) + ' — Daily P&L Heatmap';
-
-      const dailyMap = {};
-      closedTrades.forEach(function(t) {
-        const dk = t.dateKey || now.toISOString().slice(0, 10);
-        dailyMap[dk] = (dailyMap[dk] || 0) + t.pnl;
-      });
-
-      let cells = '';
-      for (let d = 1; d <= daysInMonth; d++) {
-        const key = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
-        const val = dailyMap[key];
-        let cls = 'bg-tv-bg border-tv-border text-tv-muted';
-        let label = '—';
-        if (val !== undefined) {
-          if (val > 0) {
-            cls = 'bg-emerald-500/25 border-emerald-500/60 text-emerald-300 font-bold';
-            label = '+' + sym + val.toFixed(0);
-          } else if (val < 0) {
-            cls = 'bg-rose-500/25 border-rose-500/60 text-rose-300 font-bold';
-            label = '-' + sym + Math.abs(val).toFixed(0);
-          } else {
-            label = sym + '0';
-          }
-        }
-        cells += '<div class="border rounded p-1.5 flex flex-col justify-between ' + cls + '">' +
-          '<span class="text-[9px] opacity-75">Day ' + d + '</span>' +
-          '<span class="truncate mt-0.5">' + label + '</span>' +
-        '</div>';
-      }
-      grid.innerHTML = cells;
-    }
-
-    function renderEquityCurve(closedTrades, sym) {
-      const polyline = document.getElementById('equityPolyline');
-      const peakLabel = document.getElementById('equityPeakLabel');
-      if (!closedTrades.length) {
-        polyline.setAttribute('points', '0,35 300,35');
-        polyline.setAttribute('stroke', '#089981');
-        peakLabel.textContent = 'Peak: ' + sym + '0.00';
-        return;
-      }
-      const chronological = closedTrades.slice().reverse();
-      let cum = 0;
-      const values = [0];
-      chronological.forEach(function(t) {
-        cum += t.pnl;
-        values.push(cum);
-      });
-      const maxVal = Math.max.apply(null, values.concat([10]));
-      const minVal = Math.min.apply(null, values.concat([-10]));
-      const range = maxVal - minVal || 1;
-      const pts = values.map(function(v, idx) {
-        const x = (idx / (values.length - 1)) * 300;
-        const y = 65 - ((v - minVal) / range) * 60;
-        return x.toFixed(1) + ',' + y.toFixed(1);
-      }).join(' ');
-      polyline.setAttribute('points', pts);
-      polyline.setAttribute('stroke', cum >= 0 ? '#089981' : '#f23645');
-      peakLabel.textContent = 'Peak: ' + sym + Math.max.apply(null, values).toFixed(2);
-    }
+    };
 
     function renderJournal() {
       const tbody = document.getElementById('journalTableBody');
       const sym = currencyMode === 'USD' ? '$' : '₹';
       document.getElementById('journalCountBadge').textContent = trades.length;
-
-      if (!isProActive() || trades.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="py-6 text-center text-tv-muted font-sans">Free plan includes all live market charts & 1 active indicator. Upgrade to Pro (₹149/mo) to unlock MT5 Auto-Import, Trade Journal, Golden Zone Sniper, Prop Guard & Pine Scripts.</td></tr>';
+      if (!isProActive() || !trades.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="py-5 text-center text-tv-muted font-sans">Sign in to sync your cloud journal or upgrade to Pro (₹149/mo) to unlock MT5 Import, Risk Calc & Pine Scripts.</td></tr>';
       } else {
-        tbody.innerHTML = trades.map(function(t) {
-          const sideColor = t.side === 'BUY' ? 'text-tv-green' : 'text-tv-red';
-          const pnlColor = t.pnl > 0 ? 'text-tv-green' : (t.pnl < 0 ? 'text-tv-red' : 'text-tv-muted');
-          const pnlFormatted = t.status === 'OPEN' ? '—' : ((t.pnl >= 0 ? '+' : '-') + sym + Math.abs(t.pnl).toFixed(2));
-          const statusCls = t.status === 'OPEN' ? 'bg-tv-blue/20 text-tv-blue' : (t.status === 'WIN' ? 'bg-tv-green/20 text-tv-green' : 'bg-tv-red/20 text-tv-red');
-          const openBtns = t.status === 'OPEN'
-            ? '<button onclick="closeTrade(' + t.id + ', true)" class="px-1.5 py-0.5 bg-tv-green/20 hover:bg-tv-green/40 text-tv-green rounded text-[10px]">TP Hit</button> ' +
-              '<button onclick="closeTrade(' + t.id + ', false)" class="px-1.5 py-0.5 bg-tv-red/20 hover:bg-tv-red/40 text-tv-red rounded text-[10px]">SL Hit</button> '
-            : '';
-
-          return '<tr class="border-b border-tv-border/50 hover:bg-tv-hover/40">' +
-            '<td class="py-1.5 px-2 text-tv-muted">' + t.time + '</td>' +
-            '<td class="py-1.5 px-2 font-bold text-white">' + t.symbol + '</td>' +
-            '<td class="py-1.5 px-2 font-semibold ' + sideColor + '">' + t.side + '</td>' +
-            '<td class="py-1.5 px-2">' + t.size + '</td>' +
-            '<td class="py-1.5 px-2">' + t.entry + '</td>' +
-            '<td class="py-1.5 px-2 text-tv-muted">' + t.sl + ' / ' + t.tp + '</td>' +
-            '<td class="py-1.5 px-2 font-sans text-tv-text max-w-[140px] truncate">' + (t.note || '—') + '</td>' +
-            '<td class="py-1.5 px-2"><span class="px-1.5 py-0.5 rounded text-[10px] ' + statusCls + '">' + t.status + '</span></td>' +
-            '<td class="py-1.5 px-2 font-semibold ' + pnlColor + '">' + pnlFormatted + '</td>' +
-            '<td class="py-1.5 px-2 text-right space-x-1">' + openBtns +
-              '<button onclick="deleteTrade(' + t.id + ')" class="px-1.5 py-0.5 bg-tv-bg hover:bg-tv-red/30 text-tv-muted hover:text-white rounded text-[10px]">Del</button>' +
-            '</td></tr>';
-        }).join('');
+        tbody.innerHTML = trades.map(t => `
+          <tr class="border-b border-tv-border/50 hover:bg-tv-hover/40">
+            <td class="py-1 px-2 text-tv-muted">${t.time}</td>
+            <td class="py-1 px-2 font-bold text-white">${t.symbol}</td>
+            <td class="py-1 px-2 ${t.side === 'BUY' ? 'text-tv-green' : 'text-tv-red'}">${t.side}</td>
+            <td class="py-1 px-2">${t.size}</td>
+            <td class="py-1 px-2">${t.entry}</td>
+            <td class="py-1 px-2 text-tv-muted">${t.sl}/${t.tp}</td>
+            <td class="py-1 px-2 font-sans truncate max-w-[120px]">${t.note || '—'}</td>
+            <td class="py-1 px-2">${t.status}</td>
+            <td class="py-1 px-2 font-semibold ${t.pnl >= 0 ? 'text-tv-green' : 'text-tv-red'}">${t.status === 'OPEN' ? '—' : ((t.pnl >= 0 ? '+' : '-') + sym + Math.abs(t.pnl).toFixed(2))}</td>
+            <td class="py-1 px-2 text-right space-x-1">
+              ${t.status === 'OPEN' ? `<button onclick="closeTrade(${t.id}, true)" class="px-1 bg-tv-green/20 text-tv-green rounded text-[10px]">TP</button><button onclick="closeTrade(${t.id}, false)" class="px-1 bg-tv-red/20 text-tv-red rounded text-[10px]">SL</button>` : ''}
+              <button onclick="deleteTrade(${t.id})" class="px-1 bg-tv-bg text-tv-muted hover:text-white rounded text-[10px]">Del</button>
+            </td>
+          </tr>
+        `).join('');
       }
-
-      const closed = trades.filter(function(t) { return t.status !== 'OPEN'; });
-      const wins = closed.filter(function(t) { return t.pnl > 0; });
-      const losses = closed.filter(function(t) { return t.pnl < 0; });
-      const grossProfit = wins.reduce(function(a, b) { return a + b.pnl; }, 0);
-      const grossLoss = Math.abs(losses.reduce(function(a, b) { return a + b.pnl; }, 0));
-      const netPnl = closed.reduce(function(a, b) { return a + b.pnl; }, 0);
-      const winRate = closed.length ? ((wins.length / closed.length) * 100) : 0;
-      const pf = grossLoss > 0 ? (grossProfit / grossLoss) : (grossProfit > 0 ? grossProfit : 0);
-
-      const netStr = (netPnl >= 0 ? '+' : '-') + sym + Math.abs(netPnl).toFixed(2);
-      document.getElementById('topNetPnl').textContent = netStr;
-      document.getElementById('topNetPnl').className = netPnl >= 0 ? 'text-tv-green' : 'text-tv-red';
-      document.getElementById('topWinRate').textContent = winRate.toFixed(1) + '%';
-
-      document.getElementById('statTotalTrades').textContent = closed.length;
-      document.getElementById('statWinRate').textContent = winRate.toFixed(1) + '%';
-      document.getElementById('statProfitFactor').textContent = pf.toFixed(2);
-      document.getElementById('statNetPnl').textContent = netStr;
-      document.getElementById('statNetPnl').className = 'text-lg font-bold mt-0.5 ' + (netPnl >= 0 ? 'text-tv-green' : 'text-tv-red');
-
-      renderEquityCurve(closed, sym);
-      renderHeatmap(closed, sym);
-      updatePropGuard();
+      const closed = trades.filter(t => t.status !== 'OPEN');
+      const net = closed.reduce((a, b) => a + b.pnl, 0);
+      document.getElementById('topNetPnl').textContent = (net >= 0 ? '+' : '-') + sym + Math.abs(net).toFixed(2);
     }
 
-    document.getElementById('exportCsvBtn').addEventListener('click', function() {
-      if (!isProActive()) {
-        openUpgradeModal();
-        return;
-      }
-      if (!trades.length) return;
-      const headers = ['Time,Symbol,Side,Size,Entry,SL,TP,Note,Status,PnL'];
-      const rows = trades.map(function(t) {
-        return t.time + ',' + t.symbol + ',' + t.side + ',"' + t.size + '",' + t.entry + ',' + t.sl + ',' + t.tp + ',"' + (t.note || '').replace(/"/g, '') + '",' + t.status + ',' + t.pnl;
-      });
-      const blob = new Blob([headers.concat(rows).join('\n')], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'pipscopetrade1-journal.csv';
-      a.click();
-    });
-
-    // --- BOTTOM TABS & PINE STUDIO (ALL PRO LOCKED) ---
     function switchBottomTab(tabName) {
-      if (!isProActive()) {
-        openUpgradeModal();
-        return;
-      }
-      document.querySelectorAll('.btab-btn').forEach(function(b) {
+      if (tabName !== 'screener' && !isProActive()) { openUpgradeModal(); return; }
+      document.querySelectorAll('.btab-btn').forEach(b => {
         b.classList.remove('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue');
         b.classList.add('font-medium', 'text-tv-muted');
       });
-      const activeBtn = document.querySelector('.btab-btn[data-btab="' + tabName + '"]');
-      if (activeBtn) {
-        activeBtn.classList.remove('font-medium', 'text-tv-muted');
-        activeBtn.classList.add('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue');
-      }
-      document.querySelectorAll('.btab-content').forEach(function(c) { c.classList.add('hidden'); });
+      const activeBtn = document.querySelector(`.btab-btn[data-btab="${tabName}"]`);
+      if (activeBtn) { activeBtn.classList.add('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue'); }
+      document.querySelectorAll('.btab-content').forEach(c => c.classList.add('hidden'));
       document.getElementById('tab-' + tabName).classList.remove('hidden');
+      if (tabName === 'screener') loadScreenerWidget();
     }
-
-    document.querySelectorAll('.btab-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() { switchBottomTab(btn.dataset.btab); });
-    });
-
-    document.getElementById('openPineModalBtn').addEventListener('click', function() {
-      switchBottomTab('pine');
-    });
-
-    const pineEditor = document.getElementById('pineEditor');
-    const pineSelect = document.getElementById('pineTemplateSelect');
-    pineEditor.value = localStorage.getItem('pipscopetrade1_custom_pine') || pineTemplates.golden_zone;
-
-    pineSelect.addEventListener('change', function() {
-      pineEditor.value = pineTemplates[pineSelect.value] || '';
-    });
-
-    document.getElementById('copyPineBtn').addEventListener('click', function() {
-      navigator.clipboard.writeText(pineEditor.value);
-      const btn = document.getElementById('copyPineBtn');
-      btn.textContent = 'Copied!';
-      setTimeout(function() { btn.textContent = 'Copy Pine Script v5'; }, 1500);
-    });
-
-    document.getElementById('savePineBtn').addEventListener('click', function() {
-      localStorage.setItem('pipscopetrade1_custom_pine', pineEditor.value);
-      const btn = document.getElementById('savePineBtn');
-      btn.textContent = 'Saved!';
-      setTimeout(function() { btn.textContent = 'Save Custom Script'; }, 1500);
-    });
+    document.querySelectorAll('.btab-btn').forEach(btn => btn.addEventListener('click', () => switchBottomTab(btn.dataset.btab)));
+    document.getElementById('openPineModalBtn').addEventListener('click', () => switchBottomTab('pine'));
 
     // --- INIT ---
     window.addEventListener('DOMContentLoaded', function() {
+      updateAuthUI();
       updateProUI();
       checkGoogleSheetApproval();
       updateSessionsAndClock();
@@ -1736,6 +1470,7 @@ document.getElementById('toggleBottomPanelBtn').addEventListener('click', functi
       loadWatchlistWidget();
       updateCalculator();
       renderJournal();
+      renderAlerts();
     });
   </script>
 </body>
