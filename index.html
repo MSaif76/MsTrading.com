@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MsTrading Pro — Institutional Live Charting & Trading Terminal</title>
+  <title>pipscopetrade1 — Institutional Live Charting & Trading Terminal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,9 +66,9 @@
     <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
       <div class="flex items-center gap-2 pr-2 border-r border-tv-border shrink-0">
         <div class="w-7 h-7 rounded bg-gradient-to-br from-emerald-500 to-tv-blue flex items-center justify-center font-mono font-bold text-white text-xs shadow">
-          MS
+          PS
         </div>
-        <span class="font-bold text-white tracking-tight text-sm">MsTrading <span class="text-emerald-400">Pro</span></span>
+        <span class="font-bold text-white tracking-tight text-sm">pipscopetrade1</span>
         <span id="planStatusBadge" class="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded">FREE</span>
       </div>
 
@@ -417,7 +417,7 @@
 
   <!-- FOOTER ATTRIBUTION -->
   <footer class="h-5 bg-tv-deep border-t border-tv-border px-3 flex items-center justify-between text-[10px] text-tv-muted shrink-0">
-    <span>MsTrading Pro Terminal — Personal Trading & Risk Workspace</span>
+    <span>pipscopetrade1 Terminal — Personal Trading & Risk Workspace</span>
     <span>Charts & market data powered by <a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer" class="text-tv-blue hover:underline">TradingView</a></span>
   </footer>
 
@@ -428,7 +428,7 @@
       <div class="px-5 py-4 border-b border-tv-border flex items-center justify-between bg-tv-deep">
         <div>
           <h3 class="text-base font-bold text-white flex items-center gap-2">
-            <span>⚡ Upgrade to MsTrading Pro</span>
+            <span>⚡ Upgrade to pipscopetrade1 Pro</span>
             <span class="text-xs font-normal px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Instant UPI Activation</span>
           </h3>
           <p class="text-xs text-tv-muted mt-0.5">Unlock Dual Split-Screen Charts, All Symbols, Pine Script v5 Studio & Unlimited Journal.</p>
@@ -481,7 +481,7 @@
           <div class="mt-2.5 font-mono text-xs">
             <div class="text-tv-muted">Payable Amount: <strong id="upiPayAmount" class="text-white text-sm">₹299.00</strong></div>
             <div class="text-[11px] text-tv-muted mt-0.5 flex items-center justify-center gap-1.5">
-              <span>UPI ID: <strong id="displayUpiId" class="text-emerald-400">mstrading1@naviaxis</strong></span>
+              <span>UPI ID: <strong id="displayUpiId" class="text-emerald-400">pipscopetrade1@naviaxis</strong></span>
               <button id="copyUpiIdBtn" class="px-1.5 py-0.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-[10px] text-white font-sans">Copy</button>
             </div>
           </div>
@@ -511,8 +511,8 @@
     // =========================================================
     // MERCHANT UPI CONFIGURATION
     // =========================================================
-    const MERCHANT_UPI_ID = 'mstrading1@naviaxis';
-    const MERCHANT_NAME = 'MsTrading Pro';
+    const MERCHANT_UPI_ID = 'pipscopetrade1@naviaxis';
+    const MERCHANT_NAME = 'pipscopetrade1';
 
     // --- STATE ---
     let currentSymbol = 'OANDA:XAUUSD';
@@ -521,8 +521,8 @@
     let activeStudies = [];
     let currencyMode = 'USD';
     let selectedPlan = 'monthly';
-    let proSubscription = JSON.parse(localStorage.getItem('mstrading_pro_sub') || 'null');
-    let trades = JSON.parse(localStorage.getItem('mstrading_trades_v1') || '[]');
+    let proSubscription = JSON.parse(localStorage.getItem('pipscopetrade1_pro_sub') || 'null');
+    let trades = JSON.parse(localStorage.getItem('pipscopetrade1_trades_v1') || '[]');
 
     function isProActive() {
       if (!proSubscription) return false;
@@ -591,7 +591,7 @@
     // --- UPI MODAL & QR GENERATOR ---
     function updateUpiDetails() {
       const amount = selectedPlan === 'monthly' ? '299.00' : '2999.00';
-      const note = selectedPlan === 'monthly' ? 'MsTrading Pro Monthly' : 'MsTrading Pro Yearly';
+      const note = selectedPlan === 'monthly' ? 'pipscopetrade1 Pro Monthly' : 'pipscopetrade1 Pro Yearly';
       const upiUrl = `upi://pay?pa=${encodeURIComponent(MERCHANT_UPI_ID)}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
       const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUrl)}`;
 
@@ -656,16 +656,16 @@
         activatedAt: Date.now(),
         expiresAt: Date.now() + days * 24 * 60 * 60 * 1000
       };
-      localStorage.setItem('mstrading_pro_sub', JSON.stringify(proSubscription));
+      localStorage.setItem('pipscopetrade1_pro_sub', JSON.stringify(proSubscription));
       updateProUI();
       closeUpgradeModal();
-      alert(`Thank you! MsTrading Pro (${selectedPlan === 'monthly' ? '₹299 Monthly' : '₹2,999 Yearly'}) is now active.`);
+      alert(`Thank you! pipscopetrade1 Pro (${selectedPlan === 'monthly' ? '₹299 Monthly' : '₹2,999 Yearly'}) is now active.`);
     });
 
     // --- PINE TEMPLATES ---
     const pineTemplates = {
       ema_cross: `//@version=5
-indicator("MsTrading EMA 20/50 Trend", overlay=true)
+indicator("pipscopetrade1 EMA 20/50 Trend", overlay=true)
 fastEMA = ta.ema(close, 20)
 slowEMA = ta.ema(close, 50)
 plot(fastEMA, color=color.new(#2962ff, 0), linewidth=2, title="EMA 20")
@@ -676,14 +676,14 @@ plotshape(bullSignal, style=shape.triangleup, location=location.belowbar, color=
 plotshape(bearSignal, style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small)`,
 
       rsi_div: `//@version=5
-indicator("MsTrading RSI Momentum Zones", overlay=false)
+indicator("pipscopetrade1 RSI Momentum Zones", overlay=false)
 rsiVal = ta.rsi(close, 14)
 plot(rsiVal, color=color.new(#2962ff, 0), linewidth=2, title="RSI 14")
 hline(70, "Overbought", color=color.red, linestyle=hline.style_dashed)
 hline(30, "Oversold", color=color.green, linestyle=hline.style_dashed)`,
 
       session_hl: `//@version=5
-indicator("MsTrading Asian Range Breakout", overlay=true)
+indicator("pipscopetrade1 Asian Range Breakout", overlay=true)
 asianSession = input.session("0000-0600", "Asian Session (UTC)")
 inSession = not na(time(timeframe.period, asianSession))
 var float hi = na
@@ -698,7 +698,7 @@ plot(hi, "Session High", color=color.teal, style=plot.style_linebr)
 plot(lo, "Session Low", color=color.orange, style=plot.style_linebr)`,
 
       atr_stop: `//@version=5
-indicator("MsTrading ATR Dynamic Stop", overlay=true)
+indicator("pipscopetrade1 ATR Dynamic Stop", overlay=true)
 atrLen = input.int(14, "ATR Length")
 mult = input.float(2.0, "Multiplier")
 atr = ta.atr(atrLen)
@@ -708,7 +708,7 @@ plot(longStop, "Long Stop", color=color.new(#089981, 30))
 plot(shortStop, "Short Stop", color=color.new(#f23645, 30))`,
 
       vwap_bands: `//@version=5
-indicator("MsTrading Institutional VWAP + StdDev", overlay=true)
+indicator("pipscopetrade1 Institutional VWAP + StdDev", overlay=true)
 vwapVal = ta.vwap(hlc3)
 stdevVal = ta.stdev(close, 20)
 plot(vwapVal, "VWAP", color=color.orange, linewidth=2)
@@ -1021,7 +1021,7 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
 
     // --- JOURNAL, EQUITY CURVE & ANALYTICS ---
     function saveTrades() {
-      localStorage.setItem('mstrading_trades_v1', JSON.stringify(trades));
+      localStorage.setItem('pipscopetrade1_trades_v1', JSON.stringify(trades));
       renderJournal();
     }
 
@@ -1090,7 +1090,6 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
         peakLabel.textContent = `Peak: ${sym}0.00`;
         return;
       }
-      // Chronological order
       const chronological = [...closedTrades].reverse();
       let cum = 0;
       const values = [0];
@@ -1183,7 +1182,7 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'mstrading-journal.csv';
+      a.download = 'pipscopetrade1-journal.csv';
       a.click();
     });
 
@@ -1216,7 +1215,7 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
 
     const pineEditor = document.getElementById('pineEditor');
     const pineSelect = document.getElementById('pineTemplateSelect');
-    pineEditor.value = localStorage.getItem('mstrading_custom_pine') || pineTemplates.ema_cross;
+    pineEditor.value = localStorage.getItem('pipscopetrade1_custom_pine') || pineTemplates.ema_cross;
 
     pineSelect.addEventListener('change', () => {
       pineEditor.value = pineTemplates[pineSelect.value] || '';
@@ -1230,7 +1229,7 @@ plot(vwapVal - stdevVal * 1.5, "Lower Band", color=color.new(#2962ff, 40))`
     });
 
     document.getElementById('savePineBtn').addEventListener('click', () => {
-      localStorage.setItem('mstrading_custom_pine', pineEditor.value);
+      localStorage.setItem('pipscopetrade1_custom_pine', pineEditor.value);
       const btn = document.getElementById('savePineBtn');
       btn.textContent = 'Saved!';
       setTimeout(() => (btn.textContent = 'Save Custom Script'), 1500);
