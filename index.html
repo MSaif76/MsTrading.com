@@ -16,9 +16,9 @@
         extend: {
           colors: {
             tv: {
-              deep: '#0b0e14',
-              bg: '#131722',
-              panel: '#1e222d',
+              deep: 'var(--bg-deep, #0b0e14)',
+              bg: 'var(--bg-main, #131722)',
+              panel: 'var(--bg-panel, #1e222d)',
               hover: '#2a2e39',
               border: '#2b2b43',
               blue: '#2962ff',
@@ -38,11 +38,26 @@
     }
   </script>
   <style>
+    :root {
+      --bg-deep: #0b0e14;
+      --bg-main: #131722;
+      --bg-panel: #1e222d;
+    }
+    body.theme-midnight {
+      --bg-deep: #050811;
+      --bg-main: #0a1020;
+      --bg-panel: #111a30;
+    }
+    body.theme-slate {
+      --bg-deep: #111315;
+      --bg-main: #181a1d;
+      --bg-panel: #22252a;
+    }
     * { box-sizing: border-box; }
-    body { background-color: #131722; color: #d1d4dc; font-family: 'Inter', sans-serif; overflow: hidden; user-select: none; }
+    body { background-color: var(--bg-main); color: #d1d4dc; font-family: 'Inter', sans-serif; overflow: hidden; user-select: none; }
     input, textarea, select { user-select: text; }
     ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #131722; }
+    ::-webkit-scrollbar-track { background: var(--bg-main); }
     ::-webkit-scrollbar-thumb { background: #2a2e39; border-radius: 3px; }
     .active-study { background-color: rgba(41, 98, 255, 0.22); border-color: #2962ff; color: #ffffff; }
     .tool-active { background-color: #2962ff !important; color: #ffffff !important; }
@@ -57,7 +72,7 @@
 
   <!-- LIVE ALERT TOAST BANNER -->
   <div id="liveAlertBanner" class="hidden fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-black font-mono text-xs font-bold px-4 py-2 rounded-lg shadow-2xl flex items-center gap-3">
-    <span id="liveAlertBannerText">🔔 Price Alert Triggered!</span>
+    <span id="liveAlertBannerText">🔔 Alert Triggered!</span>
     <button type="button" onclick="document.getElementById('liveAlertBanner').classList.add('hidden')" class="px-1.5 py-0.5 bg-black/20 rounded">✕</button>
   </div>
 
@@ -70,7 +85,6 @@
         <span id="planStatusBadge" class="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded">FREE</span>
       </div>
 
-      <!-- LIVE ACTIVE SYMBOL TICKER -->
       <div class="hidden lg:flex items-center gap-1.5 px-2 py-1 bg-tv-deep border border-tv-border rounded font-mono text-xs shrink-0">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
         <span id="headerActiveSym" class="font-bold text-white">XAUUSD</span>
@@ -92,14 +106,22 @@
     </div>
 
     <div class="flex items-center gap-1 shrink-0">
-      <div id="tfPills" class="hidden 2xl:flex items-center gap-0.5 bg-tv-bg p-0.5 rounded border border-tv-border">
-        <button type="button" data-tf="1" class="tf-btn px-1.5 py-0.5 text-[11px] font-mono rounded bg-tv-blue text-white">1m</button>
-        <button type="button" data-tf="5" class="tf-btn px-1.5 py-0.5 text-[11px] font-mono rounded text-tv-muted hover:text-white">5m</button>
-        <button type="button" data-tf="15" class="tf-btn px-1.5 py-0.5 text-[11px] font-mono rounded text-tv-muted hover:text-white">15m</button>
-        <button type="button" data-tf="60" class="tf-btn px-1.5 py-0.5 text-[11px] font-mono rounded text-tv-muted hover:text-white">1H</button>
-        <button type="button" data-tf="240" class="tf-btn px-1.5 py-0.5 text-[11px] font-mono rounded text-tv-muted hover:text-white">4H</button>
-        <button type="button" data-tf="D" class="tf-btn px-1.5 py-0.5 text-[11px] font-mono rounded text-tv-muted hover:text-white">1D</button>
-      </div>
+      <select id="chartStyleSelect" title="Chart Style" class="hidden 2xl:block bg-tv-bg border border-tv-border rounded px-1.5 py-1 text-[11px] font-mono text-white outline-none">
+        <option value="1" selected>Candles</option>
+        <option value="9">Hollow</option>
+        <option value="2">Line</option>
+        <option value="3">Area</option>
+      </select>
+
+      <button type="button" id="toggleReplayBtn" title="Bar Replay Backtest Mode (R)" class="px-2 py-1 text-[11px] font-mono bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-amber-300 flex items-center gap-1 shrink-0">
+        <span>⏯</span><span class="hidden md:inline">Replay</span>
+      </button>
+
+      <button type="button" id="openScratchpadBtn" title="Quick Notes / Scratchpad (N)" class="px-2 py-1 text-[11px] bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-sky-300 flex items-center gap-1 shrink-0">
+        <span>📝</span><span class="hidden lg:inline">Notes</span>
+      </button>
+
+      <button type="button" id="snapshotChartBtn" title="Download Chart Snapshot" class="hidden sm:inline-flex px-1.5 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white shrink-0">📸</button>
 
       <div class="hidden md:flex items-center bg-tv-bg p-0.5 rounded border border-tv-border text-[11px] font-mono">
         <button type="button" id="layoutSingleBtn" class="px-1.5 py-0.5 rounded bg-tv-blue text-white font-semibold">1x</button>
@@ -107,12 +129,12 @@
         <button type="button" id="layoutQuadBtn" class="px-1.5 py-0.5 rounded text-tv-muted hover:text-white">4x</button>
       </div>
 
-      <!-- ALWAYS VISIBLE SETTINGS BUTTON -->
       <button type="button" id="openSettingsModalBtn" title="Chart Settings" class="px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-white flex items-center gap-1 shrink-0">
-        <span>⚙️</span><span>Settings</span>
+        <span>⚙️</span><span class="hidden sm:inline">Settings</span>
       </button>
 
-      <button type="button" id="openLayoutModalBtn" class="hidden sm:flex items-center gap-1 px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white shrink-0">☁️ Layouts</button>
+      <button type="button" id="openShortcutsModalBtn" title="Keyboard Shortcuts (?)" class="hidden sm:inline-flex px-2 py-1 text-xs font-mono font-bold bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-muted hover:text-white shrink-0">?</button>
+
       <button type="button" id="openAlertModalBtn" class="px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white flex items-center gap-1 shrink-0">🔔 <span id="alertCountBadge" class="font-mono text-[10px] text-amber-400">0</span></button>
       <button type="button" id="togglePaperPanelBtn" class="hidden lg:flex items-center gap-1 px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-emerald-400 font-semibold shrink-0">⇄ Trade</button>
       <button type="button" id="toggleIndicatorBarBtn" class="px-2 py-1 text-xs font-medium bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-white shrink-0"><span class="text-tv-blue font-mono font-bold">fx</span></button>
@@ -129,7 +151,7 @@
     </div>
   </header>
 
-  <!-- SESSION & LIVE FEED STATUS BAR -->
+  <!-- SESSION, LIVE FEED & HIGH-IMPACT NEWS COUNTDOWN BAR -->
   <div id="sessionStatusBar" class="bg-tv-deep border-b border-tv-border px-3 py-1 flex items-center justify-between gap-2 text-[11px] font-mono shrink-0">
     <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
       <span class="text-tv-muted font-sans font-semibold uppercase text-[10px]">Sessions:</span>
@@ -138,10 +160,11 @@
       <span id="sessLondon">London</span>
       <span id="sessNewYork">New York</span>
       <span id="killzoneBadge" class="hidden sm:inline-block px-1.5 py-0.2 rounded bg-tv-panel text-tv-muted text-[10px]">Checking...</span>
-      <span id="feedStatusBadge" class="hidden md:inline-block px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 text-[10px]">● Live WS Feed Active</span>
+      <span id="redNewsTimerBadge" class="px-2 py-0.2 rounded bg-rose-500/15 border border-rose-500/40 text-rose-300 text-[10px] font-semibold">⚠️ US Core CPI in --:--:--</span>
     </div>
-    <div class="flex items-center gap-3">
-      <span id="cloudSyncIndicator" class="text-[10px] text-tv-muted">☁️ Local Mode</span>
+    <div class="flex items-center gap-3 shrink-0">
+      <span id="feedStatusBadge" class="hidden xl:inline-block text-[10px] text-emerald-400">● Live WS</span>
+      <span id="cloudSyncIndicator" class="hidden md:inline-block text-[10px] text-tv-muted">☁️ Local</span>
       <span id="liveClockIst" class="text-emerald-400 font-semibold">--:--:-- IST</span>
     </div>
   </div>
@@ -161,19 +184,37 @@
     </div>
     <div class="flex items-center gap-2">
       <span id="activeStudiesCount" class="text-[11px] font-mono text-tv-blue">0/1 Free Study</span>
-      <button type="button" id="openPineModalBtn" class="px-2 py-0.5 text-xs font-medium bg-tv-green/20 hover:bg-tv-green/30 text-tv-green border border-tv-green/40 rounded">Pine v5 Library</button>
+      <button type="button" id="openLayoutModalBtn" class="px-2 py-0.5 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text">☁️ Layouts</button>
+      <button type="button" id="openPineModalBtn" class="px-2 py-0.5 text-xs font-medium bg-tv-green/20 hover:bg-tv-green/30 text-tv-green border border-tv-green/40 rounded">Pine v5</button>
       <button type="button" id="hideIndicatorBarBtn" class="text-xs text-tv-muted hover:text-white px-1">Hide</button>
+    </div>
+  </div>
+
+  <!-- CANDLE OHLC & COUNTDOWN STRIP -->
+  <div id="candleInfoStrip" class="h-7 bg-tv-deep/90 border-b border-tv-border px-3 flex items-center justify-between gap-2 text-[11px] font-mono shrink-0">
+    <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
+      <span class="text-white font-bold" id="ohlcSymLabel">XAUUSD</span>
+      <span class="text-tv-muted">O: <strong id="ohlcOpen" class="text-tv-text">—</strong></span>
+      <span class="text-tv-muted">H: <strong id="ohlcHigh" class="text-emerald-400">—</strong></span>
+      <span class="text-tv-muted">L: <strong id="ohlcLow" class="text-rose-400">—</strong></span>
+      <span class="text-tv-muted">C: <strong id="ohlcClose" class="text-white">—</strong></span>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <span class="text-tv-muted">Bar Close:</span>
+      <span id="barCountdownTimer" class="px-1.5 py-0.2 rounded bg-tv-blue/20 text-tv-blue font-bold">00:00</span>
     </div>
   </div>
 
   <!-- MAIN WORKSPACE -->
   <div class="flex-1 flex min-h-0 overflow-hidden">
-    <!-- LEFT VERTICAL DRAWING & TERMINAL TOOLBAR -->
+    <!-- LEFT VERTICAL DRAWING, R:R BOX, RULER & TERMINAL TOOLBAR -->
     <nav class="w-10 bg-tv-panel border-r border-tv-border flex flex-col items-center py-2 gap-1.5 shrink-0 z-20">
-      <button type="button" data-drawtool="cursor" title="Interactive Chart Cursor" class="tv-draw-btn tool-active w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">╋</button>
+      <button type="button" data-drawtool="cursor" title="Interactive Chart Cursor (Esc)" class="tv-draw-btn tool-active w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">╋</button>
       <button type="button" data-drawtool="line" title="Trendline" class="tv-draw-btn w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">╱</button>
       <button type="button" data-drawtool="hline" title="Horizontal Line" class="tv-draw-btn w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">―</button>
       <button type="button" data-drawtool="rect" title="Order Block / Zone Box" class="tv-draw-btn w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">▭</button>
+      <button type="button" data-drawtool="rrbox" title="Long / Short Risk-to-Reward Box" class="tv-draw-btn w-7 h-7 rounded flex items-center justify-center text-xs text-emerald-400 hover:text-white hover:bg-tv-hover">🎯</button>
+      <button type="button" data-drawtool="ruler" title="Price & Pip Ruler" class="tv-draw-btn w-7 h-7 rounded flex items-center justify-center text-xs text-amber-300 hover:text-white hover:bg-tv-hover">📏</button>
       <button type="button" data-drawtool="brush" title="Freehand Brush" class="tv-draw-btn w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">✎</button>
       <button type="button" id="undoDrawingBtn" title="Undo Last Drawing" class="w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">↩</button>
       <button type="button" id="clearDrawingsBtn" title="Clear All Drawings" class="w-7 h-7 rounded flex items-center justify-center text-xs text-tv-red hover:bg-tv-hover">🗑️</button>
@@ -184,14 +225,28 @@
       <button type="button" data-quicktool="calc" title="Risk & Lot Calculator" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">⚖️</button>
       <button type="button" data-quicktool="prop" title="Prop Firm Guard" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">🛡️</button>
       <button type="button" data-quicktool="alert" title="Price Alerts" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">🔔</button>
-      <button type="button" id="toggleFullChartBtn" title="Fullscreen Chart" class="w-7 h-7 rounded flex items-center justify-center text-xs text-amber-400 hover:bg-tv-hover">⛶</button>
+      <button type="button" id="toggleFullChartBtn" title="Fullscreen Chart (F)" class="w-7 h-7 rounded flex items-center justify-center text-xs text-amber-400 hover:bg-tv-hover">⛶</button>
     </nav>
 
     <!-- CHART AREA -->
     <main id="chartWorkspace" class="flex-1 grid grid-cols-1 grid-rows-1 min-w-0 bg-tv-bg relative">
+      <!-- BAR REPLAY FLOATING BAR -->
+      <div id="replayControlBar" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-30 bg-tv-panel/95 backdrop-blur border border-amber-500/50 rounded-full px-4 py-1.5 shadow-2xl flex items-center gap-3 font-mono text-xs">
+        <span class="text-amber-300 font-bold">REPLAY</span>
+        <span id="replayStepCounter" class="text-white">Bar #1</span>
+        <button type="button" id="replayPlayPauseBtn" class="px-2.5 py-0.5 bg-tv-blue hover:bg-tv-blueHover text-white font-bold rounded">▶ Play</button>
+        <button type="button" id="replayStepNextBtn" class="px-2 py-0.5 bg-tv-bg hover:bg-tv-hover border border-tv-border text-white rounded">⏭ +1 Bar</button>
+        <select id="replaySpeedSelect" class="bg-tv-bg border border-tv-border rounded px-1.5 py-0.5 text-white text-[11px] outline-none">
+          <option value="1200" selected>1x</option>
+          <option value="600">2x</option>
+          <option value="250">5x</option>
+        </select>
+        <button type="button" id="exitReplayBtn" class="text-tv-red hover:underline text-[11px] font-sans font-semibold">Exit</button>
+      </div>
+
       <div id="drawingModePill" class="hidden absolute top-3 right-4 z-30 bg-tv-blue text-white font-mono text-[11px] font-semibold px-3 py-1 rounded-full shadow-lg flex items-center gap-2">
-        <span id="drawingModeText">Drawing Mode: Trendline</span>
-        <button type="button" id="exitDrawModeBtn" class="px-1.5 py-0.2 bg-black/30 rounded text-[10px]">Done (╋)</button>
+        <span id="drawingModeText">Tool: Trendline</span>
+        <button type="button" id="exitDrawModeBtn" class="px-1.5 py-0.2 bg-black/30 rounded text-[10px]">Done (Esc)</button>
       </div>
 
       <canvas id="chartDrawCanvas" class="absolute inset-0 w-full h-full z-20 pointer-events-none"></canvas>
@@ -274,19 +329,40 @@
 
     <!-- RIGHT SIDEBAR -->
     <aside id="rightSidebar" class="w-80 bg-tv-panel border-l border-tv-border flex flex-col shrink-0 overflow-y-auto">
+      <!-- LIVE MULTI-TIMEFRAME (MTF) TREND MATRIX -->
+      <div class="p-2.5 bg-tv-deep border-b border-tv-border">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-tv-muted">MTF Trend Matrix (<span id="mtfSymLabel" class="text-white">XAUUSD</span>)</span>
+          <span id="mtfOverallBadge" class="text-[10px] font-mono font-bold text-emerald-400">BULLISH</span>
+        </div>
+        <div class="grid grid-cols-5 gap-1 font-mono text-[10px] text-center">
+          <div class="bg-tv-panel border border-tv-border rounded py-1"><div class="text-tv-muted text-[9px]">1m</div><div id="mtf-1m" class="font-bold text-emerald-400">🟢</div></div>
+          <div class="bg-tv-panel border border-tv-border rounded py-1"><div class="text-tv-muted text-[9px]">5m</div><div id="mtf-5m" class="font-bold text-emerald-400">🟢</div></div>
+          <div class="bg-tv-panel border border-tv-border rounded py-1"><div class="text-tv-muted text-[9px]">15m</div><div id="mtf-15m" class="font-bold text-emerald-400">🟢</div></div>
+          <div class="bg-tv-panel border border-tv-border rounded py-1"><div class="text-tv-muted text-[9px]">1H</div><div id="mtf-1h" class="font-bold text-rose-400">🔴</div></div>
+          <div class="bg-tv-panel border border-tv-border rounded py-1"><div class="text-tv-muted text-[9px]">4H</div><div id="mtf-4h" class="font-bold text-emerald-400">🟢</div></div>
+        </div>
+      </div>
+
+      <!-- TOOL TABS -->
       <div class="p-2 bg-tv-deep border-b border-tv-border grid grid-cols-3 gap-1 text-[10px] font-semibold">
         <button type="button" id="toolTabCalc" class="py-1.5 rounded bg-tv-blue text-white">Risk & Lot</button>
         <button type="button" id="toolTabFib" class="py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white">Golden Zone</button>
         <button type="button" id="toolTabProp" class="py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white">Prop Guard</button>
       </div>
 
-      <!-- CALCULATOR -->
+      <!-- CALCULATOR + SPREAD/SLIPPAGE ESTIMATOR + LIVE AUTO-FILL + DISCIPLINE CHECKLIST -->
       <div id="panelToolCalc" class="p-3 border-b border-tv-border">
         <div class="flex items-center justify-between mb-2">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-white">Position & Lot Calc</h2>
+          <div class="flex items-center gap-1.5">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-white">Risk & Lot</h2>
+            <!-- FEATURE 10: QUICK AUTO-FILL FROM LIVE PRICE -->
+            <button type="button" id="autoFillLivePriceBtn" title="Auto-fill Entry/SL/TP from Live Price" class="px-1.5 py-0.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 rounded text-[10px] font-mono text-emerald-300">⚡ Live Fill</button>
+          </div>
+          <!-- FEATURE 2: MULTI-CURRENCY / INR QUICK CONVERSION TOGGLE -->
           <div class="flex bg-tv-bg rounded border border-tv-border p-0.5 text-[10px] font-mono">
             <button type="button" id="currUsdBtn" class="px-1.5 py-0.5 rounded bg-tv-blue text-white font-semibold">USD</button>
-            <button type="button" id="currInrBtn" class="px-1.5 py-0.5 rounded text-tv-muted hover:text-white">INR</button>
+            <button type="button" id="currInrBtn" class="px-1.5 py-0.5 rounded text-tv-muted hover:text-white">INR ₹</button>
           </div>
         </div>
 
@@ -319,19 +395,48 @@
             <div><label class="block text-[10px] text-tv-muted mb-0.5">Stop Loss</label><input id="calcSl" type="number" step="any" placeholder="2645.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
             <div><label class="block text-[10px] text-tv-muted mb-0.5">Take Profit</label><input id="calcTp" type="number" step="any" placeholder="2662.50" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
           </div>
+
+          <!-- FEATURE 7: LIVE SPREAD & SLIPPAGE ESTIMATOR -->
+          <div class="grid grid-cols-2 gap-2 items-center bg-tv-deep border border-tv-border rounded px-2 py-1.5">
+            <div>
+              <label class="block text-[9px] text-tv-muted uppercase">Est. Spread/Slip (pts)</label>
+              <input id="calcSpreadPts" type="number" step="0.05" value="0.20" class="w-full bg-tv-bg border border-tv-border rounded px-1.5 py-0.5 font-mono text-[11px] text-white outline-none" />
+            </div>
+            <div class="text-right font-mono">
+              <div class="text-[9px] text-tv-muted uppercase">Slippage Cost</div>
+              <div id="outSlippageCost" class="text-[11px] text-amber-300 font-bold">$0.00</div>
+            </div>
+          </div>
+
           <input id="calcNote" type="text" placeholder="Setup note (e.g. 0.280 Golden Zone)..." class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 text-[11px] text-white outline-none" />
+
+          <!-- PRE-TRADE DISCIPLINE CHECKLIST -->
+          <div class="bg-tv-deep border border-tv-border rounded p-2 space-y-1 text-[11px]">
+            <div class="flex items-center justify-between text-[10px] font-bold uppercase text-amber-300">
+              <span>Pre-Trade Discipline Check</span>
+              <span id="dailyLossStatusTag" class="font-mono text-emerald-400">Session Open</span>
+            </div>
+            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue" /><span>1. Higher TF Trend Aligned</span></label>
+            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue" /><span>2. 0.280–0.382 Golden Zone / OB</span></label>
+            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue" /><span>3. Risk ≤ 1% & Clear SL</span></label>
+          </div>
+
           <div class="bg-tv-bg border border-tv-border rounded p-2 space-y-1 font-mono text-[11px]">
             <div class="flex justify-between"><span class="text-tv-muted">Risk Amount:</span><span id="outRiskAmt" class="text-tv-red font-semibold">$100.00</span></div>
+            <div class="flex justify-between"><span class="text-tv-muted">INR Equivalent:</span><span id="outInrEquiv" class="text-tv-text">₹8,450</span></div>
             <div class="flex justify-between"><span class="text-tv-muted">Lot Size:</span><span id="outLotSize" class="text-white font-bold">—</span></div>
-            <div class="flex justify-between"><span class="text-tv-muted">Risk : Reward:</span><span id="outRR" class="text-tv-green font-semibold">—</span></div>
+            <div class="flex justify-between"><span class="text-tv-muted">Net R:R (after spread):</span><span id="outRR" class="text-tv-green font-semibold">—</span></div>
           </div>
           <button type="button" id="logTradeBtn" class="w-full py-1.5 bg-tv-blue hover:bg-tv-blueHover text-white font-semibold rounded">+ Log Trade to Cloud Journal</button>
         </div>
       </div>
 
-      <!-- GOLDEN ZONE -->
+      <!-- GOLDEN ZONE + LIVE AUTO-FILL -->
       <div id="panelToolFib" class="hidden p-3 border-b border-tv-border space-y-2 text-xs">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">0.280–0.382 Golden Zone Sniper</h2>
+        <div class="flex items-center justify-between">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">0.280–0.382 Golden Zone</h2>
+          <button type="button" id="autoFillFibLiveBtn" class="px-1.5 py-0.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 rounded text-[10px] font-mono text-amber-300">⚡ From Live</button>
+        </div>
         <div class="grid grid-cols-2 gap-2">
           <div><label class="block text-[10px] text-tv-muted">Swing Low</label><input id="fibLow" type="number" step="any" placeholder="2620.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
           <div><label class="block text-[10px] text-tv-muted">Swing High</label><input id="fibHigh" type="number" step="any" placeholder="2660.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
@@ -349,14 +454,18 @@
         <button type="button" id="applyFibToCalcBtn" class="w-full py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded">⚡ Send to Calculator</button>
       </div>
 
-      <!-- PROP GUARD -->
+      <!-- PROP GUARD + DAILY LOSS LOCK -->
       <div id="panelToolProp" class="hidden p-3 border-b border-tv-border space-y-2 text-xs">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Prop Firm Drawdown Guard</h2>
+        <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Prop Firm & Daily Loss Guard</h2>
         <div class="grid grid-cols-3 gap-1.5">
           <div><label class="block text-[10px] text-tv-muted">Account ($)</label><input id="propAccSize" type="number" value="10000" class="w-full bg-tv-bg border border-tv-border rounded px-1.5 py-1 font-mono text-white outline-none" /></div>
           <div><label class="block text-[10px] text-tv-muted">Max DD %</label><input id="propDailyMax" type="number" value="5" class="w-full bg-tv-bg border border-tv-border rounded px-1.5 py-1 font-mono text-white outline-none" /></div>
           <div><label class="block text-[10px] text-tv-muted">Target %</label><input id="propTargetPct" type="number" value="8" class="w-full bg-tv-bg border border-tv-border rounded px-1.5 py-1 font-mono text-white outline-none" /></div>
         </div>
+        <label class="flex items-center justify-between bg-tv-deep border border-tv-border rounded px-2 py-1.5 cursor-pointer">
+          <span class="text-[11px] text-amber-300 font-semibold">🔒 Lock Trading on Max DD Hit</span>
+          <input id="dailyLossLockToggle" type="checkbox" checked class="accent-tv-blue" />
+        </label>
         <div class="bg-tv-bg border border-tv-border rounded p-2 space-y-2 font-mono text-[11px]">
           <div>
             <div class="flex justify-between mb-1"><span class="text-tv-muted">Target Progress:</span><span id="propTargetText" class="text-emerald-400 font-bold">$0 / $800</span></div>
@@ -369,68 +478,51 @@
         </div>
       </div>
 
-      <!-- LIVE WATCHLIST -->
+      <!-- FEATURE 4 & 6: FAVORITES STRIP + CUSTOM WATCHLIST MANAGER -->
       <div class="flex-1 flex flex-col p-3 gap-2">
         <div class="flex items-center justify-between">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-tv-muted">Live Watchlist</span>
-          <span class="text-[10px] font-mono text-emerald-400">● Real-Time Feed</span>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-tv-muted">Favorites & Watchlist</span>
+          <span class="text-[10px] font-mono text-emerald-400">● Cloud Synced</span>
         </div>
-        <div id="customWatchlistBox" class="space-y-1 font-mono text-xs">
-          <button type="button" data-wl="OANDA:XAUUSD" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-blue text-left transition">
-            <div><div class="font-bold text-white">XAUUSD</div><div class="text-[10px] text-tv-muted font-sans">Gold Spot / USD</div></div>
-            <div class="text-right"><div id="price-XAUUSD" class="font-bold text-white">—</div><div id="chg-XAUUSD" class="text-[10px] text-tv-muted">PAXG Live</div></div>
-          </button>
-          <button type="button" data-wl="BINANCE:BTCUSDT" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-border text-left transition">
-            <div><div class="font-bold text-white">BTCUSDT</div><div class="text-[10px] text-tv-muted font-sans">Bitcoin / Tether</div></div>
-            <div class="text-right"><div id="price-BTCUSDT" class="font-bold text-white">—</div><div id="chg-BTCUSDT" class="text-[10px] text-tv-muted">WS Stream</div></div>
-          </button>
-          <button type="button" data-wl="BINANCE:ETHUSDT" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-border text-left transition">
-            <div><div class="font-bold text-white">ETHUSDT</div><div class="text-[10px] text-tv-muted font-sans">Ethereum / Tether</div></div>
-            <div class="text-right"><div id="price-ETHUSDT" class="font-bold text-white">—</div><div id="chg-ETHUSDT" class="text-[10px] text-tv-muted">WS Stream</div></div>
-          </button>
-          <button type="button" data-wl="FX:EURUSD" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-border text-left transition">
-            <div><div class="font-bold text-white">EURUSD</div><div class="text-[10px] text-tv-muted font-sans">Euro / US Dollar</div></div>
-            <div class="text-right"><div id="price-EURUSD" class="font-bold text-white">—</div><div id="chg-EURUSD" class="text-[10px] text-tv-muted">FX Ref</div></div>
-          </button>
-          <button type="button" data-wl="FX:GBPUSD" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-border text-left transition">
-            <div><div class="font-bold text-white">GBPUSD</div><div class="text-[10px] text-tv-muted font-sans">Pound / US Dollar</div></div>
-            <div class="text-right"><div id="price-GBPUSD" class="font-bold text-white">—</div><div id="chg-GBPUSD" class="text-[10px] text-tv-muted">FX Ref</div></div>
-          </button>
-          <button type="button" data-wl="FX:USDJPY" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-border text-left transition">
-            <div><div class="font-bold text-white">USDJPY</div><div class="text-[10px] text-tv-muted font-sans">USD / Japanese Yen</div></div>
-            <div class="text-right"><div id="price-USDJPY" class="font-bold text-white">—</div><div id="chg-USDJPY" class="text-[10px] text-tv-muted">FX Ref</div></div>
-          </button>
-          <button type="button" data-wl="NSE:NIFTY" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-border text-left transition">
-            <div><div class="font-bold text-white">NIFTY</div><div class="text-[10px] text-tv-muted font-sans">NSE NIFTY 50</div></div>
-            <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300">INDEX</span>
-          </button>
-        </div>
+        <!-- Pinned Favorites Quick-Switch Strip -->
+        <div id="favoritesQuickStrip" class="flex flex-wrap gap-1"></div>
+
+        <form id="addWatchlistForm" class="flex gap-1">
+          <input id="newWlSymbolInput" type="text" placeholder="e.g. OANDA:XAGUSD" class="flex-1 bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-2 py-1 text-[11px] font-mono text-white outline-none" />
+          <button type="submit" class="px-2 py-1 bg-tv-blue hover:bg-tv-blueHover text-white font-mono text-[11px] font-bold rounded">+ Add</button>
+        </form>
+        <div id="customWatchlistBox" class="space-y-1 font-mono text-xs"></div>
       </div>
     </aside>
   </div>
 
-  <!-- BOTTOM PANEL -->
+  <!-- BOTTOM PANEL (JOURNAL, HEATMAP, SESSION ANALYTICS, PINE V5, SCRATCHPAD) -->
   <section id="bottomPanel" class="h-48 bg-tv-panel border-t border-tv-border flex flex-col shrink-0 z-10">
-    <div class="h-8 px-3 border-b border-tv-border flex items-center justify-between bg-tv-deep overflow-x-auto no-scrollbar">
-      <div class="flex items-center gap-3.5 text-xs shrink-0">
+    <div class="h-8 px-3 border-b border-tv-border flex items-center justify-between bg-tv-deep overflow-x-auto no-scrollbar gap-2">
+      <div class="flex items-center gap-3 text-xs shrink-0">
         <button type="button" data-btab="journal" class="btab-btn font-semibold text-white border-b-2 border-tv-blue py-1.5">
-          Trade Journal <span id="journalCountBadge" class="ml-1 px-1.5 py-0.2 bg-tv-blue/20 text-tv-blue rounded font-mono text-[10px]">0</span>
+          Journal <span id="journalCountBadge" class="ml-1 px-1.5 py-0.2 bg-tv-blue/20 text-tv-blue rounded font-mono text-[10px]">0</span>
         </button>
-        <button type="button" data-btab="heatmap" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">P&L Heatmap</button>
-        <button type="button" data-btab="analytics" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">Equity Curve</button>
+        <button type="button" data-btab="heatmap" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">Heatmap</button>
+        <button type="button" data-btab="analytics" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">Sessions & Curve</button>
         <button type="button" data-btab="pine" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5 flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-tv-green"></span> Pine v5 Library
+          <span class="w-1.5 h-1.5 rounded-full bg-tv-green"></span> Pine v5
         </button>
+        <button type="button" data-btab="notes" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">📝 Scratchpad</button>
       </div>
 
-      <div class="flex items-center gap-2 text-xs font-mono shrink-0">
-        <span class="text-tv-muted">Net P&L: <strong id="topNetPnl" class="text-tv-green">+$0.00</strong></span>
-        <label id="importMt5Label" class="cursor-pointer px-2 py-0.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 rounded text-[11px] font-sans text-emerald-300">
-          Import CSV
-          <input id="mt5FileInput" type="file" accept=".csv,.html,.htm" class="hidden" />
-        </label>
-        <button type="button" id="exportCsvBtn" class="px-2 py-0.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-[11px] font-sans text-tv-text">Export CSV</button>
-        <button type="button" id="toggleBottomPanelBtn" class="px-2 py-0.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-[11px] font-sans text-tv-muted hover:text-white">Hide</button>
+      <div class="flex items-center gap-1.5 text-xs font-mono shrink-0">
+        <!-- FEATURE 3: TRADE SEARCH & STATUS FILTER -->
+        <input id="journalSearchInput" type="text" placeholder="Search symbol/note..." class="w-28 sm:w-36 bg-tv-panel border border-tv-border rounded px-2 py-0.5 text-[11px] font-sans text-white outline-none" />
+        <select id="journalFilterSelect" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-[11px] font-sans text-white outline-none">
+          <option value="ALL">All</option>
+          <option value="OPEN">Open</option>
+          <option value="WIN">Wins</option>
+          <option value="LOSS">Losses</option>
+        </select>
+        <span class="text-tv-muted">Net: <strong id="topNetPnl" class="text-tv-green">+$0.00</strong></span>
+        <button type="button" id="zeroResetTradesBtn" class="px-1.5 py-0.5 bg-tv-red/20 hover:bg-tv-red text-tv-red hover:text-white border border-tv-red/40 rounded text-[11px] font-sans">Reset</button>
+        <button type="button" id="toggleBottomPanelBtn" class="px-1.5 py-0.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-[11px] font-sans text-tv-muted hover:text-white">Hide</button>
       </div>
     </div>
 
@@ -438,7 +530,7 @@
       <table class="w-full text-left border-collapse text-xs font-mono">
         <thead>
           <tr class="text-[11px] text-tv-muted border-b border-tv-border">
-            <th class="py-1 px-2">Time</th><th class="py-1 px-2">Symbol</th><th class="py-1 px-2">Side</th><th class="py-1 px-2">Size</th><th class="py-1 px-2">Entry</th><th class="py-1 px-2">SL / TP</th><th class="py-1 px-2">Note</th><th class="py-1 px-2">Status</th><th class="py-1 px-2">P&L</th><th class="py-1 px-2 text-right">Actions</th>
+            <th class="py-1 px-2">Time</th><th class="py-1 px-2">Session</th><th class="py-1 px-2">Symbol</th><th class="py-1 px-2">Side</th><th class="py-1 px-2">Size</th><th class="py-1 px-2">Entry</th><th class="py-1 px-2">Mistake Tag</th><th class="py-1 px-2">Status</th><th class="py-1 px-2">P&L</th><th class="py-1 px-2 text-right">Actions</th>
           </tr>
         </thead>
         <tbody id="journalTableBody"></tbody>
@@ -453,13 +545,14 @@
       <div id="heatmapGrid" class="grid grid-cols-7 sm:grid-cols-10 lg:grid-cols-16 gap-1.5 font-mono text-[10px]"></div>
     </div>
 
+    <!-- FEATURE 9: SESSION-WISE WIN RATE BREAKDOWN + EQUITY CURVE -->
     <div id="tab-analytics" class="btab-content hidden flex-1 overflow-auto p-3">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 h-full">
         <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono content-start">
-          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Closed</div><div id="statTotalTrades" class="text-base font-bold text-white">0</div></div>
           <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Win Rate</div><div id="statWinRate" class="text-base font-bold text-tv-green">0.0%</div></div>
-          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Profit Factor</div><div id="statProfitFactor" class="text-base font-bold text-white">0.00</div></div>
-          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Net P&L</div><div id="statNetPnl" class="text-base font-bold text-tv-green">$0.00</div></div>
+          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Asian Win %</div><div id="statWinAsian" class="text-base font-bold text-white">0%</div></div>
+          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">London Win %</div><div id="statWinLondon" class="text-base font-bold text-sky-400">0%</div></div>
+          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">NY Win %</div><div id="statWinNy" class="text-base font-bold text-amber-400">0%</div></div>
         </div>
         <div class="bg-tv-bg border border-tv-border rounded p-2 flex flex-col justify-between">
           <div class="flex justify-between text-[10px] text-tv-muted"><span>Equity Curve</span><span id="equityPeakLabel" class="font-mono text-emerald-400">Peak: $0.00</span></div>
@@ -480,110 +573,105 @@
           <option value="ema_cross">📈 EMA 20/50 Crossover</option>
         </select>
         <button type="button" id="copyPineBtn" class="px-2 py-1 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-medium rounded">Copy Pine v5</button>
-        <button type="button" id="savePineBtn" class="px-2 py-1 bg-tv-bg hover:bg-tv-hover border border-tv-border text-tv-text text-xs rounded">Save Script</button>
       </div>
       <textarea id="pineEditor" spellcheck="false" class="flex-1 bg-tv-deep border border-tv-border rounded p-2 font-mono text-xs text-emerald-300 outline-none resize-none"></textarea>
     </div>
+
+    <!-- FEATURE 1: QUICK NOTES / SCRATCHPAD DRAWER TAB -->
+    <div id="tab-notes" class="btab-content hidden flex-1 overflow-hidden p-2 flex flex-col gap-1.5">
+      <div class="flex items-center justify-between text-[11px]">
+        <span class="text-tv-muted font-semibold">Trading Scratchpad (Auto-saved locally & synced to cloud)</span>
+        <span id="scratchpadSavedStatus" class="font-mono text-emerald-400 text-[10px]">Saved</span>
+      </div>
+      <textarea id="scratchpadTextarea" placeholder="Write key levels, XAUUSD 0.280-0.382 setup ideas, or session notes here..." class="flex-1 w-full bg-tv-deep border border-tv-border rounded p-2 font-mono text-xs text-white outline-none resize-none"></textarea>
+    </div>
   </section>
 
+  <!-- FEATURE 6: COMPACT MOBILE / SMALL-SCREEN BOTTOM QUICK BAR -->
+  <div class="md:hidden h-9 bg-tv-deep border-t border-tv-border grid grid-cols-5 text-[11px] font-semibold shrink-0">
+    <button type="button" onclick="mobileSwitchView('chart')" class="text-white hover:bg-tv-hover">📈 Chart</button>
+    <button type="button" onclick="mobileSwitchView('calc')" class="text-tv-muted hover:text-white">⚖️ Calc</button>
+    <button type="button" onclick="mobileSwitchView('watchlist')" class="text-tv-muted hover:text-white">⭐ Watch</button>
+    <button type="button" onclick="mobileSwitchView('journal')" class="text-tv-muted hover:text-white">📒 Journal</button>
+    <button type="button" onclick="mobileSwitchView('notes')" class="text-tv-muted hover:text-white">📝 Notes</button>
+  </div>
+
   <!-- FOOTER -->
-  <footer class="h-5 bg-tv-deep border-t border-tv-border px-3 flex items-center justify-between text-[10px] text-tv-muted shrink-0">
+  <footer class="hidden md:flex h-5 bg-tv-deep border-t border-tv-border px-3 items-center justify-between text-[10px] text-tv-muted shrink-0">
     <div class="flex items-center gap-3">
       <span>pipscopetrade1 Terminal</span>
       <button type="button" id="footerShowBottomBtn" class="hidden text-tv-blue hover:underline font-semibold">▲ Show Bottom Panel</button>
     </div>
-    <span>Tip: Use 15m/1H/4H/1D for 2–3 months history</span>
+    <span>Press ? for Shortcuts • Esc = Cursor • Use 15m/1H/4H/1D for 2–3 months history</span>
   </footer>
 
-  <!-- CHART SETTINGS MODAL -->
+  <!-- FEATURE 11: KEYBOARD SHORTCUTS CHEAT-SHEET MODAL (?) -->
+  <div id="shortcutsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-tv-panel border border-tv-border rounded-xl max-w-md w-full overflow-hidden shadow-2xl">
+      <div class="px-5 py-3 border-b border-tv-border flex items-center justify-between bg-tv-deep">
+        <h3 class="text-sm font-bold text-white">⌨️ Keyboard Shortcuts</h3>
+        <button type="button" id="closeShortcutsModalBtn" class="text-tv-muted hover:text-white text-lg">✕</button>
+      </div>
+      <div class="p-4 space-y-2 text-xs font-mono">
+        <div class="flex justify-between py-1 border-b border-tv-border/50"><span class="text-tv-muted">Exit Drawing / Return to Cursor</span><kbd class="px-2 py-0.5 bg-tv-deep border border-tv-border rounded text-white">Esc</kbd></div>
+        <div class="flex justify-between py-1 border-b border-tv-border/50"><span class="text-tv-muted">Toggle Bar Replay Mode</span><kbd class="px-2 py-0.5 bg-tv-deep border border-tv-border rounded text-white">Alt + R</kbd></div>
+        <div class="flex justify-between py-1 border-b border-tv-border/50"><span class="text-tv-muted">Open Quick Notes Scratchpad</span><kbd class="px-2 py-0.5 bg-tv-deep border border-tv-border rounded text-white">Alt + N</kbd></div>
+        <div class="flex justify-between py-1 border-b border-tv-border/50"><span class="text-tv-muted">Toggle Fullscreen Chart</span><kbd class="px-2 py-0.5 bg-tv-deep border border-tv-border rounded text-white">Alt + F</kbd></div>
+        <div class="flex justify-between py-1"><span class="text-tv-muted">Open This Shortcuts Guide</span><kbd class="px-2 py-0.5 bg-tv-deep border border-tv-border rounded text-white">?</kbd></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHART SETTINGS MODAL (FEATURE 5: RESET DEFAULTS + FEATURE 12: THEME PRESETS) -->
   <div id="chartSettingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="bg-tv-panel border border-tv-border rounded-xl max-w-2xl w-full overflow-hidden shadow-2xl">
       <div class="px-5 py-3 border-b border-tv-border flex items-center justify-between bg-tv-deep">
         <h3 class="text-sm font-bold text-white">Settings</h3>
         <button type="button" id="closeSettingsModalBtn" class="text-tv-muted hover:text-white text-lg">✕</button>
       </div>
-
       <div class="grid grid-cols-1 sm:grid-cols-3 min-h-[300px] text-xs">
         <div class="bg-tv-deep/70 border-r border-tv-border p-2 space-y-1">
-          <button type="button" data-settab="canvas" class="set-tab w-full text-left px-3 py-2 rounded bg-tv-blue text-white font-semibold">🎨 Canvas & Grid</button>
-          <button type="button" data-settab="scales" class="set-tab w-full text-left px-3 py-2 rounded text-tv-muted hover:text-white">📏 Scales & History</button>
+          <button type="button" data-settab="canvas" class="set-tab w-full text-left px-3 py-2 rounded bg-tv-blue text-white font-semibold">🎨 Canvas & Presets</button>
+          <button type="button" data-settab="scales" class="set-tab w-full text-left px-3 py-2 rounded text-tv-muted hover:text-white">📏 Scales & Currency</button>
           <button type="button" data-settab="drawings" class="set-tab w-full text-left px-3 py-2 rounded text-tv-muted hover:text-white">✏️ Drawing Styles</button>
-          <button type="button" data-settab="alerts" class="set-tab w-full text-left px-3 py-2 rounded text-tv-muted hover:text-white">🔔 Alerts & Sound</button>
+          <button type="button" data-settab="alerts" class="set-tab w-full text-left px-3 py-2 rounded text-tv-muted hover:text-white">🔔 Alerts & Reset</button>
         </div>
-
         <div class="sm:col-span-2 p-4 space-y-3">
           <div id="set-canvas" class="set-panel space-y-3">
-            <div class="font-bold text-white uppercase tracking-wider text-[11px]">Chart Canvas & Appearance</div>
+            <div class="font-bold text-white uppercase tracking-wider text-[11px]">Canvas Theme & Accent Presets</div>
             <div class="flex items-center justify-between">
-              <span class="text-tv-text">Chart Theme</span>
-              <select id="cfgChartTheme" class="bg-tv-bg border border-tv-border rounded px-2.5 py-1 font-mono text-white outline-none">
-                <option value="dark" selected>Dark</option>
-                <option value="light">Light</option>
+              <span class="text-tv-text">Workspace Preset</span>
+              <select id="cfgThemePreset" class="bg-tv-bg border border-tv-border rounded px-2.5 py-1 font-mono text-white outline-none">
+                <option value="dark" selected>Institutional Dark</option>
+                <option value="midnight">Deep Midnight Blue</option>
+                <option value="slate">Charcoal Slate</option>
+                <option value="light">Daylight Light</option>
               </select>
             </div>
-            <label class="flex items-center justify-between cursor-pointer">
-              <span class="text-tv-text">Show Workspace Grid Overlay</span>
-              <input id="cfgShowGrid" type="checkbox" class="accent-tv-blue w-4 h-4" />
-            </label>
-            <label class="flex items-center justify-between cursor-pointer">
-              <span class="text-tv-text">Show Session Killzone Bar</span>
-              <input id="cfgShowSessions" type="checkbox" checked class="accent-tv-blue w-4 h-4" />
-            </label>
-            <label class="flex items-center justify-between cursor-pointer">
-              <span class="text-tv-text">Show Indicator Study Bar</span>
-              <input id="cfgShowStudies" type="checkbox" checked class="accent-tv-blue w-4 h-4" />
-            </label>
+            <label class="flex items-center justify-between cursor-pointer"><span class="text-tv-text">Show Workspace Grid Overlay</span><input id="cfgShowGrid" type="checkbox" class="accent-tv-blue w-4 h-4" /></label>
+            <label class="flex items-center justify-between cursor-pointer"><span class="text-tv-text">Show Session & News Bar</span><input id="cfgShowSessions" type="checkbox" checked class="accent-tv-blue w-4 h-4" /></label>
+            <label class="flex items-center justify-between cursor-pointer"><span class="text-tv-text">Show Indicator Study Bar</span><input id="cfgShowStudies" type="checkbox" checked class="accent-tv-blue w-4 h-4" /></label>
           </div>
-
           <div id="set-scales" class="set-panel hidden space-y-3">
-            <div class="font-bold text-white uppercase tracking-wider text-[11px]">Scales & Multi-Month History</div>
-            <div class="flex items-center justify-between">
-              <span class="text-tv-text">Chart Timeframe</span>
-              <select id="cfgDefaultTf" class="bg-tv-bg border border-tv-border rounded px-2.5 py-1 font-mono text-white outline-none">
-                <option value="1" selected>1m (Recent Days)</option>
-                <option value="5">5m</option>
-                <option value="15">15m (Multi-Week)</option>
-                <option value="60">1H (2–3 Months)</option>
-                <option value="240">4H (3+ Months)</option>
-                <option value="D">1D (1+ Year)</option>
-              </select>
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="text-tv-text">Account Currency</span>
-              <select id="cfgCurrency" class="bg-tv-bg border border-tv-border rounded px-2.5 py-1 font-mono text-white outline-none">
-                <option value="USD" selected>USD ($)</option>
-                <option value="INR">INR (₹)</option>
-              </select>
-            </div>
+            <div class="font-bold text-white uppercase tracking-wider text-[11px]">Scales & Currency</div>
+            <div class="flex items-center justify-between"><span class="text-tv-text">Chart Timeframe</span><select id="cfgDefaultTf" class="bg-tv-bg border border-tv-border rounded px-2.5 py-1 font-mono text-white outline-none"><option value="1" selected>1m (Recent Days)</option><option value="5">5m</option><option value="15">15m (Multi-Week)</option><option value="60">1H (2–3 Months)</option><option value="240">4H (3+ Months)</option><option value="D">1D (1+ Year)</option></select></div>
+            <div class="flex items-center justify-between"><span class="text-tv-text">Account Currency</span><select id="cfgCurrency" class="bg-tv-bg border border-tv-border rounded px-2.5 py-1 font-mono text-white outline-none"><option value="USD" selected>USD ($)</option><option value="INR">INR (₹)</option></select></div>
           </div>
-
           <div id="set-drawings" class="set-panel hidden space-y-3">
             <div class="font-bold text-white uppercase tracking-wider text-[11px]">Custom Drawing Tools</div>
-            <div class="flex items-center justify-between">
-              <span class="text-tv-text">Trendline & Box Color</span>
-              <input id="cfgDrawColor" type="color" value="#2962ff" class="w-10 h-7 bg-transparent border border-tv-border rounded cursor-pointer" />
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="text-tv-text">Line Thickness</span>
-              <select id="cfgLineWidth" class="bg-tv-bg border border-tv-border rounded px-2.5 py-1 font-mono text-white outline-none">
-                <option value="1">1 px</option>
-                <option value="2" selected>2 px</option>
-                <option value="3">3 px</option>
-              </select>
-            </div>
+            <div class="flex items-center justify-between"><span class="text-tv-text">Trendline & Box Color</span><input id="cfgDrawColor" type="color" value="#2962ff" class="w-10 h-7 bg-transparent border border-tv-border rounded cursor-pointer" /></div>
+            <div class="flex items-center justify-between"><span class="text-tv-text">Line Thickness</span><select id="cfgLineWidth" class="bg-tv-bg border border-tv-border rounded px-2.5 py-1 font-mono text-white outline-none"><option value="1">1 px</option><option value="2" selected>2 px</option><option value="3">3 px</option></select></div>
           </div>
-
           <div id="set-alerts" class="set-panel hidden space-y-3">
-            <div class="font-bold text-white uppercase tracking-wider text-[11px]">Alerts & Audio Feedback</div>
-            <label class="flex items-center justify-between cursor-pointer">
-              <span class="text-tv-text">Play Sound on Price Alert Trigger</span>
-              <input id="cfgAlertSound" type="checkbox" checked class="accent-tv-blue w-4 h-4" />
-            </label>
-            <button type="button" id="testAlertSoundBtn" class="px-3 py-1.5 bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-white font-mono text-[11px]">🔊 Test Alert Sound</button>
+            <div class="font-bold text-white uppercase tracking-wider text-[11px]">Alerts & Layout Reset</div>
+            <label class="flex items-center justify-between cursor-pointer"><span class="text-tv-text">Play Sound on Price Alert Trigger</span><input id="cfgAlertSound" type="checkbox" checked class="accent-tv-blue w-4 h-4" /></label>
+            <div class="flex items-center gap-2 pt-2">
+              <button type="button" id="testAlertSoundBtn" class="px-3 py-1.5 bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-white font-mono text-[11px]">🔊 Test Sound</button>
+              <button type="button" id="resetLayoutDefaultsBtn" class="px-3 py-1.5 bg-tv-red/20 hover:bg-tv-red text-tv-red hover:text-white border border-tv-red/40 rounded font-mono text-[11px]">↺ Reset Layout & Drawings</button>
+            </div>
           </div>
         </div>
       </div>
-
       <div class="px-5 py-3 border-t border-tv-border bg-tv-deep flex items-center justify-end gap-2 text-xs">
         <button type="button" id="cancelSettingsBtn" class="px-4 py-1.5 bg-tv-panel hover:bg-tv-hover border border-tv-border rounded text-tv-text">Cancel</button>
         <button type="button" id="saveSettingsBtn" class="px-4 py-1.5 bg-tv-blue hover:bg-tv-blueHover rounded text-white font-semibold">OK</button>
@@ -603,27 +691,15 @@
           <button type="button" id="tabLoginMode" class="py-1.5 rounded bg-tv-blue text-white">Sign In</button>
           <button type="button" id="tabSignupMode" class="py-1.5 rounded text-tv-muted hover:text-white">Create Account</button>
         </div>
-        <div id="signupNameWrap" class="hidden">
-          <label class="block text-[11px] text-tv-muted mb-1">Full Name</label>
-          <input id="authNameInput" type="text" placeholder="Your Name" class="w-full bg-tv-bg border border-tv-border rounded px-3 py-2 text-xs text-white outline-none" />
-        </div>
-        <div>
-          <label class="block text-[11px] text-tv-muted mb-1">Email Address</label>
-          <input id="authEmailInput" type="email" placeholder="you@gmail.com" class="w-full bg-tv-bg border border-tv-border rounded px-3 py-2 text-xs text-white outline-none" />
-        </div>
-        <div>
-          <label class="block text-[11px] text-tv-muted mb-1">Password</label>
-          <input id="authPassInput" type="password" placeholder="••••••••" class="w-full bg-tv-bg border border-tv-border rounded px-3 py-2 text-xs text-white outline-none" />
-        </div>
+        <div id="signupNameWrap" class="hidden"><label class="block text-[11px] text-tv-muted mb-1">Full Name</label><input id="authNameInput" type="text" placeholder="Your Name" class="w-full bg-tv-bg border border-tv-border rounded px-3 py-2 text-xs text-white outline-none" /></div>
+        <div><label class="block text-[11px] text-tv-muted mb-1">Email Address</label><input id="authEmailInput" type="email" placeholder="you@gmail.com" class="w-full bg-tv-bg border border-tv-border rounded px-3 py-2 text-xs text-white outline-none" /></div>
+        <div><label class="block text-[11px] text-tv-muted mb-1">Password</label><input id="authPassInput" type="password" placeholder="••••••••" class="w-full bg-tv-bg border border-tv-border rounded px-3 py-2 text-xs text-white outline-none" /></div>
         <p id="authFeedbackMsg" class="text-xs text-tv-red hidden"></p>
         <button type="button" id="submitAuthBtn" class="w-full py-2 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-bold rounded">Sign In & Sync Cloud</button>
       </div>
       <div id="authLoggedInView" class="hidden p-5 space-y-3 text-xs">
         <div class="bg-tv-bg border border-tv-border rounded-lg p-3 flex items-center justify-between">
-          <div>
-            <div id="profUserName" class="font-bold text-white text-sm">Trader</div>
-            <div id="profUserEmail" class="text-tv-muted font-mono text-[11px]">email@example.com</div>
-          </div>
+          <div><div id="profUserName" class="font-bold text-white text-sm">Trader</div><div id="profUserEmail" class="text-tv-muted font-mono text-[11px]">email@example.com</div></div>
           <span id="profPlanBadge" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono font-bold">PRO</span>
         </div>
         <button type="button" id="manualSyncNowBtn" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded">☁️ Sync Data to Cloud Now</button>
@@ -679,17 +755,12 @@
       </div>
       <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
         <div class="space-y-3">
-          <div id="planMonthlyCard" class="cursor-pointer p-3 rounded-lg border-2 border-tv-blue bg-tv-blue/10">
-            <div class="flex items-center justify-between"><span class="font-bold text-white text-sm">Monthly Pro</span><span class="font-mono font-bold text-lg text-white">₹149<span class="text-xs text-tv-muted font-normal">/mo</span></span></div>
-          </div>
-          <div id="planYearlyCard" class="cursor-pointer p-3 rounded-lg border border-tv-border bg-tv-bg relative">
-            <span class="absolute -top-2.5 right-3 px-2 py-0.5 bg-emerald-500 text-black font-bold text-[10px] rounded-full">SAVE ₹139</span>
-            <div class="flex items-center justify-between"><span class="font-bold text-white text-sm">Yearly Pro</span><span class="font-mono font-bold text-lg text-emerald-400">₹1,649<span class="text-xs text-tv-muted font-normal">/yr</span></span></div>
-          </div>
+          <div id="planMonthlyCard" class="cursor-pointer p-3 rounded-lg border-2 border-tv-blue bg-tv-blue/10"><div class="flex items-center justify-between"><span class="font-bold text-white text-sm">Monthly Pro</span><span class="font-mono font-bold text-lg text-white">₹149<span class="text-xs text-tv-muted font-normal">/mo</span></span></div></div>
+          <div id="planYearlyCard" class="cursor-pointer p-3 rounded-lg border border-tv-border bg-tv-bg relative"><span class="absolute -top-2.5 right-3 px-2 py-0.5 bg-emerald-500 text-black font-bold text-[10px] rounded-full">SAVE ₹139</span><div class="flex items-center justify-between"><span class="font-bold text-white text-sm">Yearly Pro</span><span class="font-mono font-bold text-lg text-emerald-400">₹1,649<span class="text-xs text-tv-muted font-normal">/yr</span></span></div></div>
           <ul class="text-[11px] space-y-1.5 text-tv-text bg-tv-deep border border-tv-border rounded-lg p-3">
             <li>✓ <strong>2x Split & 4x Multi-Chart Grid</strong></li>
             <li>✓ <strong>Unlimited Indicators Stack</strong></li>
-            <li>✓ <strong>Trade Journal, P&L Heatmap & Equity Curve</strong></li>
+            <li>✓ <strong>Trade Journal, Session Analytics & Heatmap</strong></li>
             <li>✓ <strong>0.280–0.382 Golden Zone Sniper & Prop Guard</strong></li>
             <li>✓ <strong>Pine v5 Library & Cross-Device Cloud Sync</strong></li>
           </ul>
@@ -700,10 +771,7 @@
             <div class="bg-white p-2 rounded-lg shadow-md inline-block"><img id="upiQrImg" src="" alt="UPI QR" class="w-36 h-36 object-contain" /></div>
             <div class="mt-2 font-mono text-xs">
               <div class="text-tv-muted">Payable: <strong id="upiPayAmount" class="text-white text-sm">₹149.00</strong></div>
-              <div class="text-[11px] text-tv-muted mt-0.5 flex items-center justify-center gap-1.5">
-                <span>UPI ID: <strong class="text-emerald-400">pipscopetrade1@naviaxis</strong></span>
-                <button type="button" id="copyUpiIdBtn" class="px-1.5 py-0.5 bg-tv-panel border border-tv-border rounded text-[10px] text-white font-sans">Copy</button>
-              </div>
+              <div class="text-[11px] text-tv-muted mt-0.5 flex items-center justify-center gap-1.5"><span>UPI ID: <strong class="text-emerald-400">pipscopetrade1@naviaxis</strong></span><button type="button" id="copyUpiIdBtn" class="px-1.5 py-0.5 bg-tv-panel border border-tv-border rounded text-[10px] text-white font-sans">Copy</button></div>
             </div>
             <a id="upiIntentLink" href="#" class="mt-2 w-full py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded block">📱 Open UPI App</a>
           </div>
@@ -727,17 +795,25 @@
     const MERCHANT_NAME = 'pipscopetrade1';
     const GOOGLE_SHEET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwl033BmqUUqgrEQ-cUPS3ssgKRZo3O_Nc0TgWXQv6YAtRhXwK1nF3x8-zJAX/exec';
     const ADMIN_SECRET_CODE = 'SAIFPRO2026';
+    const USD_TO_INR = 84.5;
 
     let currentSymbol = 'OANDA:XAUUSD';
     let currentInterval = '1';
+    let currentChartStyle = '1';
     let layoutMode = '1x';
     let activeStudies = [];
     let currencyMode = 'USD';
     let selectedPlan = 'monthly';
     let authMode = 'login';
 
+    let ohlcCandle = { o: null, h: null, l: null, c: null };
+    let replayActive = false;
+    let replayPlaying = false;
+    let replayBarIndex = 1;
+    let replayTimer = null;
+
     let chartSettings = Object.assign({
-      theme: 'dark',
+      themePreset: 'dark',
       showGrid: false,
       showSessions: true,
       showStudies: true,
@@ -746,15 +822,308 @@
       alertSound: true
     }, JSON.parse(localStorage.getItem('pipscopetrade1_settings') || '{}'));
 
+    const DEFAULT_WATCHLIST = [
+      { symbol: 'OANDA:XAUUSD', label: 'XAUUSD', desc: 'Gold Spot / USD', pinned: true },
+      { symbol: 'BINANCE:BTCUSDT', label: 'BTCUSDT', desc: 'Bitcoin / Tether', pinned: true },
+      { symbol: 'FX:EURUSD', label: 'EURUSD', desc: 'Euro / US Dollar', pinned: true },
+      { symbol: 'FX:GBPUSD', label: 'GBPUSD', desc: 'Pound / US Dollar', pinned: false },
+      { symbol: 'FX:USDJPY', label: 'USDJPY', desc: 'USD / Japanese Yen', pinned: false },
+      { symbol: 'NSE:NIFTY', label: 'NIFTY', desc: 'NSE NIFTY 50', pinned: false }
+    ];
+
     let currentUser = JSON.parse(localStorage.getItem('pipscopetrade1_user') || 'null');
     let proSubscription = JSON.parse(localStorage.getItem('pipscopetrade1_pro_sub') || 'null');
     let trades = JSON.parse(localStorage.getItem('pipscopetrade1_trades_v1') || '[]');
     let savedLayouts = JSON.parse(localStorage.getItem('pipscopetrade1_layouts') || '[]');
     let priceAlerts = JSON.parse(localStorage.getItem('pipscopetrade1_alerts') || '[]');
+    let customWatchlist = JSON.parse(localStorage.getItem('pipscopetrade1_watchlist') || 'null') || DEFAULT_WATCHLIST;
+    let scratchpadText = localStorage.getItem('pipscopetrade1_notes') || '';
     const livePrices = {};
+    const priceHistory = {};
+
+    function getCurrentSessionName() {
+      const h = new Date().getUTCHours();
+      if (h >= 13 && h < 22) return 'NY';
+      if (h >= 8 && h < 17) return 'London';
+      return 'Asian';
+    }
+
+    // =========================================================
+    // QUICK NOTES / SCRATCHPAD DRAWER
+    // =========================================================
+    const scratchpadEl = document.getElementById('scratchpadTextarea');
+    scratchpadEl.value = scratchpadText;
+    let noteSaveTimeout = null;
+    scratchpadEl.addEventListener('input', function() {
+      scratchpadText = this.value;
+      localStorage.setItem('pipscopetrade1_notes', scratchpadText);
+      document.getElementById('scratchpadSavedStatus').textContent = 'Saving...';
+      clearTimeout(noteSaveTimeout);
+      noteSaveTimeout = setTimeout(() => {
+        document.getElementById('scratchpadSavedStatus').textContent = 'Saved ✓';
+        syncUserToCloud();
+      }, 600);
+    });
+
+    document.getElementById('openScratchpadBtn').addEventListener('click', () => {
+      document.getElementById('bottomPanel').classList.remove('hidden');
+      document.getElementById('footerShowBottomBtn').classList.add('hidden');
+      switchBottomTab('notes', true);
+      scratchpadEl.focus();
+    });
+
+    // =========================================================
+    // MOBILE QUICK SWITCH BAR
+    // =========================================================
+    window.mobileSwitchView = function(view) {
+      const side = document.getElementById('rightSidebar');
+      const bot = document.getElementById('bottomPanel');
+      if (view === 'chart') {
+        side.classList.add('hidden');
+        bot.classList.add('hidden');
+      } else if (view === 'calc') {
+        side.classList.remove('hidden');
+        switchRightTool('calc');
+      } else if (view === 'watchlist') {
+        side.classList.remove('hidden');
+        side.scrollTop = side.scrollHeight;
+      } else if (view === 'journal') {
+        bot.classList.remove('hidden');
+        switchBottomTab('journal', true);
+      } else if (view === 'notes') {
+        bot.classList.remove('hidden');
+        switchBottomTab('notes', true);
+      }
+      setTimeout(resizeDrawCanvas, 60);
+    };
+
+    // =========================================================
+    // LIVE MULTI-TIMEFRAME (MTF) TREND MATRIX
+    // =========================================================
+    function updateMtfMatrix(symKey, price) {
+      if (!priceHistory[symKey]) priceHistory[symKey] = [];
+      priceHistory[symKey].push(price);
+      if (priceHistory[symKey].length > 60) priceHistory[symKey].shift();
+      if (currentSymbol.split(':').pop() !== symKey) return;
+
+      document.getElementById('mtfSymLabel').textContent = symKey;
+      const arr = priceHistory[symKey];
+      const getDir = (lookback) => {
+        if (arr.length <= lookback) return price >= arr[0] ? 'BULL' : 'BEAR';
+        return price >= arr[arr.length - 1 - lookback] ? 'BULL' : 'BEAR';
+      };
+      const tfs = [
+        { id: 'mtf-1m', dir: getDir(2) },
+        { id: 'mtf-5m', dir: getDir(6) },
+        { id: 'mtf-15m', dir: getDir(12) },
+        { id: 'mtf-1h', dir: getDir(24) },
+        { id: 'mtf-4h', dir: getDir(40) }
+      ];
+      let bullCount = 0;
+      tfs.forEach(t => {
+        const el = document.getElementById(t.id);
+        if (t.dir === 'BULL') { bullCount++; el.textContent = '🟢'; el.className = 'font-bold text-emerald-400'; }
+        else { el.textContent = '🔴'; el.className = 'font-bold text-rose-400'; }
+      });
+      const overall = document.getElementById('mtfOverallBadge');
+      overall.textContent = bullCount >= 3 ? `BULLISH (${bullCount}/5)` : `BEARISH (${5 - bullCount}/5)`;
+      overall.className = bullCount >= 3 ? 'text-[10px] font-mono font-bold text-emerald-400' : 'text-[10px] font-mono font-bold text-rose-400';
+    }
+
+    // =========================================================
+    // HIGH-IMPACT RED-FOLDER NEWS COUNTDOWN TIMER
+    // =========================================================
+    function updateRedNewsCountdown() {
+      const now = new Date();
+      const target = new Date(now);
+      target.setUTCHours(12, 30, 0, 0);
+      if (now >= target) target.setUTCDate(target.getUTCDate() + 1);
+      const diffSec = Math.max(0, Math.floor((target - now) / 1000));
+      const h = Math.floor(diffSec / 3600);
+      const m = Math.floor((diffSec % 3600) / 60);
+      const s = diffSec % 60;
+      const badge = document.getElementById('redNewsTimerBadge');
+      badge.textContent = `⚠️ US Core CPI in ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      badge.className = diffSec <= 900
+        ? 'px-2 py-0.2 rounded bg-rose-600 text-white text-[10px] font-bold animate-pulse'
+        : 'px-2 py-0.2 rounded bg-rose-500/15 border border-rose-500/40 text-rose-300 text-[10px] font-semibold';
+    }
+    setInterval(updateRedNewsCountdown, 1000);
+
+    // =========================================================
+    // FAVORITES QUICK-SWITCH STRIP + CUSTOM WATCHLIST MANAGER
+    // =========================================================
+    function renderWatchlist() {
+      const box = document.getElementById('customWatchlistBox');
+      const favStrip = document.getElementById('favoritesQuickStrip');
+      const sorted = [...customWatchlist].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+
+      const pinnedItems = sorted.filter(w => w.pinned);
+      favStrip.innerHTML = pinnedItems.map(item => {
+        const s = item.symbol.split(':').pop();
+        const act = item.symbol === currentSymbol;
+        return `<button type="button" onclick="setActiveSymbol('${item.symbol}')" class="px-2 py-0.5 rounded text-[10px] font-mono ${act ? 'bg-tv-blue text-white font-bold' : 'bg-tv-deep border border-tv-border text-amber-300 hover:border-amber-400'}">★ ${s}</button>`;
+      }).join('');
+
+      box.innerHTML = sorted.map(item => {
+        const shortSym = item.symbol.split(':').pop();
+        const isActive = item.symbol === currentSymbol;
+        const p = livePrices[shortSym];
+        const dec = shortSym.includes('EURUSD') || shortSym.includes('GBPUSD') ? 5 : 2;
+        return `
+          <div class="wl-item flex items-center justify-between px-2 py-1.5 rounded bg-tv-bg hover:bg-tv-hover border ${isActive ? 'border-tv-blue' : 'border-tv-border'} transition">
+            <button type="button" onclick="setActiveSymbol('${item.symbol}')" class="flex-1 text-left">
+              <div class="font-bold text-white flex items-center gap-1">
+                <span>${item.pinned ? '★' : ''}</span><span>${shortSym}</span>
+              </div>
+              <div class="text-[10px] text-tv-muted font-sans">${item.desc || item.symbol}</div>
+            </button>
+            <div class="flex items-center gap-2">
+              <div class="text-right">
+                <div id="price-${shortSym}" class="font-bold text-white">${p ? p.toFixed(dec) : '—'}</div>
+                <div id="chg-${shortSym}" class="text-[10px] text-tv-muted">Live</div>
+              </div>
+              <div class="flex flex-col gap-0.5 text-[10px]">
+                <button type="button" onclick="togglePinWatchlist('${item.symbol}')" title="Pin/Unpin Favorite" class="${item.pinned ? 'text-amber-400' : 'text-tv-muted'} hover:text-amber-400">★</button>
+                <button type="button" onclick="removeWatchlistItem('${item.symbol}')" title="Remove" class="text-tv-muted hover:text-tv-red">✕</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.togglePinWatchlist = function(sym) {
+      customWatchlist = customWatchlist.map(w => w.symbol === sym ? Object.assign({}, w, { pinned: !w.pinned }) : w);
+      localStorage.setItem('pipscopetrade1_watchlist', JSON.stringify(customWatchlist));
+      renderWatchlist();
+      syncUserToCloud();
+    };
+
+    window.removeWatchlistItem = function(sym) {
+      if (customWatchlist.length <= 1) return;
+      customWatchlist = customWatchlist.filter(w => w.symbol !== sym);
+      localStorage.setItem('pipscopetrade1_watchlist', JSON.stringify(customWatchlist));
+      renderWatchlist();
+      syncUserToCloud();
+    };
+
+    document.getElementById('addWatchlistForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const raw = document.getElementById('newWlSymbolInput').value.trim().toUpperCase();
+      if (!raw) return;
+      if (!customWatchlist.some(w => w.symbol === raw)) {
+        customWatchlist.push({ symbol: raw, label: raw.split(':').pop(), desc: raw, pinned: false });
+        localStorage.setItem('pipscopetrade1_watchlist', JSON.stringify(customWatchlist));
+        renderWatchlist();
+        syncUserToCloud();
+      }
+      document.getElementById('newWlSymbolInput').value = '';
+      setActiveSymbol(raw);
+    });
+
+    // =========================================================
+    // QUICK LIVE PRICE AUTO-FILL BUTTONS
+    // =========================================================
+    document.getElementById('autoFillLivePriceBtn').addEventListener('click', function() {
+      const shortSym = currentSymbol.split(':').pop();
+      const base = livePrices[shortSym] || (shortSym.includes('BTC') ? 60500 : shortSym.includes('EUR') || shortSym.includes('GBP') ? 1.09500 : 2650.00);
+      const isFx = shortSym.includes('EUR') || shortSym.includes('GBP');
+      const dec = isFx ? 5 : 2;
+      const riskDist = isFx ? 0.0025 : (shortSym.includes('BTC') ? 250 : 5.0);
+      const side = document.getElementById('calcSide').value;
+      document.getElementById('calcEntry').value = base.toFixed(dec);
+      document.getElementById('calcSl').value = (side === 'BUY' ? base - riskDist : base + riskDist).toFixed(dec);
+      document.getElementById('calcTp').value = (side === 'BUY' ? base + riskDist * 2.5 : base - riskDist * 2.5).toFixed(dec);
+      updateCalculator();
+    });
+
+    document.getElementById('autoFillFibLiveBtn').addEventListener('click', function() {
+      const shortSym = currentSymbol.split(':').pop();
+      const base = livePrices[shortSym] || 2650.00;
+      const swing = shortSym.includes('BTC') ? 800 : (shortSym.includes('EUR') || shortSym.includes('GBP') ? 0.0080 : 25);
+      document.getElementById('fibLow').value = (base - swing).toFixed(2);
+      document.getElementById('fibHigh').value = (base + swing * 0.35).toFixed(2);
+      updateFibGoldenZone();
+    });
+
+    // =========================================================
+    // OHLC, BAR COUNTDOWN & REPLAY
+    // =========================================================
+    function updateOhlcBar(price) {
+      const dec = currentSymbol.includes('EURUSD') || currentSymbol.includes('GBPUSD') ? 5 : 2;
+      if (ohlcCandle.o === null) ohlcCandle = { o: price, h: price, l: price, c: price };
+      else {
+        ohlcCandle.c = price;
+        if (price > ohlcCandle.h) ohlcCandle.h = price;
+        if (price < ohlcCandle.l) ohlcCandle.l = price;
+      }
+      document.getElementById('ohlcSymLabel').textContent = currentSymbol.split(':').pop();
+      document.getElementById('ohlcOpen').textContent = ohlcCandle.o.toFixed(dec);
+      document.getElementById('ohlcHigh').textContent = ohlcCandle.h.toFixed(dec);
+      document.getElementById('ohlcLow').textContent = ohlcCandle.l.toFixed(dec);
+      document.getElementById('ohlcClose').textContent = ohlcCandle.c.toFixed(dec);
+    }
+
+    function updateBarCountdown() {
+      const tfSecMap = { '1': 60, '5': 300, '15': 900, '60': 3600, '240': 14400, 'D': 86400 };
+      const period = tfSecMap[currentInterval] || 60;
+      const rem = period - (Math.floor(Date.now() / 1000) % period);
+      document.getElementById('barCountdownTimer').textContent =
+        String(Math.floor(rem / 60)).padStart(2, '0') + ':' + String(rem % 60).padStart(2, '0');
+    }
+    setInterval(updateBarCountdown, 1000);
+
+    function stepReplayBar() {
+      replayBarIndex += 1;
+      document.getElementById('replayStepCounter').textContent = 'Bar #' + replayBarIndex;
+      const shortSym = currentSymbol.split(':').pop();
+      const base = livePrices[shortSym] || (shortSym.includes('BTC') ? 60000 : shortSym.includes('EUR') || shortSym.includes('GBP') ? 1.09 : 2650);
+      const step = shortSym.includes('BTC') ? 35 : (shortSym.includes('EUR') || shortSym.includes('GBP') ? 0.0008 : 1.5);
+      const nextP = Math.max(0.0001, base + (Math.sin(replayBarIndex * 0.7) + (Math.random() - 0.5)) * step);
+      updatePriceTicker(shortSym, nextP, null, shortSym.includes('EUR') || shortSym.includes('GBP') ? 5 : 2);
+      updateOhlcBar(nextP);
+    }
+
+    document.getElementById('toggleReplayBtn').addEventListener('click', function() {
+      replayActive = !replayActive;
+      document.getElementById('replayControlBar').classList.toggle('hidden', !replayActive);
+      if (!replayActive) { replayPlaying = false; clearInterval(replayTimer); document.getElementById('replayPlayPauseBtn').textContent = '▶ Play'; }
+    });
+    document.getElementById('replayPlayPauseBtn').addEventListener('click', function() {
+      replayPlaying = !replayPlaying;
+      clearInterval(replayTimer);
+      if (replayPlaying) {
+        this.textContent = '⏸ Pause';
+        replayTimer = setInterval(stepReplayBar, Number(document.getElementById('replaySpeedSelect').value) || 1200);
+      } else this.textContent = '▶ Play';
+    });
+    document.getElementById('replayStepNextBtn').addEventListener('click', stepReplayBar);
+    document.getElementById('exitReplayBtn').addEventListener('click', () => {
+      replayActive = false; replayPlaying = false; clearInterval(replayTimer);
+      document.getElementById('replayControlBar').classList.add('hidden');
+      document.getElementById('replayPlayPauseBtn').textContent = '▶ Play';
+    });
+
+    document.getElementById('snapshotChartBtn').addEventListener('click', function() {
+      const link = document.createElement('a');
+      link.download = `${currentSymbol.split(':').pop()}_snapshot_${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // =========================================================
+    // SETTINGS, THEME PRESETS & RESET DEFAULTS
+    // =========================================================
+    function applyThemePreset(preset) {
+      document.body.classList.remove('theme-midnight', 'theme-slate');
+      if (preset === 'midnight') document.body.classList.add('theme-midnight');
+      if (preset === 'slate') document.body.classList.add('theme-slate');
+    }
 
     function applySavedSettingsToUI() {
-      document.getElementById('cfgChartTheme').value = chartSettings.theme;
+      applyThemePreset(chartSettings.themePreset || 'dark');
+      document.getElementById('cfgThemePreset').value = chartSettings.themePreset || 'dark';
       document.getElementById('cfgShowGrid').checked = !!chartSettings.showGrid;
       document.getElementById('cfgShowSessions').checked = !!chartSettings.showSessions;
       document.getElementById('cfgShowStudies').checked = !!chartSettings.showStudies;
@@ -784,16 +1153,15 @@
 
     document.querySelectorAll('.set-tab').forEach(tab => tab.addEventListener('click', function() {
       document.querySelectorAll('.set-tab').forEach(t => { t.classList.remove('bg-tv-blue', 'text-white', 'font-semibold'); t.classList.add('text-tv-muted'); });
-      this.classList.add('bg-tv-blue', 'text-white', 'font-semibold');
-      this.classList.remove('text-tv-muted');
+      this.classList.add('bg-tv-blue', 'text-white', 'font-semibold'); this.classList.remove('text-tv-muted');
       const target = this.dataset.settab;
       document.querySelectorAll('.set-panel').forEach(p => p.classList.toggle('hidden', p.id !== 'set-' + target));
     }));
 
     document.getElementById('saveSettingsBtn').addEventListener('click', function() {
-      const prevTheme = chartSettings.theme;
+      const prevPreset = chartSettings.themePreset;
       const prevTf = currentInterval;
-      chartSettings.theme = document.getElementById('cfgChartTheme').value;
+      chartSettings.themePreset = document.getElementById('cfgThemePreset').value;
       chartSettings.showGrid = document.getElementById('cfgShowGrid').checked;
       chartSettings.showSessions = document.getElementById('cfgShowSessions').checked;
       chartSettings.showStudies = document.getElementById('cfgShowStudies').checked;
@@ -809,10 +1177,50 @@
       redrawAllShapes();
       updateCalculator();
       renderJournal();
-      if (prevTheme !== chartSettings.theme || prevTf !== currentInterval) loadChartWidget();
+      if (prevPreset !== chartSettings.themePreset || prevTf !== currentInterval) loadChartWidget();
       closeSettingsModal();
     });
 
+    document.getElementById('resetLayoutDefaultsBtn').addEventListener('click', function() {
+      if (confirm('Reset chart drawings, layout panels, and visual settings to default? (Your trades & account will stay safe)')) {
+        chartDrawings = [];
+        localStorage.removeItem('pipscopetrade1_drawings');
+        chartSettings = { themePreset: 'dark', showGrid: false, showSessions: true, showStudies: true, drawColor: '#2962ff', lineWidth: 2, alertSound: true };
+        localStorage.setItem('pipscopetrade1_settings', JSON.stringify(chartSettings));
+        document.getElementById('rightSidebar').classList.remove('hidden');
+        document.getElementById('bottomPanel').classList.remove('hidden');
+        document.getElementById('footerShowBottomBtn').classList.add('hidden');
+        setChartLayout('1x');
+        applySavedSettingsToUI();
+        redrawAllShapes();
+        closeSettingsModal();
+      }
+    });
+
+    // =========================================================
+    // SHORTCUTS MODAL (?) & KEYBOARD CONTROLS
+    // =========================================================
+    function toggleShortcutsModal(force) {
+      const m = document.getElementById('shortcutsModal');
+      const show = force !== undefined ? force : m.classList.contains('hidden');
+      m.classList.toggle('hidden', !show);
+      m.classList.toggle('flex', show);
+    }
+    document.getElementById('openShortcutsModalBtn').addEventListener('click', () => toggleShortcutsModal(true));
+    document.getElementById('closeShortcutsModalBtn').addEventListener('click', () => toggleShortcutsModal(false));
+
+    window.addEventListener('keydown', (e) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+      if (e.key === 'Escape') { setDrawTool('cursor'); toggleShortcutsModal(false); }
+      if (e.key === '?') toggleShortcutsModal();
+      if (e.altKey && e.key.toLowerCase() === 'r') document.getElementById('toggleReplayBtn').click();
+      if (e.altKey && e.key.toLowerCase() === 'n') document.getElementById('openScratchpadBtn').click();
+      if (e.altKey && e.key.toLowerCase() === 'f') document.getElementById('toggleFullChartBtn').click();
+    });
+
+    // =========================================================
+    // LIVE PRICE FEED & SOUND ALERTS
+    // =========================================================
     function playAlertSound() {
       if (!chartSettings.alertSound) return;
       try {
@@ -830,6 +1238,7 @@
     function updatePriceTicker(symKey, price, pctChange, decimals) {
       const prev = livePrices[symKey];
       livePrices[symKey] = price;
+      updateMtfMatrix(symKey, price);
       const formatted = price.toFixed(decimals);
       const priceEl = document.getElementById('price-' + symKey);
       const chgEl = document.getElementById('chg-' + symKey);
@@ -850,6 +1259,7 @@
         const hdrPrice = document.getElementById('headerActivePrice');
         hdrPrice.textContent = formatted;
         hdrPrice.className = (prev !== undefined && price < prev) ? 'text-rose-400 font-semibold' : 'text-emerald-400 font-semibold';
+        updateOhlcBar(price);
       }
 
       if (prev !== undefined && priceAlerts.length) {
@@ -879,10 +1289,10 @@
     function startLiveMarketFeeds() {
       const feedBadge = document.getElementById('feedStatusBadge');
       try {
-        const ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@miniTicker/ethusdt@miniTicker/paxgusdt@miniTicker');
+        const ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@miniTicker/ethusdt@miniTicker/paxgusdt@miniTicker/solusdt@miniTicker');
         ws.onopen = () => {
-          feedBadge.textContent = '● Live WS Feed Active';
-          feedBadge.className = 'hidden md:inline-block px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 text-[10px]';
+          feedBadge.textContent = '● Live WS';
+          feedBadge.className = 'hidden xl:inline-block text-[10px] text-emerald-400';
         };
         ws.onmessage = (ev) => {
           const msg = JSON.parse(ev.data);
@@ -893,12 +1303,10 @@
           const pct = open ? ((last - open) / open) * 100 : 0;
           if (d.s === 'BTCUSDT') updatePriceTicker('BTCUSDT', last, pct, 2);
           if (d.s === 'ETHUSDT') updatePriceTicker('ETHUSDT', last, pct, 2);
+          if (d.s === 'SOLUSDT') updatePriceTicker('SOLUSDT', last, pct, 2);
           if (d.s === 'PAXGUSDT') updatePriceTicker('XAUUSD', last, pct, 2);
         };
-        ws.onclose = () => {
-          feedBadge.textContent = '● Feed Reconnecting...';
-          setTimeout(startLiveMarketFeeds, 5000);
-        };
+        ws.onclose = () => { setTimeout(startLiveMarketFeeds, 5000); };
       } catch (e) {}
 
       async function fetchForexRates() {
@@ -916,6 +1324,9 @@
       setInterval(fetchForexRates, 60000);
     }
 
+    // =========================================================
+    // DRAWING CANVAS + VISUAL LONG/SHORT R:R BOX + RULER
+    // =========================================================
     const canvas = document.getElementById('chartDrawCanvas');
     const ctx = canvas.getContext('2d');
     let drawTool = 'cursor';
@@ -932,6 +1343,14 @@
     }
     window.addEventListener('resize', resizeDrawCanvas);
 
+    function formatMeasureLabel(x1, y1, x2, y2) {
+      const dy = Math.abs(y2 - y1);
+      const dx = Math.abs(x2 - x1);
+      const pct = ((dy / Math.max(1, canvas.height)) * 5).toFixed(2);
+      const points = (dy * 0.25).toFixed(1);
+      return `${points} pts (${pct}%) | ${Math.round(dx)}px`;
+    }
+
     function drawSingleShape(s) {
       ctx.save();
       ctx.strokeStyle = s.color || chartSettings.drawColor || '#2962ff';
@@ -945,6 +1364,49 @@
         ctx.fillStyle = 'rgba(41, 98, 255, 0.14)';
         ctx.fillRect(s.x1, s.y1, s.x2 - s.x1, s.y2 - s.y1);
         ctx.strokeRect(s.x1, s.y1, s.x2 - s.x1, s.y2 - s.y1);
+      } else if (s.type === 'rrbox') {
+        const left = Math.min(s.x1, s.x2);
+        const width = Math.max(60, Math.abs(s.x2 - s.x1));
+        const entryY = s.y1;
+        const tpY = s.y2;
+        const rewardH = tpY - entryY;
+        const slH = -rewardH * 0.4;
+
+        ctx.fillStyle = 'rgba(8, 153, 129, 0.22)';
+        ctx.strokeStyle = '#089981';
+        ctx.fillRect(left, entryY, width, rewardH);
+        ctx.strokeRect(left, entryY, width, rewardH);
+
+        ctx.fillStyle = 'rgba(242, 54, 69, 0.22)';
+        ctx.strokeStyle = '#f23645';
+        ctx.fillRect(left, entryY, width, slH);
+        ctx.strokeRect(left, entryY, width, slH);
+
+        ctx.fillStyle = '#1e222d';
+        ctx.fillRect(left + width / 2 - 42, entryY - 10, 84, 20);
+        ctx.strokeStyle = '#d1d4dc';
+        ctx.strokeRect(left + width / 2 - 42, entryY - 10, 84, 20);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 10px JetBrains Mono, monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('1 : 2.5 R:R', left + width / 2, entryY);
+      } else if (s.type === 'ruler') {
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.14)';
+        ctx.strokeStyle = '#f59e0b';
+        ctx.fillRect(s.x1, s.y1, s.x2 - s.x1, s.y2 - s.y1);
+        ctx.strokeRect(s.x1, s.y1, s.x2 - s.x1, s.y2 - s.y1);
+        const label = formatMeasureLabel(s.x1, s.y1, s.x2, s.y2);
+        const midX = (s.x1 + s.x2) / 2;
+        const midY = (s.y1 + s.y2) / 2;
+        ctx.fillStyle = '#1e222d';
+        ctx.fillRect(midX - 65, midY - 11, 130, 22);
+        ctx.strokeRect(midX - 65, midY - 11, 130, 22);
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = 'bold 11px JetBrains Mono, monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, midX, midY);
       } else if (s.type === 'brush' && s.pts && s.pts.length > 1) {
         ctx.beginPath(); ctx.moveTo(s.pts[0].x, s.pts[0].y);
         for (let i = 1; i < s.pts.length; i++) ctx.lineTo(s.pts[i].x, s.pts[i].y);
@@ -966,8 +1428,8 @@
         canvas.classList.add('pointer-events-none'); canvas.style.cursor = 'default'; pill.classList.add('hidden');
       } else {
         canvas.classList.remove('pointer-events-none'); canvas.style.cursor = 'crosshair';
-        const names = { line: 'Trendline', hline: 'Horizontal Line', rect: 'Order Block Zone', brush: 'Freehand Brush' };
-        document.getElementById('drawingModeText').textContent = 'Drawing: ' + (names[tool] || tool);
+        const names = { line: 'Trendline', hline: 'Horizontal Line', rect: 'Order Block Zone', rrbox: 'Long / Short R:R Box', ruler: 'Price & Pip Ruler', brush: 'Freehand Brush' };
+        document.getElementById('drawingModeText').textContent = 'Tool: ' + (names[tool] || tool);
         pill.classList.remove('hidden');
       }
     }
@@ -1026,6 +1488,9 @@
       redrawAllShapes();
     });
 
+    // =========================================================
+    // PRO STATE, AUTH, CHARTS & DISCIPLINE / DAILY LOSS GUARD
+    // =========================================================
     function isProActive() {
       const now = Date.now();
       if (proSubscription && (proSubscription.isPro === true || now < Number(proSubscription.expiresAt || 0))) return true;
@@ -1059,6 +1524,30 @@
       refreshAllUI();
     }
 
+    function isDailyLossLocked() {
+      const lockEnabled = document.getElementById('dailyLossLockToggle').checked;
+      if (!lockEnabled) return false;
+      const acc = parseFloat(document.getElementById('propAccSize').value) || 10000;
+      const ddPct = parseFloat(document.getElementById('propDailyMax').value) || 5;
+      const maxLoss = acc * (ddPct / 100);
+      const todayKey = new Date().toISOString().slice(0, 10);
+      const todayNet = trades.filter(t => t.dateKey === todayKey && t.status !== 'OPEN').reduce((a, b) => a + b.pnl, 0);
+      return todayNet <= -maxLoss;
+    }
+
+    function checkDisciplineAndLossGuard() {
+      if (isDailyLossLocked()) {
+        alert('🔒 Daily Max Loss Limit Reached! Overtrading lock is active for today.');
+        return false;
+      }
+      const checks = Array.from(document.querySelectorAll('.disc-chk'));
+      if (checks.some(c => !c.checked)) {
+        alert('⚠️ Complete all 3 Pre-Trade Discipline Checklist rules before placing/logging a trade!');
+        return false;
+      }
+      return true;
+    }
+
     function refreshAllUI() {
       const pro = isProActive();
       const badge = document.getElementById('planStatusBadge');
@@ -1080,7 +1569,7 @@
         upgradeBtn.className = 'px-2 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 text-black rounded shadow';
         document.getElementById('activeStudiesCount').textContent = activeStudies.length + '/1 Free Study';
       }
-      updateCalculator(); updateFibGoldenZone(); updatePropGuard(); renderJournal(); renderAlerts();
+      updateCalculator(); updateFibGoldenZone(); updatePropGuard(); renderJournal(); renderAlerts(); renderWatchlist();
     }
 
     async function syncUserToCloud() {
@@ -1089,10 +1578,10 @@
       ind.textContent = '☁️ Syncing...';
       const exp = Math.max(Number((proSubscription && proSubscription.expiresAt) || 0), Number((currentUser && currentUser.expiresAt) || 0));
       const plan = isProActive() ? 'PRO' : 'FREE';
-      const syncUrl = `${GOOGLE_SHEET_SCRIPT_URL}?action=sync&email=${encodeURIComponent(currentUser.email)}&plan=${encodeURIComponent(plan)}&expiresAt=${encodeURIComponent(exp)}&trades=${encodeURIComponent(JSON.stringify(trades.slice(0, 30)))}&layouts=${encodeURIComponent(JSON.stringify(savedLayouts.slice(0, 15)))}&_t=${Date.now()}`;
+      const syncUrl = `${GOOGLE_SHEET_SCRIPT_URL}?action=sync&email=${encodeURIComponent(currentUser.email)}&plan=${encodeURIComponent(plan)}&expiresAt=${encodeURIComponent(exp)}&trades=${encodeURIComponent(JSON.stringify(trades.slice(0, 30)))}&layouts=${encodeURIComponent(JSON.stringify(savedLayouts.slice(0, 15)))}&watchlist=${encodeURIComponent(JSON.stringify(customWatchlist.slice(0, 20)))}&_t=${Date.now()}`;
       try { await fetch(syncUrl, { mode: 'no-cors' }); } catch (e) { new Image().src = syncUrl; }
-      ind.textContent = '☁️ Cloud Synced (' + currentUser.email + ')';
-      ind.className = 'text-[10px] text-emerald-400';
+      ind.textContent = '☁️ Synced';
+      ind.className = 'hidden md:inline-block text-[10px] text-emerald-400';
     }
 
     function updateAuthUI() {
@@ -1102,12 +1591,12 @@
       if (currentUser) {
         hdrText.textContent = currentUser.name.split(' ')[0];
         hdrAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
-        cloudInd.textContent = '☁️ Cloud Synced (' + currentUser.email + ')';
-        cloudInd.className = 'text-[10px] text-emerald-400';
+        cloudInd.textContent = '☁️ Synced';
+        cloudInd.className = 'hidden md:inline-block text-[10px] text-emerald-400';
         document.getElementById('payerContactInput').value = currentUser.email;
       } else {
         hdrText.textContent = 'Sign In'; hdrAvatar.textContent = '👤';
-        cloudInd.textContent = '☁️ Local Mode'; cloudInd.className = 'text-[10px] text-tv-muted';
+        cloudInd.textContent = '☁️ Local'; cloudInd.className = 'hidden md:inline-block text-[10px] text-tv-muted';
       }
     }
 
@@ -1167,6 +1656,7 @@
           }
           if (Array.isArray(data.user.trades) && data.user.trades.length) { trades = data.user.trades; localStorage.setItem('pipscopetrade1_trades_v1', JSON.stringify(trades)); }
           if (Array.isArray(data.user.layouts) && data.user.layouts.length) { savedLayouts = data.user.layouts; localStorage.setItem('pipscopetrade1_layouts', JSON.stringify(savedLayouts)); }
+          if (Array.isArray(data.user.watchlist) && data.user.watchlist.length) { customWatchlist = data.user.watchlist; localStorage.setItem('pipscopetrade1_watchlist', JSON.stringify(customWatchlist)); }
           updateAuthUI(); refreshAllUI();
           document.getElementById('authModal').classList.add('hidden'); document.getElementById('authModal').classList.remove('flex');
         } else {
@@ -1180,7 +1670,10 @@
     document.getElementById('manualSyncNowBtn').addEventListener('click', syncUserToCloud);
 
     document.getElementById('logoutUserBtn').addEventListener('click', function() {
-      currentUser = null; localStorage.removeItem('pipscopetrade1_user');
+      currentUser = null;
+      proSubscription = null;
+      localStorage.removeItem('pipscopetrade1_user');
+      localStorage.removeItem('pipscopetrade1_pro_sub');
       updateAuthUI(); refreshAllUI();
       document.getElementById('authModal').classList.add('hidden'); document.getElementById('authModal').classList.remove('flex');
     });
@@ -1237,30 +1730,36 @@
       const el = document.getElementById(containerId);
       if (!el || typeof TradingView === 'undefined') return;
       el.innerHTML = '';
+      const tvTheme = chartSettings.themePreset === 'light' ? 'light' : 'dark';
       new TradingView.widget({
-        autosize: true, symbol, interval, timezone: 'Asia/Kolkata', theme: chartSettings.theme || 'dark', style: '1', locale: 'en',
+        autosize: true, symbol, interval, timezone: 'Asia/Kolkata', theme: tvTheme,
+        style: currentChartStyle || '1', locale: 'en',
         toolbar_bg: '#1e222d', enable_publishing: false, withdateranges: true, hide_side_toolbar: hideSide || false,
         allow_symbol_change: false, studies: studies || [], container_id: containerId
       });
     }
 
-    function setActiveSymbol(sym) {
+    document.getElementById('chartStyleSelect').addEventListener('change', function() {
+      currentChartStyle = this.value;
+      loadChartWidget();
+    });
+
+    window.setActiveSymbol = function(sym) {
       currentSymbol = sym;
+      ohlcCandle = { o: null, h: null, l: null, c: null };
       const shortSym = sym.split(':').pop();
       document.getElementById('headerActiveSym').textContent = shortSym;
+      document.getElementById('mtfSymLabel').textContent = shortSym;
       document.getElementById('headerActivePrice').textContent = livePrices[shortSym] ? livePrices[shortSym].toFixed(shortSym === 'EURUSD' || shortSym === 'GBPUSD' ? 5 : 2) : 'Live';
+      if (livePrices[shortSym]) { updateOhlcBar(livePrices[shortSym]); updateMtfMatrix(shortSym, livePrices[shortSym]); }
       document.querySelectorAll('.sym-btn').forEach(b => {
         const match = b.dataset.symbol === sym;
         b.classList.toggle('bg-tv-blue', match); b.classList.toggle('text-white', match);
         b.classList.toggle('bg-tv-bg', !match); b.classList.toggle('text-tv-text', !match);
       });
-      document.querySelectorAll('.wl-item').forEach(w => {
-        const match = w.dataset.wl === sym;
-        w.classList.toggle('border-tv-blue', match); w.classList.toggle('border-tv-border', !match);
-      });
       loadChartWidget();
       redrawAllShapes();
-    }
+    };
 
     function loadChartWidget() {
       createTvWidget('tv_chart_container', currentSymbol, currentInterval, activeStudies, false);
@@ -1271,18 +1770,10 @@
     }
 
     document.querySelectorAll('.sym-btn').forEach(btn => btn.addEventListener('click', function(e) { e.preventDefault(); setActiveSymbol(this.dataset.symbol); }));
-    document.querySelectorAll('.wl-item').forEach(item => item.addEventListener('click', function(e) { e.preventDefault(); setActiveSymbol(this.dataset.wl); }));
     document.getElementById('customSymbolForm').addEventListener('submit', function(e) {
       e.preventDefault(); const val = document.getElementById('customSymbolInput').value.trim().toUpperCase();
       if (val) setActiveSymbol(val);
     });
-
-    document.querySelectorAll('.tf-btn').forEach(btn => btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      document.querySelectorAll('.tf-btn').forEach(b => { b.classList.remove('bg-tv-blue', 'text-white'); b.classList.add('text-tv-muted'); });
-      this.classList.remove('text-tv-muted'); this.classList.add('bg-tv-blue', 'text-white');
-      currentInterval = this.dataset.tf; loadChartWidget();
-    }));
 
     function setChartLayout(mode) {
       if ((mode === '2x' || mode === '4x') && !isProActive()) { showUpgradeModal(); return; }
@@ -1355,19 +1846,32 @@
       const entry = parseFloat(document.getElementById('calcEntry').value);
       const sl = parseFloat(document.getElementById('calcSl').value);
       const tp = parseFloat(document.getElementById('calcTp').value);
+      const spreadPts = parseFloat(document.getElementById('calcSpreadPts').value) || 0;
       const sym = currencyMode === 'USD' ? '$' : '₹';
+      const mult = currencyMode === 'USD' ? 1 : USD_TO_INR;
       const riskAmt = bal * (riskPct / 100);
       document.getElementById('outRiskAmt').textContent = sym + riskAmt.toFixed(2);
+      document.getElementById('outInrEquiv').textContent = '₹' + Math.round(riskAmt * (currencyMode === 'USD' ? USD_TO_INR : 1)).toLocaleString('en-IN');
 
       if (!isNaN(entry) && !isNaN(sl) && entry !== sl) {
         const dist = Math.abs(entry - sl);
-        document.getElementById('outLotSize').textContent = inst === 'XAUUSD' ? (riskAmt / (dist * 100)).toFixed(2) + ' Lots' : (riskAmt / (dist * 100000)).toFixed(2) + ' Lots';
-        document.getElementById('outRR').textContent = (!isNaN(tp) && tp !== entry) ? '1 : ' + (Math.abs(tp - entry) / dist).toFixed(2) : '—';
+        const lots = inst === 'XAUUSD' ? (riskAmt / (dist * 100)) : (riskAmt / (dist * 100000));
+        const slipCost = inst === 'XAUUSD' ? (lots * spreadPts * 100) : (lots * spreadPts * 10);
+        document.getElementById('outLotSize').textContent = lots.toFixed(2) + ' Lots';
+        document.getElementById('outSlippageCost').textContent = sym + (slipCost * mult).toFixed(2);
+        if (!isNaN(tp) && tp !== entry) {
+          const netReward = Math.max(0, Math.abs(tp - entry) - spreadPts);
+          document.getElementById('outRR').textContent = '1 : ' + (netReward / (dist + spreadPts)).toFixed(2);
+        } else {
+          document.getElementById('outRR').textContent = '—';
+        }
       } else {
-        document.getElementById('outLotSize').textContent = 'Enter Entry & SL'; document.getElementById('outRR').textContent = '—';
+        document.getElementById('outLotSize').textContent = 'Enter Entry & SL';
+        document.getElementById('outSlippageCost').textContent = sym + '0.00';
+        document.getElementById('outRR').textContent = '—';
       }
     }
-    ['calcBalance', 'calcRiskPct', 'calcInstrument', 'calcEntry', 'calcSl', 'calcTp'].forEach(id => document.getElementById(id).addEventListener('input', updateCalculator));
+    ['calcBalance', 'calcRiskPct', 'calcInstrument', 'calcEntry', 'calcSl', 'calcTp', 'calcSpreadPts'].forEach(id => document.getElementById(id).addEventListener('input', updateCalculator));
     document.getElementById('currUsdBtn').addEventListener('click', () => { currencyMode = 'USD'; updateCalculator(); renderJournal(); });
     document.getElementById('currInrBtn').addEventListener('click', () => { currencyMode = 'INR'; updateCalculator(); renderJournal(); });
 
@@ -1409,16 +1913,26 @@
       document.getElementById('propTargetBar').style.width = Math.max(0, Math.min(100, (net / tgtAmt) * 100)) + '%';
       document.getElementById('propDdText').textContent = `$${ddLeft.toFixed(2)} Safe`;
       document.getElementById('propDdBar').style.width = Math.max(0, Math.min(100, (ddLeft / maxDd) * 100)) + '%';
+
+      const lockTag = document.getElementById('dailyLossStatusTag');
+      if (isDailyLossLocked()) {
+        lockTag.textContent = 'LOCKED (DD Hit)';
+        lockTag.className = 'font-mono text-rose-400 font-bold';
+      } else {
+        lockTag.textContent = 'Session Open';
+        lockTag.className = 'font-mono text-emerald-400';
+      }
     }
-    ['propAccSize', 'propDailyMax', 'propTargetPct'].forEach(id => document.getElementById(id).addEventListener('input', updatePropGuard));
+    ['propAccSize', 'propDailyMax', 'propTargetPct', 'dailyLossLockToggle'].forEach(id => document.getElementById(id).addEventListener('input', updatePropGuard));
 
     function saveTrades() {
       localStorage.setItem('pipscopetrade1_trades_v1', JSON.stringify(trades));
-      renderJournal(); syncUserToCloud();
+      renderJournal(); updatePropGuard(); updateSessionAnalytics(); syncUserToCloud();
     }
 
     document.getElementById('logTradeBtn').addEventListener('click', function() {
       if (!isProActive()) { showUpgradeModal(); return; }
+      if (!checkDisciplineAndLossGuard()) return;
       const entry = parseFloat(document.getElementById('calcEntry').value);
       const sl = parseFloat(document.getElementById('calcSl').value);
       const tp = parseFloat(document.getElementById('calcTp').value);
@@ -1426,11 +1940,17 @@
       const now = new Date();
       trades.unshift({
         id: Date.now(), dateKey: now.toISOString().slice(0, 10), time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        symbol: currentSymbol.split(':').pop(), side: document.getElementById('calcSide').value, size: document.getElementById('outLotSize').textContent,
-        entry, sl, tp: isNaN(tp) ? '-' : tp, note: document.getElementById('calcNote').value.trim(), status: 'OPEN', pnl: 0
+        session: getCurrentSessionName(), symbol: currentSymbol.split(':').pop(), side: document.getElementById('calcSide').value,
+        size: document.getElementById('outLotSize').textContent, entry, sl, tp: isNaN(tp) ? '-' : tp,
+        note: document.getElementById('calcNote').value.trim(), mistake: 'Clean', status: 'OPEN', pnl: 0
       });
       saveTrades();
     });
+
+    window.setTradeMistake = function(id, tag) {
+      trades = trades.map(t => t.id === id ? Object.assign({}, t, { mistake: tag }) : t);
+      saveTrades();
+    };
 
     window.closeTrade = function(id, isWin) {
       const bal = parseFloat(document.getElementById('calcBalance').value) || 10000;
@@ -1448,22 +1968,47 @@
 
     window.deleteTrade = function(id) { trades = trades.filter(t => t.id !== id); saveTrades(); };
 
+    document.getElementById('zeroResetTradesBtn').addEventListener('click', function() {
+      if (!trades.length) return;
+      if (confirm('Clear all logged trades and reset P&L to zero?')) { trades = []; saveTrades(); }
+    });
+
+    function updateSessionAnalytics() {
+      const closed = trades.filter(t => t.status !== 'OPEN');
+      const winPct = (list) => list.length ? Math.round((list.filter(t => t.status === 'WIN').length / list.length) * 100) + '%' : '0%';
+      document.getElementById('statWinRate').textContent = winPct(closed);
+      document.getElementById('statWinAsian').textContent = winPct(closed.filter(t => (t.session || 'Asian') === 'Asian'));
+      document.getElementById('statWinLondon').textContent = winPct(closed.filter(t => t.session === 'London'));
+      document.getElementById('statWinNy').textContent = winPct(closed.filter(t => t.session === 'NY'));
+    }
+
     function renderJournal() {
       const tbody = document.getElementById('journalTableBody');
       const sym = currencyMode === 'USD' ? '$' : '₹';
+      const filter = document.getElementById('journalFilterSelect').value;
+      const query = (document.getElementById('journalSearchInput').value || '').trim().toLowerCase();
       document.getElementById('journalCountBadge').textContent = trades.length;
-      if (!trades.length) {
-        tbody.innerHTML = '<tr><td colspan="10" class="py-5 text-center text-tv-muted font-sans">No trades logged yet. Use Risk Calculator or ⇄ Trade to log trades.</td></tr>';
+
+      let filtered = filter === 'ALL' ? trades : trades.filter(t => t.status === filter);
+      if (query) filtered = filtered.filter(t => (t.symbol || '').toLowerCase().includes(query) || (t.note || '').toLowerCase().includes(query));
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="py-5 text-center text-tv-muted font-sans">No trades matching search/filter.</td></tr>';
       } else {
-        tbody.innerHTML = trades.map(t => `
+        const tags = ['Clean', 'FOMO', 'Early Exit', 'Revenge', 'Rule Break'];
+        tbody.innerHTML = filtered.map(t => `
           <tr class="border-b border-tv-border/50 hover:bg-tv-hover/40">
             <td class="py-1 px-2 text-tv-muted">${t.time}</td>
+            <td class="py-1 px-2 text-sky-300">${t.session || 'NY'}</td>
             <td class="py-1 px-2 font-bold text-white">${t.symbol}</td>
             <td class="py-1 px-2 ${t.side === 'BUY' ? 'text-tv-green' : 'text-tv-red'}">${t.side}</td>
             <td class="py-1 px-2">${t.size}</td>
             <td class="py-1 px-2">${t.entry}</td>
-            <td class="py-1 px-2 text-tv-muted">${t.sl}/${t.tp}</td>
-            <td class="py-1 px-2 font-sans truncate max-w-[120px]">${t.note || '—'}</td>
+            <td class="py-1 px-2">
+              <select onchange="setTradeMistake(${t.id}, this.value)" class="bg-tv-bg border border-tv-border rounded px-1 py-0.2 text-[10px] text-amber-300 outline-none">
+                ${tags.map(tag => `<option value="${tag}" ${(t.mistake || 'Clean') === tag ? 'selected' : ''}>${tag}</option>`).join('')}
+              </select>
+            </td>
             <td class="py-1 px-2">${t.status}</td>
             <td class="py-1 px-2 font-semibold ${t.pnl >= 0 ? 'text-tv-green' : 'text-tv-red'}">${t.status === 'OPEN' ? '—' : ((t.pnl >= 0 ? '+' : '-') + sym + Math.abs(t.pnl).toFixed(2))}</td>
             <td class="py-1 px-2 text-right space-x-1">
@@ -1476,10 +2021,13 @@
       const closed = trades.filter(t => t.status !== 'OPEN');
       const net = closed.reduce((a, b) => a + b.pnl, 0);
       document.getElementById('topNetPnl').textContent = (net >= 0 ? '+' : '-') + sym + Math.abs(net).toFixed(2);
+      updateSessionAnalytics();
     }
+    document.getElementById('journalFilterSelect').addEventListener('change', renderJournal);
+    document.getElementById('journalSearchInput').addEventListener('input', renderJournal);
 
-    function switchBottomTab(tabName) {
-      if (!isProActive()) { showUpgradeModal(); return; }
+    function switchBottomTab(tabName, bypassPro) {
+      if (!bypassPro && tabName !== 'notes' && !isProActive()) { showUpgradeModal(); return; }
       document.querySelectorAll('.btab-btn').forEach(b => {
         b.classList.remove('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue'); b.classList.add('font-medium', 'text-tv-muted');
       });
@@ -1558,11 +2106,12 @@
     document.getElementById('closeFloatOrderBtn').addEventListener('click', () => document.getElementById('floatingOrderPanel').classList.add('hidden'));
     function placePaperOrder(side) {
       if (!isProActive()) { showUpgradeModal(); return; }
+      if (!checkDisciplineAndLossGuard()) return;
       const lots = document.getElementById('floatLotInput').value || '0.10';
       const shortSym = currentSymbol.split(':').pop();
       const fillPrice = livePrices[shortSym] ? livePrices[shortSym] : 'Market';
       const now = new Date();
-      trades.unshift({ id: Date.now(), dateKey: now.toISOString().slice(0, 10), time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), symbol: shortSym, side, size: lots + ' Lots', entry: fillPrice, sl: '-', tp: '-', note: 'Live Paper Order', status: 'OPEN', pnl: 0 });
+      trades.unshift({ id: Date.now(), dateKey: now.toISOString().slice(0, 10), time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), session: getCurrentSessionName(), symbol: shortSym, side, size: lots + ' Lots', entry: fillPrice, sl: '-', tp: '-', note: 'Live Paper Order', mistake: 'Clean', status: 'OPEN', pnl: 0 });
       saveTrades();
     }
     document.getElementById('instantBuyBtn').addEventListener('click', () => placePaperOrder('BUY'));
@@ -1589,6 +2138,9 @@
       applySavedSettingsToUI();
       updateAuthUI();
       updateClock();
+      updateBarCountdown();
+      updateRedNewsCountdown();
+      renderWatchlist();
       loadChartWidget();
       startLiveMarketFeeds();
       setTimeout(resizeDrawCanvas, 150);
