@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pipscopetrade1 — Institutional Trading Terminal & Cloud Journal</title>
+  <title>pipscopetrade1 — Institutional Live Terminal, Drawing Studio & Cloud Journal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,10 +45,16 @@
     ::-webkit-scrollbar-track { background: #131722; }
     ::-webkit-scrollbar-thumb { background: #2a2e39; border-radius: 3px; }
     .active-study { background-color: rgba(41, 98, 255, 0.22); border-color: #2962ff; color: #ffffff; }
-    .tool-active { background-color: #2962ff; color: #ffffff; }
+    .tool-active { background-color: #2962ff !important; color: #ffffff !important; }
   </style>
 </head>
 <body class="h-screen w-screen flex flex-col bg-tv-bg text-tv-text">
+
+  <!-- LIVE ALERT TOAST BANNER -->
+  <div id="liveAlertBanner" class="hidden fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-black font-mono text-xs font-bold px-4 py-2 rounded-lg shadow-2xl flex items-center gap-3">
+    <span id="liveAlertBannerText">🔔 Price Alert Triggered!</span>
+    <button type="button" onclick="document.getElementById('liveAlertBanner').classList.add('hidden')" class="px-1.5 py-0.5 bg-black/20 rounded">✕</button>
+  </div>
 
   <!-- TOP BAR -->
   <header class="h-12 bg-tv-panel border-b border-tv-border px-2.5 flex items-center justify-between gap-2 shrink-0 z-30">
@@ -57,6 +63,13 @@
         <div class="w-7 h-7 rounded bg-gradient-to-br from-emerald-500 to-tv-blue flex items-center justify-center font-mono font-bold text-white text-xs">PS</div>
         <span class="font-bold text-white text-sm">pipscopetrade1</span>
         <span id="planStatusBadge" class="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded">FREE</span>
+      </div>
+
+      <!-- LIVE ACTIVE SYMBOL TICKER -->
+      <div class="hidden sm:flex items-center gap-2 px-2.5 py-1 bg-tv-deep border border-tv-border rounded font-mono text-xs shrink-0">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="headerActiveSym" class="font-bold text-white">XAUUSD</span>
+        <span id="headerActivePrice" class="text-emerald-400 font-semibold">Live</span>
       </div>
 
       <div id="symbolPills" class="flex items-center gap-1 shrink-0">
@@ -76,7 +89,7 @@
     </div>
 
     <div class="flex items-center gap-1.5 shrink-0">
-      <div id="tfPills" class="hidden xl:flex items-center gap-0.5 bg-tv-bg p-0.5 rounded border border-tv-border">
+      <div id="tfPills" class="hidden 2xl:flex items-center gap-0.5 bg-tv-bg p-0.5 rounded border border-tv-border">
         <button type="button" data-tf="1" class="tf-btn px-2 py-0.5 text-xs font-mono rounded bg-tv-blue text-white">1m</button>
         <button type="button" data-tf="5" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">5m</button>
         <button type="button" data-tf="15" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">15m</button>
@@ -108,7 +121,7 @@
     </div>
   </header>
 
-  <!-- SESSION & CLOUD BAR -->
+  <!-- SESSION & LIVE FEED STATUS BAR -->
   <div class="bg-tv-deep border-b border-tv-border px-3 py-1 flex items-center justify-between gap-2 text-[11px] font-mono shrink-0">
     <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
       <span class="text-tv-muted font-sans font-semibold uppercase text-[10px]">Sessions:</span>
@@ -117,6 +130,7 @@
       <span id="sessLondon">London</span>
       <span id="sessNewYork">New York</span>
       <span id="killzoneBadge" class="hidden sm:inline-block px-1.5 py-0.2 rounded bg-tv-panel text-tv-muted text-[10px]">Checking...</span>
+      <span id="feedStatusBadge" class="hidden md:inline-block px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 text-[10px]">● Live Feed Connecting...</span>
     </div>
     <div class="flex items-center gap-3">
       <span id="cloudSyncIndicator" class="text-[10px] text-tv-muted">☁️ Local Mode</span>
@@ -146,22 +160,38 @@
 
   <!-- MAIN WORKSPACE -->
   <div class="flex-1 flex min-h-0 overflow-hidden">
-    <!-- LEFT VERTICAL TOOLBAR -->
+    <!-- LEFT VERTICAL DRAWING & TERMINAL TOOLBAR -->
     <nav class="w-10 bg-tv-panel border-r border-tv-border flex flex-col items-center py-2 gap-1.5 shrink-0 z-20">
-      <button type="button" title="Cursor" class="tv-left-tool tool-active w-7 h-7 rounded flex items-center justify-center text-xs">╋</button>
-      <button type="button" data-quicktool="fib" title="Golden Zone" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">📐</button>
+      <button type="button" data-drawtool="cursor" title="Interactive Chart Cursor (Pan & Zoom)" class="tv-draw-btn tool-active w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">╋</button>
+      <button type="button" data-drawtool="line" title="Draw Trendline on Chart" class="tv-draw-btn w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">╱</button>
+      <button type="button" data-drawtool="hline" title="Draw Horizontal Support / Resistance" class="tv-draw-btn w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">―</button>
+      <button type="button" data-drawtool="rect" title="Draw Order Block / Golden Zone Box" class="tv-draw-btn w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">▭</button>
+      <button type="button" data-drawtool="brush" title="Freehand Brush" class="tv-draw-btn w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">✎</button>
+      <button type="button" id="undoDrawingBtn" title="Undo Last Drawing" class="w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">↩</button>
+      <button type="button" id="clearDrawingsBtn" title="Clear All Drawings" class="w-7 h-7 rounded flex items-center justify-center text-xs text-tv-red hover:bg-tv-hover">🗑️</button>
+
+      <div class="w-5 border-t border-tv-border my-1"></div>
+
+      <button type="button" data-quicktool="fib" title="Golden Zone Calculator" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">📐</button>
       <button type="button" data-quicktool="calc" title="Risk & Lot Calculator" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">⚖️</button>
       <button type="button" data-quicktool="prop" title="Prop Firm Guard" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">🛡️</button>
       <button type="button" data-quicktool="alert" title="Price Alerts" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">🔔</button>
-      <button type="button" data-quicktool="screener" title="Market Screener" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">🔍</button>
-      <div class="w-5 border-t border-tv-border my-1"></div>
       <button type="button" id="toggleFullChartBtn" title="Fullscreen Chart" class="w-7 h-7 rounded flex items-center justify-center text-xs text-amber-400 hover:bg-tv-hover">⛶</button>
     </nav>
 
-    <!-- CHART AREA -->
+    <!-- CHART AREA WITH INTERACTIVE DRAWING OVERLAY -->
     <main id="chartWorkspace" class="flex-1 grid grid-cols-1 grid-rows-1 min-w-0 bg-tv-bg relative">
+      <!-- Drawing Mode Status Pill -->
+      <div id="drawingModePill" class="hidden absolute top-3 right-4 z-30 bg-tv-blue text-white font-mono text-[11px] font-semibold px-3 py-1 rounded-full shadow-lg flex items-center gap-2">
+        <span id="drawingModeText">Drawing Mode: Trendline</span>
+        <button type="button" id="exitDrawModeBtn" class="px-1.5 py-0.2 bg-black/30 rounded text-[10px]">Done (╋)</button>
+      </div>
+
+      <!-- Transparent Drawing Canvas Overlay (pointer-events-none in cursor mode; active when drawing) -->
+      <canvas id="chartDrawCanvas" class="absolute inset-0 w-full h-full z-20 pointer-events-none"></canvas>
+
       <!-- Floating Paper Order Box -->
-      <div id="floatingOrderPanel" class="hidden absolute top-3 left-14 z-20 bg-tv-panel/95 backdrop-blur border border-tv-border rounded-lg shadow-2xl p-2 flex items-center gap-2 font-mono text-xs">
+      <div id="floatingOrderPanel" class="hidden absolute top-3 left-14 z-30 bg-tv-panel/95 backdrop-blur border border-tv-border rounded-lg shadow-2xl p-2 flex items-center gap-2 font-mono text-xs">
         <button type="button" id="instantSellBtn" class="px-3 py-1.5 bg-tv-red hover:bg-rose-500 text-white font-bold rounded flex flex-col items-center leading-tight">
           <span class="text-[9px] opacity-80">SELL</span>
           <span id="floatSymbolSell">XAUUSD</span>
@@ -237,7 +267,7 @@
       </div>
     </main>
 
-    <!-- RIGHT SIDEBAR -->
+    <!-- RIGHT SIDEBAR WITH REAL-TIME LIVE PRICE WATCHLIST -->
     <aside id="rightSidebar" class="w-80 bg-tv-panel border-l border-tv-border flex flex-col shrink-0 overflow-y-auto">
       <div class="p-2 bg-tv-deep border-b border-tv-border grid grid-cols-3 gap-1 text-[10px] font-semibold">
         <button type="button" id="toolTabCalc" class="py-1.5 rounded bg-tv-blue text-white">Risk & Lot</button>
@@ -334,14 +364,42 @@
         </div>
       </div>
 
-      <!-- WATCHLIST & NEWS -->
-      <div class="flex-1 flex flex-col min-h-[220px] p-3">
-        <div class="flex items-center gap-1 bg-tv-bg p-0.5 rounded border border-tv-border mb-2 text-[11px] font-semibold">
-          <button type="button" id="sideTabWatchlist" class="flex-1 py-1 rounded bg-tv-panel text-white">Watchlist</button>
-          <button type="button" id="sideTabCalendar" class="flex-1 py-1 rounded text-tv-muted hover:text-white">News Calendar</button>
+      <!-- REAL-TIME LIVE PRICE WATCHLIST (INTERNAL SWITCH, ZERO REDIRECT) -->
+      <div class="flex-1 flex flex-col p-3 gap-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-tv-muted">Live Watchlist</span>
+          <span class="text-[10px] font-mono text-emerald-400">● Real-Time Feed</span>
         </div>
-        <div id="marketOverviewWidget" class="flex-1 w-full rounded overflow-hidden border border-tv-border"></div>
-        <div id="economicCalendarWidget" class="hidden flex-1 w-full rounded overflow-hidden border border-tv-border"></div>
+        <div id="customWatchlistBox" class="space-y-1 font-mono text-xs">
+          <button type="button" data-wl="OANDA:XAUUSD" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-blue text-left transition">
+            <div><div class="font-bold text-white">XAUUSD</div><div class="text-[10px] text-tv-muted font-sans">Gold Spot / USD</div></div>
+            <div class="text-right"><div id="price-XAUUSD" class="font-bold text-white">—</div><div id="chg-XAUUSD" class="text-[10px] text-tv-muted">PAXG Live</div></div>
+          </button>
+          <button type="button" data-wl="BINANCE:BTCUSDT" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-border text-left transition">
+            <div><div class="font-bold text-white">BTCUSDT</div><div class="text-[10px] text-tv-muted font-sans">Bitcoin / Tether</div></div>
+            <div class="text-right"><div id="price-BTCUSDT" class="font-bold text-white">—</div><div id="chg-BTCUSDT" class="text-[10px] text-tv-muted">WS Stream</div></div>
+          </button>
+          <button type="button" data-wl="BINANCE:ETHUSDT" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-border text-left transition">
+            <div><div class="font-bold text-white">ETHUSDT</div><div class="text-[10px] text-tv-muted font-sans">Ethereum / Tether</div></div>
+            <div class="text-right"><div id="price-ETHUSDT" class="font-bold text-white">—</div><div id="chg-ETHUSDT" class="text-[10px] text-tv-muted">WS Stream</div></div>
+          </button>
+          <button type="button" data-wl="FX:EURUSD" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-border text-left transition">
+            <div><div class="font-bold text-white">EURUSD</div><div class="text-[10px] text-tv-muted font-sans">Euro / US Dollar</div></div>
+            <div class="text-right"><div id="price-EURUSD" class="font-bold text-white">—</div><div id="chg-EURUSD" class="text-[10px] text-tv-muted">FX Ref</div></div>
+          </button>
+          <button type="button" data-wl="FX:GBPUSD" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-border text-left transition">
+            <div><div class="font-bold text-white">GBPUSD</div><div class="text-[10px] text-tv-muted font-sans">Pound / US Dollar</div></div>
+            <div class="text-right"><div id="price-GBPUSD" class="font-bold text-white">—</div><div id="chg-GBPUSD" class="text-[10px] text-tv-muted">FX Ref</div></div>
+          </button>
+          <button type="button" data-wl="FX:USDJPY" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-border text-left transition">
+            <div><div class="font-bold text-white">USDJPY</div><div class="text-[10px] text-tv-muted font-sans">USD / Japanese Yen</div></div>
+            <div class="text-right"><div id="price-USDJPY" class="font-bold text-white">—</div><div id="chg-USDJPY" class="text-[10px] text-tv-muted">FX Ref</div></div>
+          </button>
+          <button type="button" data-wl="NSE:NIFTY" class="wl-item w-full flex items-center justify-between px-2.5 py-2 rounded bg-tv-bg hover:bg-tv-hover border border-tv-border text-left transition">
+            <div><div class="font-bold text-white">NIFTY</div><div class="text-[10px] text-tv-muted font-sans">NSE NIFTY 50</div></div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300">INDEX</span>
+          </button>
+        </div>
       </div>
     </aside>
   </div>
@@ -355,7 +413,6 @@
         </button>
         <button type="button" data-btab="heatmap" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">P&L Heatmap</button>
         <button type="button" data-btab="analytics" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">Equity Curve</button>
-        <button type="button" data-btab="screener" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">Market Screener</button>
         <button type="button" data-btab="pine" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5 flex items-center gap-1">
           <span class="w-1.5 h-1.5 rounded-full bg-tv-green"></span> Pine v5 Library
         </button>
@@ -409,10 +466,6 @@
       </div>
     </div>
 
-    <div id="tab-screener" class="btab-content hidden flex-1 overflow-hidden">
-      <div id="tvScreenerContainer" class="w-full h-full"></div>
-    </div>
-
     <div id="tab-pine" class="btab-content hidden flex-1 overflow-hidden p-2 flex gap-2">
       <div class="w-56 flex flex-col gap-1.5 shrink-0">
         <select id="pineTemplateSelect" class="bg-tv-bg border border-tv-border rounded px-2 py-1 text-xs text-white outline-none">
@@ -434,7 +487,7 @@
       <span>pipscopetrade1 Terminal</span>
       <button type="button" id="footerShowBottomBtn" class="hidden text-tv-blue hover:underline font-semibold">▲ Show Bottom Panel</button>
     </div>
-    <span>Charts & market data powered by <a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer" class="text-tv-blue hover:underline">TradingView</a></span>
+    <span>pipscopetrade1 Institutional Workspace</span>
   </footer>
 
   <!-- MODAL 1: AUTH -->
@@ -499,13 +552,13 @@
   <div id="alertModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="bg-tv-panel border border-tv-border rounded-xl max-w-md w-full overflow-hidden shadow-2xl">
       <div class="px-4 py-3 border-b border-tv-border flex items-center justify-between bg-tv-deep">
-        <h3 class="text-sm font-bold text-white">🔔 Sound Price Alerts</h3>
+        <h3 class="text-sm font-bold text-white">🔔 Real-Time Sound Price Alerts</h3>
         <button type="button" id="closeAlertModalBtn" class="text-tv-muted hover:text-white">✕</button>
       </div>
       <div class="p-4 space-y-3 text-xs">
         <div class="grid grid-cols-3 gap-1.5">
           <input id="alertSymInput" type="text" value="XAUUSD" class="bg-tv-bg border border-tv-border rounded px-2 py-1.5 font-mono text-white outline-none" />
-          <input id="alertPriceInput" type="number" step="any" placeholder="Price" class="bg-tv-bg border border-tv-border rounded px-2 py-1.5 font-mono text-white outline-none" />
+          <input id="alertPriceInput" type="number" step="any" placeholder="Target Price" class="bg-tv-bg border border-tv-border rounded px-2 py-1.5 font-mono text-white outline-none" />
           <button type="button" id="addPriceAlertBtn" class="bg-amber-500 hover:bg-amber-400 text-black font-bold rounded">+ Add</button>
         </div>
         <div id="priceAlertsList" class="space-y-1.5 max-h-48 overflow-y-auto font-mono"></div>
@@ -587,10 +640,256 @@
     let trades = JSON.parse(localStorage.getItem('pipscopetrade1_trades_v1') || '[]');
     let savedLayouts = JSON.parse(localStorage.getItem('pipscopetrade1_layouts') || '[]');
     let priceAlerts = JSON.parse(localStorage.getItem('pipscopetrade1_alerts') || '[]');
+    const livePrices = {};
 
+    // =========================================================
+    // 1. REAL-TIME LIVE PRICE FEED (BINANCE WS + FRANKFURTER FX)
+    // =========================================================
+    function playAlertSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(920, ctx.currentTime);
+        osc.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.35);
+      } catch (e) {}
+    }
+
+    function updatePriceTicker(symKey, price, pctChange, decimals) {
+      const prev = livePrices[symKey];
+      livePrices[symKey] = price;
+      const formatted = price.toFixed(decimals);
+      const priceEl = document.getElementById('price-' + symKey);
+      const chgEl = document.getElementById('chg-' + symKey);
+
+      if (priceEl) {
+        priceEl.textContent = formatted;
+        priceEl.className = prev !== undefined
+          ? (price >= prev ? 'font-bold text-emerald-400' : 'font-bold text-rose-400')
+          : 'font-bold text-white';
+      }
+      if (chgEl && pctChange !== null && !isNaN(pctChange)) {
+        const sign = pctChange >= 0 ? '+' : '';
+        chgEl.textContent = `${sign}${pctChange.toFixed(2)}%`;
+        chgEl.className = pctChange >= 0 ? 'text-[10px] text-emerald-400' : 'text-[10px] text-rose-400';
+      }
+
+      if (currentSymbol.split(':').pop() === symKey) {
+        const hdrPrice = document.getElementById('headerActivePrice');
+        hdrPrice.textContent = formatted;
+        hdrPrice.className = (prev !== undefined && price < prev) ? 'text-rose-400 font-semibold' : 'text-emerald-400 font-semibold';
+      }
+
+      // Check Real-Time Sound Price Alerts
+      if (prev !== undefined && priceAlerts.length) {
+        let triggered = false;
+        priceAlerts = priceAlerts.filter(a => {
+          if (a.symbol === symKey) {
+            const crossedUp = prev < a.price && price >= a.price;
+            const crossedDown = prev > a.price && price <= a.price;
+            if (crossedUp || crossedDown) {
+              triggered = true;
+              const banner = document.getElementById('liveAlertBanner');
+              document.getElementById('liveAlertBannerText').textContent = `🔔 ALERT: ${symKey} hit ${formatted} (Target: ${a.price})`;
+              banner.classList.remove('hidden');
+              playAlertSound();
+              return false;
+            }
+          }
+          return true;
+        });
+        if (triggered) {
+          localStorage.setItem('pipscopetrade1_alerts', JSON.stringify(priceAlerts));
+          renderAlerts();
+        }
+      }
+    }
+
+    function startLiveMarketFeeds() {
+      const feedBadge = document.getElementById('feedStatusBadge');
+      try {
+        const ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@miniTicker/ethusdt@miniTicker/paxgusdt@miniTicker');
+        ws.onopen = () => {
+          feedBadge.textContent = '● Live WS Feed Active';
+          feedBadge.className = 'hidden md:inline-block px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 text-[10px]';
+        };
+        ws.onmessage = (ev) => {
+          const msg = JSON.parse(ev.data);
+          const d = msg.data;
+          if (!d || !d.s) return;
+          const last = parseFloat(d.c);
+          const open = parseFloat(d.o);
+          const pct = open ? ((last - open) / open) * 100 : 0;
+          if (d.s === 'BTCUSDT') updatePriceTicker('BTCUSDT', last, pct, 2);
+          if (d.s === 'ETHUSDT') updatePriceTicker('ETHUSDT', last, pct, 2);
+          if (d.s === 'PAXGUSDT') updatePriceTicker('XAUUSD', last, pct, 2);
+        };
+        ws.onclose = () => {
+          feedBadge.textContent = '● Feed Reconnecting...';
+          setTimeout(startLiveMarketFeeds, 5000);
+        };
+      } catch (e) {}
+
+      async function fetchForexRates() {
+        try {
+          const res = await fetch('https://api.frankfurter.dev/v1/latest?base=USD&symbols=EUR,GBP,JPY');
+          const data = await res.json();
+          if (data && data.rates) {
+            if (data.rates.EUR) updatePriceTicker('EURUSD', 1 / data.rates.EUR, null, 5);
+            if (data.rates.GBP) updatePriceTicker('GBPUSD', 1 / data.rates.GBP, null, 5);
+            if (data.rates.JPY) updatePriceTicker('USDJPY', data.rates.JPY, null, 3);
+          }
+        } catch (e) {}
+      }
+      fetchForexRates();
+      setInterval(fetchForexRates, 60000);
+    }
+
+    // =========================================================
+    // 2. INTERACTIVE CUSTOM CHART DRAWING CANVAS OVERLAY
+    // =========================================================
+    const canvas = document.getElementById('chartDrawCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawTool = 'cursor';
+    let isDrawing = false;
+    let startX = 0, startY = 0;
+    let currentBrushPts = [];
+    let chartDrawings = JSON.parse(localStorage.getItem('pipscopetrade1_drawings') || '[]');
+
+    function resizeDrawCanvas() {
+      const rect = document.getElementById('chartWorkspace').getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      redrawAllShapes();
+    }
+    window.addEventListener('resize', resizeDrawCanvas);
+
+    function drawSingleShape(s) {
+      ctx.save();
+      ctx.strokeStyle = s.color || '#2962ff';
+      ctx.lineWidth = 2;
+      if (s.type === 'line') {
+        ctx.beginPath();
+        ctx.moveTo(s.x1, s.y1);
+        ctx.lineTo(s.x2, s.y2);
+        ctx.stroke();
+      } else if (s.type === 'hline') {
+        ctx.setLineDash([5, 4]);
+        ctx.strokeStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.moveTo(0, s.y1);
+        ctx.lineTo(canvas.width, s.y1);
+        ctx.stroke();
+      } else if (s.type === 'rect') {
+        ctx.fillStyle = 'rgba(41, 98, 255, 0.14)';
+        ctx.strokeStyle = '#089981';
+        ctx.fillRect(s.x1, s.y1, s.x2 - s.x1, s.y2 - s.y1);
+        ctx.strokeRect(s.x1, s.y1, s.x2 - s.x1, s.y2 - s.y1);
+      } else if (s.type === 'brush' && s.pts && s.pts.length > 1) {
+        ctx.strokeStyle = '#10b981';
+        ctx.beginPath();
+        ctx.moveTo(s.pts[0].x, s.pts[0].y);
+        for (let i = 1; i < s.pts.length; i++) ctx.lineTo(s.pts[i].x, s.pts[i].y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function redrawAllShapes() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const symShapes = chartDrawings.filter(d => d.symbol === currentSymbol);
+      symShapes.forEach(drawSingleShape);
+    }
+
+    function setDrawTool(tool) {
+      drawTool = tool;
+      document.querySelectorAll('.tv-draw-btn').forEach(b => b.classList.toggle('tool-active', b.dataset.drawtool === tool));
+      const pill = document.getElementById('drawingModePill');
+      if (tool === 'cursor') {
+        canvas.classList.add('pointer-events-none');
+        canvas.style.cursor = 'default';
+        pill.classList.add('hidden');
+      } else {
+        canvas.classList.remove('pointer-events-none');
+        canvas.style.cursor = 'crosshair';
+        const names = { line: 'Trendline', hline: 'Horizontal Level', rect: 'Order Block Zone', brush: 'Freehand Brush' };
+        document.getElementById('drawingModeText').textContent = 'Drawing: ' + (names[tool] || tool);
+        pill.classList.remove('hidden');
+      }
+    }
+
+    document.querySelectorAll('.tv-draw-btn').forEach(btn => btn.addEventListener('click', () => setDrawTool(btn.dataset.drawtool)));
+    document.getElementById('exitDrawModeBtn').addEventListener('click', () => setDrawTool('cursor'));
+
+    canvas.addEventListener('mousedown', (e) => {
+      if (drawTool === 'cursor') return;
+      const rect = canvas.getBoundingClientRect();
+      startX = e.clientX - rect.left;
+      startY = e.clientY - rect.top;
+      if (drawTool === 'hline') {
+        chartDrawings.push({ symbol: currentSymbol, type: 'hline', y1: startY });
+        localStorage.setItem('pipscopetrade1_drawings', JSON.stringify(chartDrawings));
+        redrawAllShapes();
+        return;
+      }
+      isDrawing = true;
+      currentBrushPts = [{ x: startX, y: startY }];
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isDrawing || drawTool === 'cursor') return;
+      const rect = canvas.getBoundingClientRect();
+      const curX = e.clientX - rect.left;
+      const curY = e.clientY - rect.top;
+      redrawAllShapes();
+      if (drawTool === 'brush') {
+        currentBrushPts.push({ x: curX, y: curY });
+        drawSingleShape({ type: 'brush', pts: currentBrushPts });
+      } else {
+        drawSingleShape({ type: drawTool, x1: startX, y1: startY, x2: curX, y2: curY });
+      }
+    });
+
+    canvas.addEventListener('mouseup', (e) => {
+      if (!isDrawing) return;
+      isDrawing = false;
+      const rect = canvas.getBoundingClientRect();
+      const endX = e.clientX - rect.left;
+      const endY = e.clientY - rect.top;
+      if (drawTool === 'brush') {
+        chartDrawings.push({ symbol: currentSymbol, type: 'brush', pts: currentBrushPts });
+      } else {
+        chartDrawings.push({ symbol: currentSymbol, type: drawTool, x1: startX, y1: startY, x2: endX, y2: endY });
+      }
+      localStorage.setItem('pipscopetrade1_drawings', JSON.stringify(chartDrawings));
+      redrawAllShapes();
+    });
+
+    document.getElementById('undoDrawingBtn').addEventListener('click', () => {
+      for (let i = chartDrawings.length - 1; i >= 0; i--) {
+        if (chartDrawings[i].symbol === currentSymbol) {
+          chartDrawings.splice(i, 1);
+          break;
+        }
+      }
+      localStorage.setItem('pipscopetrade1_drawings', JSON.stringify(chartDrawings));
+      redrawAllShapes();
+    });
+
+    document.getElementById('clearDrawingsBtn').addEventListener('click', () => {
+      chartDrawings = chartDrawings.filter(d => d.symbol !== currentSymbol);
+      localStorage.setItem('pipscopetrade1_drawings', JSON.stringify(chartDrawings));
+      redrawAllShapes();
+    });
+
+    // =========================================================
+    // 3. PRO STATE, AUTH, CHARTS & TOOLS
+    // =========================================================
     function isProActive() {
       const now = Date.now();
-      if (proSubscription && now < Number(proSubscription.expiresAt || 0)) return true;
+      if (proSubscription && (proSubscription.isPro === true || now < Number(proSubscription.expiresAt || 0))) return true;
       if (currentUser && (String(currentUser.plan || '').toUpperCase() === 'PRO' || now < Number(currentUser.expiresAt || 0))) return true;
       return false;
     }
@@ -602,15 +901,16 @@
     }
 
     function showUpgradeModal() {
+      if (isProActive()) return;
       updateUpiDetails();
       const m = document.getElementById('upgradeModal');
       m.classList.remove('hidden');
       m.classList.add('flex');
     }
 
-    async function activateProAndRefreshAll(days, sourceLabel) {
-      const expiresAt = Date.now() + (days || 30) * 24 * 60 * 60 * 1000;
-      proSubscription = { plan: sourceLabel || 'pro', activatedAt: Date.now(), expiresAt };
+    async function unlockProForever(days, sourceLabel) {
+      const expiresAt = Date.now() + (days || 365) * 24 * 60 * 60 * 1000;
+      proSubscription = { isPro: true, plan: sourceLabel || 'pro', activatedAt: Date.now(), expiresAt };
       localStorage.setItem('pipscopetrade1_pro_sub', JSON.stringify(proSubscription));
       localStorage.removeItem('pipscopetrade1_pending_utr');
 
@@ -620,7 +920,6 @@
         localStorage.setItem('pipscopetrade1_user', JSON.stringify(currentUser));
         await syncUserToCloud();
       }
-
       hideUpgradeModal();
       refreshAllUI();
     }
@@ -632,7 +931,7 @@
       const pendingUtr = localStorage.getItem('pipscopetrade1_pending_utr');
 
       if (pro) {
-        const exp = Math.max(Number((proSubscription && proSubscription.expiresAt) || 0), Number((currentUser && currentUser.expiresAt) || 0)) || (Date.now() + 30 * 86400000);
+        const exp = Math.max(Number((proSubscription && proSubscription.expiresAt) || 0), Number((currentUser && currentUser.expiresAt) || 0)) || (Date.now() + 365 * 86400000);
         const expDate = new Date(exp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
         badge.textContent = 'PRO • ' + expDate;
         badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded';
@@ -646,7 +945,6 @@
         upgradeBtn.className = 'px-2.5 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 text-black rounded shadow';
         document.getElementById('activeStudiesCount').textContent = activeStudies.length + '/1 Free Study';
       }
-
       updateCalculator();
       updateFibGoldenZone();
       updatePropGuard();
@@ -659,7 +957,7 @@
       const ind = document.getElementById('cloudSyncIndicator');
       ind.textContent = '☁️ Syncing...';
       const exp = Math.max(Number((proSubscription && proSubscription.expiresAt) || 0), Number((currentUser && currentUser.expiresAt) || 0));
-      const plan = exp > Date.now() ? 'PRO' : 'FREE';
+      const plan = isProActive() ? 'PRO' : 'FREE';
       const syncUrl = `${GOOGLE_SHEET_SCRIPT_URL}?action=sync&email=${encodeURIComponent(currentUser.email)}&plan=${encodeURIComponent(plan)}&expiresAt=${encodeURIComponent(exp)}&trades=${encodeURIComponent(JSON.stringify(trades.slice(0, 30)))}&layouts=${encodeURIComponent(JSON.stringify(savedLayouts.slice(0, 15)))}&_t=${Date.now()}`;
       try { await fetch(syncUrl, { mode: 'no-cors' }); } catch (e) { new Image().src = syncUrl; }
       ind.textContent = '☁️ Cloud Synced (' + currentUser.email + ')';
@@ -742,8 +1040,8 @@
         if (data.status === 'ok' && data.user) {
           currentUser = data.user;
           localStorage.setItem('pipscopetrade1_user', JSON.stringify(currentUser));
-          if (data.user.expiresAt && Number(data.user.expiresAt) > Date.now()) {
-            proSubscription = { plan: 'cloud', activatedAt: Date.now(), expiresAt: Number(data.user.expiresAt) };
+          if (String(data.user.plan || '').toUpperCase() === 'PRO' || Number(data.user.expiresAt || 0) > Date.now()) {
+            proSubscription = { isPro: true, plan: 'cloud', activatedAt: Date.now(), expiresAt: Number(data.user.expiresAt || (Date.now() + 365 * 86400000)) };
             localStorage.setItem('pipscopetrade1_pro_sub', JSON.stringify(proSubscription));
           }
           if (Array.isArray(data.user.trades) && data.user.trades.length) {
@@ -781,7 +1079,6 @@
       document.getElementById('authModal').classList.remove('flex');
     });
 
-    // UPI & UTR
     function updateUpiDetails() {
       const amount = selectedPlan === 'monthly' ? '149.00' : '1649.00';
       const upiUrl = `upi://pay?pa=${encodeURIComponent(MERCHANT_UPI_ID)}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${amount}&cu=INR`;
@@ -809,7 +1106,7 @@
       statusEl.classList.add('hidden');
 
       if (utr === ADMIN_SECRET_CODE) {
-        await activateProAndRefreshAll(3650, 'admin');
+        await unlockProForever(3650, 'admin');
         alert('Pro unlocked!');
         return;
       }
@@ -839,12 +1136,11 @@
         const res = await fetch(`${GOOGLE_SHEET_SCRIPT_URL}?action=check&utr=${encodeURIComponent(pending.utr)}`);
         const data = await res.json();
         if (data.status === 'Approved') {
-          await activateProAndRefreshAll(pending.plan === 'yearly' ? 365 : 30, 'utr_' + pending.utr);
+          await unlockProForever(pending.plan === 'yearly' ? 365 : 30, 'utr_' + pending.utr);
         }
       } catch (e) {}
     }
 
-    // CHARTS (NO EXTERNAL LINK TRIGGERS ON PAIR SWITCH)
     function createTvWidget(containerId, symbol, interval, studies, hideSide) {
       const el = document.getElementById(containerId);
       if (!el || typeof TradingView === 'undefined') return;
@@ -854,6 +1150,28 @@
         toolbar_bg: '#1e222d', enable_publishing: false, withdateranges: true, hide_side_toolbar: hideSide || false,
         allow_symbol_change: false, studies: studies || [], container_id: containerId
       });
+    }
+
+    function setActiveSymbol(sym) {
+      currentSymbol = sym;
+      const shortSym = sym.split(':').pop();
+      document.getElementById('headerActiveSym').textContent = shortSym;
+      document.getElementById('headerActivePrice').textContent = livePrices[shortSym] ? livePrices[shortSym].toFixed(shortSym === 'EURUSD' || shortSym === 'GBPUSD' ? 5 : 2) : 'Live';
+
+      document.querySelectorAll('.sym-btn').forEach(b => {
+        const match = b.dataset.symbol === sym;
+        b.classList.toggle('bg-tv-blue', match);
+        b.classList.toggle('text-white', match);
+        b.classList.toggle('bg-tv-bg', !match);
+        b.classList.toggle('text-tv-text', !match);
+      });
+      document.querySelectorAll('.wl-item').forEach(w => {
+        const match = w.dataset.wl === sym;
+        w.classList.toggle('border-tv-blue', match);
+        w.classList.toggle('border-tv-border', !match);
+      });
+      loadChartWidget();
+      redrawAllShapes();
     }
 
     function loadChartWidget() {
@@ -866,17 +1184,18 @@
 
     document.querySelectorAll('.sym-btn').forEach(btn => btn.addEventListener('click', function(e) {
       e.preventDefault();
-      document.querySelectorAll('.sym-btn').forEach(b => { b.classList.remove('bg-tv-blue', 'text-white'); b.classList.add('bg-tv-bg', 'text-tv-text'); });
-      this.classList.remove('bg-tv-bg', 'text-tv-text');
-      this.classList.add('bg-tv-blue', 'text-white');
-      currentSymbol = this.dataset.symbol;
-      loadChartWidget();
+      setActiveSymbol(this.dataset.symbol);
+    }));
+
+    document.querySelectorAll('.wl-item').forEach(item => item.addEventListener('click', function(e) {
+      e.preventDefault();
+      setActiveSymbol(this.dataset.wl);
     }));
 
     document.getElementById('customSymbolForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const val = document.getElementById('customSymbolInput').value.trim().toUpperCase();
-      if (val) { currentSymbol = val; loadChartWidget(); }
+      if (val) setActiveSymbol(val);
     });
 
     document.querySelectorAll('.tf-btn').forEach(btn => btn.addEventListener('click', function(e) {
@@ -903,6 +1222,7 @@
         createTvWidget('tv_chart_container_3', document.getElementById('quadSymbol3').value, document.getElementById('quadTf3').value, [], true);
         createTvWidget('tv_chart_container_4', document.getElementById('quadSymbol4').value, document.getElementById('quadTf4').value, [], true);
       }
+      setTimeout(resizeDrawCanvas, 100);
     }
 
     document.getElementById('layoutSingleBtn').addEventListener('click', () => setChartLayout('1x'));
@@ -920,9 +1240,26 @@
 
     document.getElementById('toggleIndicatorBarBtn').addEventListener('click', () => document.getElementById('indicatorBar').classList.toggle('hidden'));
     document.getElementById('hideIndicatorBarBtn').addEventListener('click', () => document.getElementById('indicatorBar').classList.add('hidden'));
-    document.getElementById('toggleSidebarBtn').addEventListener('click', () => document.getElementById('rightSidebar').classList.toggle('hidden'));
+    document.getElementById('toggleSidebarBtn').addEventListener('click', () => { document.getElementById('rightSidebar').classList.toggle('hidden'); setTimeout(resizeDrawCanvas, 50); });
 
-    // SIDEBAR TOOLS
+    document.querySelectorAll('.tv-left-tool').forEach(btn => btn.addEventListener('click', function() {
+      const qt = this.dataset.quicktool;
+      if (qt === 'fib') { document.getElementById('rightSidebar').classList.remove('hidden'); switchRightTool('fib'); }
+      if (qt === 'calc') { document.getElementById('rightSidebar').classList.remove('hidden'); switchRightTool('calc'); }
+      if (qt === 'prop') { document.getElementById('rightSidebar').classList.remove('hidden'); switchRightTool('prop'); }
+      if (qt === 'alert') { document.getElementById('openAlertModalBtn').click(); }
+    }));
+
+    document.getElementById('toggleFullChartBtn').addEventListener('click', function() {
+      const side = document.getElementById('rightSidebar');
+      const bot = document.getElementById('bottomPanel');
+      const bothHidden = side.classList.contains('hidden') && bot.classList.contains('hidden');
+      side.classList.toggle('hidden', !bothHidden);
+      bot.classList.toggle('hidden', !bothHidden);
+      document.getElementById('footerShowBottomBtn').classList.toggle('hidden', bothHidden);
+      setTimeout(resizeDrawCanvas, 50);
+    });
+
     function switchRightTool(toolName) {
       if ((toolName === 'fib' || toolName === 'prop') && !isProActive()) { showUpgradeModal(); return; }
       ['Calc', 'Fib', 'Prop'].forEach(t => {
@@ -1004,7 +1341,6 @@
     }
     ['propAccSize', 'propDailyMax', 'propTargetPct'].forEach(id => document.getElementById(id).addEventListener('input', updatePropGuard));
 
-    // JOURNAL & BOTTOM TABS
     function saveTrades() {
       localStorage.setItem('pipscopetrade1_trades_v1', JSON.stringify(trades));
       renderJournal();
@@ -1076,7 +1412,7 @@
     }
 
     function switchBottomTab(tabName) {
-      if (tabName !== 'screener' && !isProActive()) { showUpgradeModal(); return; }
+      if (!isProActive()) { showUpgradeModal(); return; }
       document.querySelectorAll('.btab-btn').forEach(b => {
         b.classList.remove('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue');
         b.classList.add('font-medium', 'text-tv-muted');
@@ -1085,17 +1421,6 @@
       if (activeBtn) activeBtn.classList.add('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue');
       document.querySelectorAll('.btab-content').forEach(c => c.classList.add('hidden'));
       document.getElementById('tab-' + tabName).classList.remove('hidden');
-      if (tabName === 'screener') {
-        const wrap = document.getElementById('tvScreenerContainer');
-        if (!wrap.dataset.loaded) {
-          wrap.dataset.loaded = '1';
-          const s = document.createElement('script');
-          s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
-          s.async = true;
-          s.innerHTML = JSON.stringify({ width: '100%', height: '100%', defaultColumn: 'overview', defaultScreen: 'general', market: 'forex', showToolbar: true, colorTheme: 'dark', locale: 'en', isTransparent: true });
-          wrap.appendChild(s);
-        }
-      }
     }
     document.querySelectorAll('.btab-btn').forEach(btn => btn.addEventListener('click', () => switchBottomTab(btn.dataset.btab)));
     document.getElementById('openPineModalBtn').addEventListener('click', () => switchBottomTab('pine'));
@@ -1103,13 +1428,14 @@
     document.getElementById('toggleBottomPanelBtn').addEventListener('click', () => {
       document.getElementById('bottomPanel').classList.add('hidden');
       document.getElementById('footerShowBottomBtn').classList.remove('hidden');
+      setTimeout(resizeDrawCanvas, 50);
     });
     document.getElementById('footerShowBottomBtn').addEventListener('click', function() {
       document.getElementById('bottomPanel').classList.remove('hidden');
       this.classList.add('hidden');
+      setTimeout(resizeDrawCanvas, 50);
     });
 
-    // LAYOUTS, ALERTS, PAPER PANEL, CLOCK
     function renderSavedLayouts() {
       const list = document.getElementById('savedLayoutsList');
       list.innerHTML = savedLayouts.length ? savedLayouts.map((l, idx) => `
@@ -1150,7 +1476,7 @@
           <span><strong class="text-white">${a.symbol}</strong> @ <span class="text-amber-400">${a.price}</span></span>
           <button onclick="removePriceAlert(${i})" class="text-tv-muted hover:text-tv-red">Delete</button>
         </div>
-      `).join('') : '<div class="text-tv-muted text-center py-3 font-sans">No alerts set.</div>';
+      `).join('') : '<div class="text-tv-muted text-center py-3 font-sans">No active alerts.</div>';
     }
     window.removePriceAlert = function(i) { priceAlerts.splice(i, 1); localStorage.setItem('pipscopetrade1_alerts', JSON.stringify(priceAlerts)); renderAlerts(); };
     document.getElementById('openAlertModalBtn').addEventListener('click', () => { document.getElementById('alertSymInput').value = currentSymbol.split(':').pop(); renderAlerts(); document.getElementById('alertModal').classList.remove('hidden'); document.getElementById('alertModal').classList.add('flex'); });
@@ -1162,6 +1488,7 @@
       priceAlerts.push({ symbol: sym, price });
       localStorage.setItem('pipscopetrade1_alerts', JSON.stringify(priceAlerts));
       document.getElementById('alertPriceInput').value = '';
+      playAlertSound();
       renderAlerts();
     });
 
@@ -1170,8 +1497,10 @@
     function placePaperOrder(side) {
       if (!isProActive()) { showUpgradeModal(); return; }
       const lots = document.getElementById('floatLotInput').value || '0.10';
+      const shortSym = currentSymbol.split(':').pop();
+      const fillPrice = livePrices[shortSym] ? livePrices[shortSym] : 'Market';
       const now = new Date();
-      trades.unshift({ id: Date.now(), dateKey: now.toISOString().slice(0, 10), time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), symbol: currentSymbol.split(':').pop(), side, size: lots + ' Lots', entry: 'Market', sl: '-', tp: '-', note: 'Paper Order', status: 'OPEN', pnl: 0 });
+      trades.unshift({ id: Date.now(), dateKey: now.toISOString().slice(0, 10), time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), symbol: shortSym, side, size: lots + ' Lots', entry: fillPrice, sl: '-', tp: '-', note: 'Live Paper Order', status: 'OPEN', pnl: 0 });
       saveTrades();
     }
     document.getElementById('instantBuyBtn').addEventListener('click', () => placePaperOrder('BUY'));
@@ -1194,36 +1523,12 @@
     }
     setInterval(updateClock, 1000);
 
-    function loadWatchlist() {
-      const wrap = document.getElementById('marketOverviewWidget');
-      wrap.innerHTML = '';
-      const s = document.createElement('script');
-      s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
-      s.async = true;
-      s.innerHTML = JSON.stringify({ colorTheme: 'dark', dateRange: '1D', showChart: false, locale: 'en', width: '100%', height: '100%', isTransparent: true, tabs: [{ title: 'Watchlist', symbols: [{ s: 'OANDA:XAUUSD', d: 'Gold' }, { s: 'FX:EURUSD', d: 'EURUSD' }, { s: 'BINANCE:BTCUSDT', d: 'BTC' }, { s: 'NSE:NIFTY', d: 'NIFTY' }] }] });
-      wrap.appendChild(s);
-    }
-
-    document.getElementById('sideTabWatchlist').addEventListener('click', () => { document.getElementById('marketOverviewWidget').classList.remove('hidden'); document.getElementById('economicCalendarWidget').classList.add('hidden'); });
-    document.getElementById('sideTabCalendar').addEventListener('click', () => {
-      document.getElementById('economicCalendarWidget').classList.remove('hidden');
-      document.getElementById('marketOverviewWidget').classList.add('hidden');
-      const wrap = document.getElementById('economicCalendarWidget');
-      if (!wrap.dataset.loaded) {
-        wrap.dataset.loaded = '1';
-        const s = document.createElement('script');
-        s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
-        s.async = true;
-        s.innerHTML = JSON.stringify({ colorTheme: 'dark', isTransparent: true, width: '100%', height: '100%', locale: 'en', importanceFilter: '0,1' });
-        wrap.appendChild(s);
-      }
-    });
-
     window.addEventListener('DOMContentLoaded', async function() {
       updateAuthUI();
       updateClock();
       loadChartWidget();
-      loadWatchlist();
+      startLiveMarketFeeds();
+      setTimeout(resizeDrawCanvas, 150);
       await checkGoogleSheetApproval();
       refreshAllUI();
     });
