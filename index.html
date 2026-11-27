@@ -106,6 +106,8 @@
     </div>
 
     <div class="flex items-center gap-1 shrink-0">
+      <button type="button" id="forceRefreshChartBtn" title="Force Reload Chart Feed" class="px-1.5 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-emerald-400 shrink-0">🔄</button>
+
       <select id="chartStyleSelect" title="Chart Style" class="hidden 2xl:block bg-tv-bg border border-tv-border rounded px-1.5 py-1 text-[11px] font-mono text-white outline-none">
         <option value="1" selected>Candles</option>
         <option value="9">Hollow</option>
@@ -113,11 +115,11 @@
         <option value="3">Area</option>
       </select>
 
-      <button type="button" id="toggleReplayBtn" title="Bar Replay Backtest Mode (R)" class="px-2 py-1 text-[11px] font-mono bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-amber-300 flex items-center gap-1 shrink-0">
+      <button type="button" id="toggleReplayBtn" title="Bar Replay Backtest Mode (Alt+R)" class="px-2 py-1 text-[11px] font-mono bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-amber-300 flex items-center gap-1 shrink-0">
         <span>⏯</span><span class="hidden md:inline">Replay</span>
       </button>
 
-      <button type="button" id="openScratchpadBtn" title="Quick Notes / Scratchpad (N)" class="px-2 py-1 text-[11px] bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-sky-300 flex items-center gap-1 shrink-0">
+      <button type="button" id="openScratchpadBtn" title="Quick Notes / Scratchpad (Alt+N)" class="px-2 py-1 text-[11px] bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-sky-300 flex items-center gap-1 shrink-0">
         <span>📝</span><span class="hidden lg:inline">Notes</span>
       </button>
 
@@ -169,7 +171,7 @@
     </div>
   </div>
 
-  <!-- INDICATOR BAR -->
+  <!-- SAFE POPUP-FREE INDICATOR BAR -->
   <div id="indicatorBar" class="bg-tv-panel/80 border-b border-tv-border px-3 py-1.5 flex flex-wrap items-center justify-between gap-2 shrink-0">
     <div class="flex items-center gap-1.5 flex-wrap">
       <span class="text-[11px] font-semibold uppercase tracking-wider text-tv-muted mr-1"><span class="text-tv-blue font-mono">fx</span> Studies:</span>
@@ -178,14 +180,12 @@
       <button type="button" data-study="RSI@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">RSI</button>
       <button type="button" data-study="MACD@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">MACD</button>
       <button type="button" data-study="BB@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">Bollinger</button>
-      <button type="button" data-study="VWAP@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">VWAP</button>
       <button type="button" data-study="Volume@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">Volume</button>
-      <button type="button" data-study="ATR@tv-basicstudies" class="study-btn px-2 py-0.5 text-xs font-mono bg-tv-panel border border-tv-border rounded hover:border-tv-blue">ATR</button>
     </div>
     <div class="flex items-center gap-2">
       <span id="activeStudiesCount" class="text-[11px] font-mono text-tv-blue">0/1 Free Study</span>
       <button type="button" id="openLayoutModalBtn" class="px-2 py-0.5 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text">☁️ Layouts</button>
-      <button type="button" id="openPineModalBtn" class="px-2 py-0.5 text-xs font-medium bg-tv-green/20 hover:bg-tv-green/30 text-tv-green border border-tv-green/40 rounded">Pine v5</button>
+      <button type="button" id="openPineModalBtn" class="px-2 py-0.5 text-xs font-medium bg-tv-green/20 hover:bg-tv-green/30 text-tv-green border border-tv-green/40 rounded">Custom Strategy</button>
       <button type="button" id="hideIndicatorBarBtn" class="text-xs text-tv-muted hover:text-white px-1">Hide</button>
     </div>
   </div>
@@ -198,6 +198,7 @@
       <span class="text-tv-muted">H: <strong id="ohlcHigh" class="text-emerald-400">—</strong></span>
       <span class="text-tv-muted">L: <strong id="ohlcLow" class="text-rose-400">—</strong></span>
       <span class="text-tv-muted">C: <strong id="ohlcClose" class="text-white">—</strong></span>
+      <span id="liveStrategySignalBadge" class="hidden px-2 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold">Strategy: Ready</span>
     </div>
     <div class="flex items-center gap-2 shrink-0">
       <span class="text-tv-muted">Bar Close:</span>
@@ -207,7 +208,7 @@
 
   <!-- MAIN WORKSPACE -->
   <div class="flex-1 flex min-h-0 overflow-hidden">
-    <!-- LEFT VERTICAL DRAWING, R:R BOX, RULER & TERMINAL TOOLBAR -->
+    <!-- LEFT VERTICAL DRAWING, FAVORITE BAR TOGGLE & TERMINAL TOOLBAR -->
     <nav class="w-10 bg-tv-panel border-r border-tv-border flex flex-col items-center py-2 gap-1.5 shrink-0 z-20">
       <button type="button" data-drawtool="cursor" title="Interactive Chart Cursor (Esc)" class="tv-draw-btn tool-active w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">╋</button>
       <button type="button" data-drawtool="line" title="Trendline" class="tv-draw-btn w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">╱</button>
@@ -221,25 +222,41 @@
 
       <div class="w-5 border-t border-tv-border my-1"></div>
 
-      <button type="button" data-quicktool="fib" title="Golden Zone Calculator" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">📐</button>
+      <!-- TRADINGVIEW-STYLE FLOATING FAVORITE DRAWING TOOLBAR TOGGLE -->
+      <button type="button" id="toggleFavToolbarBtn" title="Show/Hide Floating Favorite Drawing Bar" class="w-7 h-7 rounded flex items-center justify-center text-xs text-amber-400 hover:bg-tv-hover">★</button>
       <button type="button" data-quicktool="calc" title="Risk & Lot Calculator" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">⚖️</button>
       <button type="button" data-quicktool="prop" title="Prop Firm Guard" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">🛡️</button>
       <button type="button" data-quicktool="alert" title="Price Alerts" class="tv-left-tool w-7 h-7 rounded flex items-center justify-center text-xs text-tv-muted hover:text-white hover:bg-tv-hover">🔔</button>
-      <button type="button" id="toggleFullChartBtn" title="Fullscreen Chart (F)" class="w-7 h-7 rounded flex items-center justify-center text-xs text-amber-400 hover:bg-tv-hover">⛶</button>
+      <button type="button" id="toggleFullChartBtn" title="Fullscreen Chart (Alt+F)" class="w-7 h-7 rounded flex items-center justify-center text-xs text-sky-400 hover:bg-tv-hover">⛶</button>
     </nav>
 
     <!-- CHART AREA -->
     <main id="chartWorkspace" class="flex-1 grid grid-cols-1 grid-rows-1 min-w-0 bg-tv-bg relative">
-      <!-- BAR REPLAY FLOATING BAR -->
-      <div id="replayControlBar" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-30 bg-tv-panel/95 backdrop-blur border border-amber-500/50 rounded-full px-4 py-1.5 shadow-2xl flex items-center gap-3 font-mono text-xs">
+      <!-- DRAGGABLE FLOATING FAVORITE DRAWING BAR (TRADINGVIEW STYLE) -->
+      <div id="floatingFavDrawBar" style="top: 14px; left: 64px;" class="hidden absolute z-30 bg-tv-panel/95 backdrop-blur border border-tv-border rounded-lg shadow-2xl px-2 py-1.5 flex items-center gap-1 font-mono text-xs">
+        <span id="favDrawDragHandle" title="Drag Toolbar" class="cursor-move text-tv-muted hover:text-white px-1 select-none">⋮⋮</span>
+        <button type="button" data-drawtool="rrbox" title="Long/Short R:R Box" class="tv-draw-btn px-2 py-1 rounded hover:bg-tv-hover text-emerald-400">🎯 R:R</button>
+        <button type="button" data-drawtool="line" title="Trendline" class="tv-draw-btn px-2 py-1 rounded hover:bg-tv-hover text-white">╱ Line</button>
+        <button type="button" data-drawtool="hline" title="Horizontal Line" class="tv-draw-btn px-2 py-1 rounded hover:bg-tv-hover text-amber-300">― H-Line</button>
+        <button type="button" data-drawtool="rect" title="Order Block Zone" class="tv-draw-btn px-2 py-1 rounded hover:bg-tv-hover text-sky-300">▭ Box</button>
+        <button type="button" data-drawtool="ruler" title="Measure Ruler" class="tv-draw-btn px-2 py-1 rounded hover:bg-tv-hover text-amber-300">📏</button>
+        <button type="button" data-drawtool="brush" title="Brush" class="tv-draw-btn px-2 py-1 rounded hover:bg-tv-hover text-emerald-300">✎</button>
+        <button type="button" data-drawtool="cursor" title="Cursor" class="tv-draw-btn px-1.5 py-1 rounded hover:bg-tv-hover text-tv-muted">╋</button>
+        <button type="button" id="closeFavDrawBarBtn" title="Close Favorite Bar" class="text-tv-muted hover:text-white px-1">✕</button>
+      </div>
+
+      <!-- BAR REPLAY FLOATING BAR WITH CUT START POINT -->
+      <div id="replayControlBar" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-30 bg-tv-panel/95 backdrop-blur border border-amber-500/50 rounded-full px-3 py-1.5 shadow-2xl flex items-center gap-2 font-mono text-xs">
         <span class="text-amber-300 font-bold">REPLAY</span>
         <span id="replayStepCounter" class="text-white">Bar #1</span>
+        <input id="replayCutPriceInput" type="number" step="any" placeholder="Cut Price" class="w-24 bg-tv-deep border border-tv-border rounded px-1.5 py-0.5 text-white text-[11px] outline-none" />
+        <button type="button" id="replayCutHereBtn" title="Cut / Set Replay Start Point from Current Price" class="px-2 py-0.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded text-[11px]">✂ Cut Here</button>
         <button type="button" id="replayPlayPauseBtn" class="px-2.5 py-0.5 bg-tv-blue hover:bg-tv-blueHover text-white font-bold rounded">▶ Play</button>
-        <button type="button" id="replayStepNextBtn" class="px-2 py-0.5 bg-tv-bg hover:bg-tv-hover border border-tv-border text-white rounded">⏭ +1 Bar</button>
-        <select id="replaySpeedSelect" class="bg-tv-bg border border-tv-border rounded px-1.5 py-0.5 text-white text-[11px] outline-none">
-          <option value="1200" selected>1x</option>
-          <option value="600">2x</option>
-          <option value="250">5x</option>
+        <button type="button" id="replayStepNextBtn" class="px-2 py-0.5 bg-tv-bg hover:bg-tv-hover border border-tv-border text-white rounded">⏭ +1</button>
+        <select id="replaySpeedSelect" class="bg-tv-bg border border-tv-border rounded px-1 py-0.5 text-white text-[11px] outline-none">
+          <option value="1000" selected>1x</option>
+          <option value="500">2x</option>
+          <option value="200">5x</option>
         </select>
         <button type="button" id="exitReplayBtn" class="text-tv-red hover:underline text-[11px] font-sans font-semibold">Exit</button>
       </div>
@@ -251,7 +268,7 @@
 
       <canvas id="chartDrawCanvas" class="absolute inset-0 w-full h-full z-20 pointer-events-none"></canvas>
 
-      <div id="floatingOrderPanel" class="hidden absolute top-3 left-14 z-30 bg-tv-panel/95 backdrop-blur border border-tv-border rounded-lg shadow-2xl p-2 flex items-center gap-2 font-mono text-xs">
+      <div id="floatingOrderPanel" class="hidden absolute top-14 left-14 z-30 bg-tv-panel/95 backdrop-blur border border-tv-border rounded-lg shadow-2xl p-2 flex items-center gap-2 font-mono text-xs">
         <button type="button" id="instantSellBtn" class="px-3 py-1.5 bg-tv-red hover:bg-rose-500 text-white font-bold rounded flex flex-col items-center leading-tight">
           <span class="text-[9px] opacity-80">SELL</span>
           <span id="floatSymbolSell">XAUUSD</span>
@@ -327,9 +344,8 @@
       </div>
     </main>
 
-    <!-- RIGHT SIDEBAR -->
+    <!-- RIGHT SIDEBAR (NO GOLDEN ZONE) -->
     <aside id="rightSidebar" class="w-80 bg-tv-panel border-l border-tv-border flex flex-col shrink-0 overflow-y-auto">
-      <!-- LIVE MULTI-TIMEFRAME (MTF) TREND MATRIX -->
       <div class="p-2.5 bg-tv-deep border-b border-tv-border">
         <div class="flex items-center justify-between mb-1.5">
           <span class="text-[10px] font-bold uppercase tracking-wider text-tv-muted">MTF Trend Matrix (<span id="mtfSymLabel" class="text-white">XAUUSD</span>)</span>
@@ -344,22 +360,18 @@
         </div>
       </div>
 
-      <!-- TOOL TABS -->
-      <div class="p-2 bg-tv-deep border-b border-tv-border grid grid-cols-3 gap-1 text-[10px] font-semibold">
+      <!-- TWO TABS ONLY: RISK & LOT + PROP GUARD -->
+      <div class="p-2 bg-tv-deep border-b border-tv-border grid grid-cols-2 gap-1 text-[10px] font-semibold">
         <button type="button" id="toolTabCalc" class="py-1.5 rounded bg-tv-blue text-white">Risk & Lot</button>
-        <button type="button" id="toolTabFib" class="py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white">Golden Zone</button>
         <button type="button" id="toolTabProp" class="py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white">Prop Guard</button>
       </div>
 
-      <!-- CALCULATOR + SPREAD/SLIPPAGE ESTIMATOR + LIVE AUTO-FILL + DISCIPLINE CHECKLIST -->
       <div id="panelToolCalc" class="p-3 border-b border-tv-border">
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-1.5">
             <h2 class="text-xs font-bold uppercase tracking-wider text-white">Risk & Lot</h2>
-            <!-- FEATURE 10: QUICK AUTO-FILL FROM LIVE PRICE -->
             <button type="button" id="autoFillLivePriceBtn" title="Auto-fill Entry/SL/TP from Live Price" class="px-1.5 py-0.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 rounded text-[10px] font-mono text-emerald-300">⚡ Live Fill</button>
           </div>
-          <!-- FEATURE 2: MULTI-CURRENCY / INR QUICK CONVERSION TOGGLE -->
           <div class="flex bg-tv-bg rounded border border-tv-border p-0.5 text-[10px] font-mono">
             <button type="button" id="currUsdBtn" class="px-1.5 py-0.5 rounded bg-tv-blue text-white font-semibold">USD</button>
             <button type="button" id="currInrBtn" class="px-1.5 py-0.5 rounded text-tv-muted hover:text-white">INR ₹</button>
@@ -396,7 +408,6 @@
             <div><label class="block text-[10px] text-tv-muted mb-0.5">Take Profit</label><input id="calcTp" type="number" step="any" placeholder="2662.50" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
           </div>
 
-          <!-- FEATURE 7: LIVE SPREAD & SLIPPAGE ESTIMATOR -->
           <div class="grid grid-cols-2 gap-2 items-center bg-tv-deep border border-tv-border rounded px-2 py-1.5">
             <div>
               <label class="block text-[9px] text-tv-muted uppercase">Est. Spread/Slip (pts)</label>
@@ -408,16 +419,15 @@
             </div>
           </div>
 
-          <input id="calcNote" type="text" placeholder="Setup note (e.g. 0.280 Golden Zone)..." class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 text-[11px] text-white outline-none" />
+          <input id="calcNote" type="text" placeholder="Setup note..." class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 text-[11px] text-white outline-none" />
 
-          <!-- PRE-TRADE DISCIPLINE CHECKLIST -->
           <div class="bg-tv-deep border border-tv-border rounded p-2 space-y-1 text-[11px]">
             <div class="flex items-center justify-between text-[10px] font-bold uppercase text-amber-300">
               <span>Pre-Trade Discipline Check</span>
               <span id="dailyLossStatusTag" class="font-mono text-emerald-400">Session Open</span>
             </div>
             <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue" /><span>1. Higher TF Trend Aligned</span></label>
-            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue" /><span>2. 0.280–0.382 Golden Zone / OB</span></label>
+            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue" /><span>2. Key Level / OB Confirmed</span></label>
             <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="disc-chk accent-tv-blue" /><span>3. Risk ≤ 1% & Clear SL</span></label>
           </div>
 
@@ -431,30 +441,6 @@
         </div>
       </div>
 
-      <!-- GOLDEN ZONE + LIVE AUTO-FILL -->
-      <div id="panelToolFib" class="hidden p-3 border-b border-tv-border space-y-2 text-xs">
-        <div class="flex items-center justify-between">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">0.280–0.382 Golden Zone</h2>
-          <button type="button" id="autoFillFibLiveBtn" class="px-1.5 py-0.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 rounded text-[10px] font-mono text-amber-300">⚡ From Live</button>
-        </div>
-        <div class="grid grid-cols-2 gap-2">
-          <div><label class="block text-[10px] text-tv-muted">Swing Low</label><input id="fibLow" type="number" step="any" placeholder="2620.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
-          <div><label class="block text-[10px] text-tv-muted">Swing High</label><input id="fibHigh" type="number" step="any" placeholder="2660.00" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none" /></div>
-        </div>
-        <select id="fibTrend" class="w-full bg-tv-bg border border-tv-border rounded px-2 py-1 font-mono text-white outline-none">
-          <option value="BULL">Bullish Impulse (Buy Pullback)</option>
-          <option value="BEAR">Bearish Impulse (Sell Pullback)</option>
-        </select>
-        <div class="bg-tv-bg border border-amber-500/30 rounded p-2 space-y-1 font-mono text-[11px]">
-          <div class="flex justify-between text-amber-300 font-bold"><span>0.280–0.382 Zone:</span><span id="fibSniperZone">—</span></div>
-          <div class="flex justify-between"><span>0.500 Equilibrium:</span><span id="fibHalfLevel">—</span></div>
-          <div class="flex justify-between text-emerald-400"><span>0.618 Golden Pocket:</span><span id="fibGoldenLevel">—</span></div>
-          <div class="flex justify-between text-sky-400"><span>-0.272 Extension:</span><span id="fibTargetLevel">—</span></div>
-        </div>
-        <button type="button" id="applyFibToCalcBtn" class="w-full py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded">⚡ Send to Calculator</button>
-      </div>
-
-      <!-- PROP GUARD + DAILY LOSS LOCK -->
       <div id="panelToolProp" class="hidden p-3 border-b border-tv-border space-y-2 text-xs">
         <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Prop Firm & Daily Loss Guard</h2>
         <div class="grid grid-cols-3 gap-1.5">
@@ -478,15 +464,12 @@
         </div>
       </div>
 
-      <!-- FEATURE 4 & 6: FAVORITES STRIP + CUSTOM WATCHLIST MANAGER -->
       <div class="flex-1 flex flex-col p-3 gap-2">
         <div class="flex items-center justify-between">
           <span class="text-[11px] font-bold uppercase tracking-wider text-tv-muted">Favorites & Watchlist</span>
           <span class="text-[10px] font-mono text-emerald-400">● Cloud Synced</span>
         </div>
-        <!-- Pinned Favorites Quick-Switch Strip -->
         <div id="favoritesQuickStrip" class="flex flex-wrap gap-1"></div>
-
         <form id="addWatchlistForm" class="flex gap-1">
           <input id="newWlSymbolInput" type="text" placeholder="e.g. OANDA:XAGUSD" class="flex-1 bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-2 py-1 text-[11px] font-mono text-white outline-none" />
           <button type="submit" class="px-2 py-1 bg-tv-blue hover:bg-tv-blueHover text-white font-mono text-[11px] font-bold rounded">+ Add</button>
@@ -496,23 +479,21 @@
     </aside>
   </div>
 
-  <!-- BOTTOM PANEL (JOURNAL, HEATMAP, SESSION ANALYTICS, PINE V5, SCRATCHPAD) -->
+  <!-- BOTTOM PANEL -->
   <section id="bottomPanel" class="h-48 bg-tv-panel border-t border-tv-border flex flex-col shrink-0 z-10">
     <div class="h-8 px-3 border-b border-tv-border flex items-center justify-between bg-tv-deep overflow-x-auto no-scrollbar gap-2">
       <div class="flex items-center gap-3 text-xs shrink-0">
         <button type="button" data-btab="journal" class="btab-btn font-semibold text-white border-b-2 border-tv-blue py-1.5">
           Journal <span id="journalCountBadge" class="ml-1 px-1.5 py-0.2 bg-tv-blue/20 text-tv-blue rounded font-mono text-[10px]">0</span>
         </button>
-        <button type="button" data-btab="heatmap" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">Heatmap</button>
-        <button type="button" data-btab="analytics" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">Sessions & Curve</button>
+        <button type="button" data-btab="analytics" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">Sessions</button>
         <button type="button" data-btab="pine" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5 flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-tv-green"></span> Pine v5
+          <span class="w-1.5 h-1.5 rounded-full bg-tv-green"></span> Custom Strategy
         </button>
         <button type="button" data-btab="notes" class="btab-btn font-medium text-tv-muted hover:text-white py-1.5">📝 Scratchpad</button>
       </div>
 
       <div class="flex items-center gap-1.5 text-xs font-mono shrink-0">
-        <!-- FEATURE 3: TRADE SEARCH & STATUS FILTER -->
         <input id="journalSearchInput" type="text" placeholder="Search symbol/note..." class="w-28 sm:w-36 bg-tv-panel border border-tv-border rounded px-2 py-0.5 text-[11px] font-sans text-white outline-none" />
         <select id="journalFilterSelect" class="bg-tv-panel border border-tv-border rounded px-1.5 py-0.5 text-[11px] font-sans text-white outline-none">
           <option value="ALL">All</option>
@@ -537,57 +518,41 @@
       </table>
     </div>
 
-    <div id="tab-heatmap" class="btab-content hidden flex-1 overflow-auto p-3">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-bold text-white" id="heatmapMonthTitle">Monthly P&L Heatmap</span>
-        <div class="flex items-center gap-3 text-[11px] font-mono"><span class="text-emerald-400">■ Profit</span><span class="text-rose-400">■ Loss</span></div>
-      </div>
-      <div id="heatmapGrid" class="grid grid-cols-7 sm:grid-cols-10 lg:grid-cols-16 gap-1.5 font-mono text-[10px]"></div>
-    </div>
-
-    <!-- FEATURE 9: SESSION-WISE WIN RATE BREAKDOWN + EQUITY CURVE -->
     <div id="tab-analytics" class="btab-content hidden flex-1 overflow-auto p-3">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 h-full">
-        <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono content-start">
-          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Win Rate</div><div id="statWinRate" class="text-base font-bold text-tv-green">0.0%</div></div>
-          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Asian Win %</div><div id="statWinAsian" class="text-base font-bold text-white">0%</div></div>
-          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">London Win %</div><div id="statWinLondon" class="text-base font-bold text-sky-400">0%</div></div>
-          <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">NY Win %</div><div id="statWinNy" class="text-base font-bold text-amber-400">0%</div></div>
-        </div>
-        <div class="bg-tv-bg border border-tv-border rounded p-2 flex flex-col justify-between">
-          <div class="flex justify-between text-[10px] text-tv-muted"><span>Equity Curve</span><span id="equityPeakLabel" class="font-mono text-emerald-400">Peak: $0.00</span></div>
-          <svg viewBox="0 0 300 70" class="w-full h-14 overflow-visible">
-            <line x1="0" y1="35" x2="300" y2="35" stroke="#2b2b43" stroke-dasharray="3,3" stroke-width="1" />
-            <polyline id="equityPolyline" fill="none" stroke="#089981" stroke-width="2" points="0,35 300,35" />
-          </svg>
-        </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono">
+        <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Overall Win %</div><div id="statWinRate" class="text-base font-bold text-tv-green">0%</div></div>
+        <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">Asian Win %</div><div id="statWinAsian" class="text-base font-bold text-white">0%</div></div>
+        <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">London Win %</div><div id="statWinLondon" class="text-base font-bold text-sky-400">0%</div></div>
+        <div class="bg-tv-bg border border-tv-border rounded p-2"><div class="text-[10px] text-tv-muted font-sans">NY Win %</div><div id="statWinNy" class="text-base font-bold text-amber-400">0%</div></div>
       </div>
     </div>
 
     <div id="tab-pine" class="btab-content hidden flex-1 overflow-hidden p-2 flex gap-2">
-      <div class="w-56 flex flex-col gap-1.5 shrink-0">
-        <select id="pineTemplateSelect" class="bg-tv-bg border border-tv-border rounded px-2 py-1 text-xs text-white outline-none">
-          <option value="golden_zone">🔥 Gold 0.280–0.382 Golden Zone</option>
-          <option value="smc_ob">🏦 SMC Order Blocks & FVG</option>
-          <option value="killzone_box">⏰ London & NY Killzones</option>
-          <option value="ema_cross">📈 EMA 20/50 Crossover</option>
+      <div class="w-60 flex flex-col gap-1.5 shrink-0 text-xs">
+        <select id="pineTemplateSelect" class="bg-tv-bg border border-tv-border rounded px-2 py-1 text-white outline-none">
+          <option value="ema_momentum">📈 Fast/Slow EMA Trend Bias</option>
+          <option value="killzone_session">⏰ London/NY Killzone Filter</option>
         </select>
-        <button type="button" id="copyPineBtn" class="px-2 py-1 bg-tv-blue hover:bg-tv-blueHover text-white text-xs font-medium rounded">Copy Pine v5</button>
+        <div class="grid grid-cols-2 gap-1 font-mono text-[11px]">
+          <div><label class="text-[9px] text-tv-muted">Fast EMA</label><input id="stratFastLen" type="number" value="5" class="w-full bg-tv-bg border border-tv-border rounded px-1.5 py-0.5 text-white outline-none" /></div>
+          <div><label class="text-[9px] text-tv-muted">Slow EMA</label><input id="stratSlowLen" type="number" value="15" class="w-full bg-tv-bg border border-tv-border rounded px-1.5 py-0.5 text-white outline-none" /></div>
+        </div>
+        <button type="button" id="runCustomStrategyBtn" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded">▶ Run Live on Chart</button>
+        <button type="button" id="stopCustomStrategyBtn" class="px-2 py-1 bg-tv-bg hover:bg-tv-hover border border-tv-border text-tv-muted rounded">■ Stop Overlay</button>
       </div>
       <textarea id="pineEditor" spellcheck="false" class="flex-1 bg-tv-deep border border-tv-border rounded p-2 font-mono text-xs text-emerald-300 outline-none resize-none"></textarea>
     </div>
 
-    <!-- FEATURE 1: QUICK NOTES / SCRATCHPAD DRAWER TAB -->
     <div id="tab-notes" class="btab-content hidden flex-1 overflow-hidden p-2 flex flex-col gap-1.5">
       <div class="flex items-center justify-between text-[11px]">
         <span class="text-tv-muted font-semibold">Trading Scratchpad (Auto-saved locally & synced to cloud)</span>
         <span id="scratchpadSavedStatus" class="font-mono text-emerald-400 text-[10px]">Saved</span>
       </div>
-      <textarea id="scratchpadTextarea" placeholder="Write key levels, XAUUSD 0.280-0.382 setup ideas, or session notes here..." class="flex-1 w-full bg-tv-deep border border-tv-border rounded p-2 font-mono text-xs text-white outline-none resize-none"></textarea>
+      <textarea id="scratchpadTextarea" placeholder="Write key levels or session notes here..." class="flex-1 w-full bg-tv-deep border border-tv-border rounded p-2 font-mono text-xs text-white outline-none resize-none"></textarea>
     </div>
   </section>
 
-  <!-- FEATURE 6: COMPACT MOBILE / SMALL-SCREEN BOTTOM QUICK BAR -->
+  <!-- MOBILE QUICK BAR -->
   <div class="md:hidden h-9 bg-tv-deep border-t border-tv-border grid grid-cols-5 text-[11px] font-semibold shrink-0">
     <button type="button" onclick="mobileSwitchView('chart')" class="text-white hover:bg-tv-hover">📈 Chart</button>
     <button type="button" onclick="mobileSwitchView('calc')" class="text-tv-muted hover:text-white">⚖️ Calc</button>
@@ -597,7 +562,7 @@
   </div>
 
   <!-- FOOTER -->
-  <footer class="hidden md:flex h-5 bg-tv-deep border-t border-tv-border px-3 items-center justify-between text-[10px] text-tv-muted shrink-0">
+  <footer class="hidden md:flex h-5 bg-tv-deep border-t border-tv-border px-3 flex items-center justify-between text-[10px] text-tv-muted shrink-0">
     <div class="flex items-center gap-3">
       <span>pipscopetrade1 Terminal</span>
       <button type="button" id="footerShowBottomBtn" class="hidden text-tv-blue hover:underline font-semibold">▲ Show Bottom Panel</button>
@@ -605,7 +570,7 @@
     <span>Press ? for Shortcuts • Esc = Cursor • Use 15m/1H/4H/1D for 2–3 months history</span>
   </footer>
 
-  <!-- FEATURE 11: KEYBOARD SHORTCUTS CHEAT-SHEET MODAL (?) -->
+  <!-- SHORTCUTS MODAL -->
   <div id="shortcutsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="bg-tv-panel border border-tv-border rounded-xl max-w-md w-full overflow-hidden shadow-2xl">
       <div class="px-5 py-3 border-b border-tv-border flex items-center justify-between bg-tv-deep">
@@ -622,7 +587,7 @@
     </div>
   </div>
 
-  <!-- CHART SETTINGS MODAL (FEATURE 5: RESET DEFAULTS + FEATURE 12: THEME PRESETS) -->
+  <!-- CHART SETTINGS MODAL -->
   <div id="chartSettingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="bg-tv-panel border border-tv-border rounded-xl max-w-2xl w-full overflow-hidden shadow-2xl">
       <div class="px-5 py-3 border-b border-tv-border flex items-center justify-between bg-tv-deep">
@@ -749,7 +714,7 @@
       <div class="px-5 py-3.5 border-b border-tv-border flex items-center justify-between bg-tv-deep">
         <div>
           <h3 class="text-base font-extrabold text-white">⚡ Upgrade to pipscopetrade1 PRO</h3>
-          <p class="text-xs text-tv-muted mt-0.5">All institutional charts, multi-screen layouts, cloud journal & Pine scripts.</p>
+          <p class="text-xs text-tv-muted mt-0.5">All institutional charts, multi-screen layouts, cloud journal & custom strategies.</p>
         </div>
         <button type="button" id="closeUpgradeModalBtn" class="text-tv-muted hover:text-white text-lg px-2">✕</button>
       </div>
@@ -761,8 +726,8 @@
             <li>✓ <strong>2x Split & 4x Multi-Chart Grid</strong></li>
             <li>✓ <strong>Unlimited Indicators Stack</strong></li>
             <li>✓ <strong>Trade Journal, Session Analytics & Heatmap</strong></li>
-            <li>✓ <strong>0.280–0.382 Golden Zone Sniper & Prop Guard</strong></li>
-            <li>✓ <strong>Pine v5 Library & Cross-Device Cloud Sync</strong></li>
+            <li>✓ <strong>Prop Guard & Custom Strategy Runner</strong></li>
+            <li>✓ <strong>Cross-Device Cloud Sync</strong></li>
           </ul>
         </div>
         <div class="bg-tv-bg border border-tv-border rounded-lg p-4 flex flex-col items-center text-center justify-between">
@@ -810,7 +775,9 @@
     let replayActive = false;
     let replayPlaying = false;
     let replayBarIndex = 1;
+    let replayAnchorPrice = null;
     let replayTimer = null;
+    let customStrategyActive = false;
 
     let chartSettings = Object.assign({
       themePreset: 'dark',
@@ -849,6 +816,99 @@
     }
 
     // =========================================================
+    // DRAGGABLE FLOATING FAVORITE DRAWING BAR
+    // =========================================================
+    const favDrawBar = document.getElementById('floatingFavDrawBar');
+    const favDragHandle = document.getElementById('favDrawDragHandle');
+    let isDraggingFavBar = false;
+    let favOffsetX = 0, favOffsetY = 0;
+
+    document.getElementById('toggleFavToolbarBtn').addEventListener('click', () => {
+      favDrawBar.classList.toggle('hidden');
+    });
+    document.getElementById('closeFavDrawBarBtn').addEventListener('click', () => {
+      favDrawBar.classList.add('hidden');
+    });
+
+    favDragHandle.addEventListener('mousedown', (e) => {
+      isDraggingFavBar = true;
+      const rect = favDrawBar.getBoundingClientRect();
+      favOffsetX = e.clientX - rect.left;
+      favOffsetY = e.clientY - rect.top;
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!isDraggingFavBar) return;
+      const wsRect = document.getElementById('chartWorkspace').getBoundingClientRect();
+      const x = Math.max(8, Math.min(wsRect.width - favDrawBar.offsetWidth - 8, e.clientX - wsRect.left - favOffsetX));
+      const y = Math.max(8, Math.min(wsRect.height - favDrawBar.offsetHeight - 8, e.clientY - wsRect.top - favOffsetY));
+      favDrawBar.style.left = x + 'px';
+      favDrawBar.style.top = y + 'px';
+    });
+    window.addEventListener('mouseup', () => { isDraggingFavBar = false; });
+
+    // =========================================================
+    // CUSTOM STRATEGY / SCRIPT ENGINE (NO EXTERNAL POPUP)
+    // =========================================================
+    const STRATEGY_TEMPLATES = {
+      ema_momentum: `// Fast vs Slow EMA Trend Bias\n// BUY bias when fast EMA > slow EMA\n// SELL bias when fast EMA < slow EMA`,
+      killzone_session: `// Session Killzone Strategy\n// Active during London (08:00-17:00 UTC) & NY (13:00-22:00 UTC)`
+    };
+
+    document.getElementById('pineTemplateSelect').addEventListener('change', function() {
+      document.getElementById('pineEditor').value = STRATEGY_TEMPLATES[this.value] || '';
+    });
+    document.getElementById('pineEditor').value = STRATEGY_TEMPLATES.ema_momentum;
+
+    function computeAverage(arr, len) {
+      if (!arr || !arr.length) return 0;
+      const slice = arr.slice(-Math.max(1, len));
+      return slice.reduce((a, b) => a + b, 0) / slice.length;
+    }
+
+    function updateCustomStrategyOverlay(symKey, price) {
+      const badge = document.getElementById('liveStrategySignalBadge');
+      if (!customStrategyActive || currentSymbol.split(':').pop() !== symKey) {
+        badge.classList.add('hidden');
+        return;
+      }
+      const hist = priceHistory[symKey] || [price];
+      const fastLen = Number(document.getElementById('stratFastLen').value) || 5;
+      const slowLen = Number(document.getElementById('stratSlowLen').value) || 15;
+      const fastAvg = computeAverage(hist, fastLen);
+      const slowAvg = computeAverage(hist, slowLen);
+      const signal = fastAvg >= slowAvg ? 'LONG BIAS' : 'SHORT BIAS';
+      badge.textContent = `Strategy: ${signal} (${fastLen}/${slowLen})`;
+      badge.className = fastAvg >= slowAvg
+        ? 'px-2 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold'
+        : 'px-2 py-0.2 rounded bg-rose-500/20 text-rose-300 font-bold';
+      badge.classList.remove('hidden');
+
+      redrawAllShapes();
+      ctx.save();
+      ctx.setLineDash([6, 4]);
+      ctx.strokeStyle = fastAvg >= slowAvg ? '#089981' : '#f23645';
+      ctx.lineWidth = 1.5;
+      const yLine = canvas.height * 0.45;
+      ctx.beginPath(); ctx.moveTo(0, yLine); ctx.lineTo(canvas.width, yLine); ctx.stroke();
+      ctx.fillStyle = fastAvg >= slowAvg ? '#089981' : '#f23645';
+      ctx.font = 'bold 10px JetBrains Mono, monospace';
+      ctx.fillText(`Strategy Signal Line (${signal})`, 14, yLine - 6);
+      ctx.restore();
+    }
+
+    document.getElementById('runCustomStrategyBtn').addEventListener('click', function() {
+      customStrategyActive = true;
+      const shortSym = currentSymbol.split(':').pop();
+      updateCustomStrategyOverlay(shortSym, livePrices[shortSym] || 2650);
+    });
+
+    document.getElementById('stopCustomStrategyBtn').addEventListener('click', function() {
+      customStrategyActive = false;
+      document.getElementById('liveStrategySignalBadge').classList.add('hidden');
+      redrawAllShapes();
+    });
+
+    // =========================================================
     // QUICK NOTES / SCRATCHPAD DRAWER
     // =========================================================
     const scratchpadEl = document.getElementById('scratchpadTextarea');
@@ -872,28 +932,14 @@
       scratchpadEl.focus();
     });
 
-    // =========================================================
-    // MOBILE QUICK SWITCH BAR
-    // =========================================================
     window.mobileSwitchView = function(view) {
       const side = document.getElementById('rightSidebar');
       const bot = document.getElementById('bottomPanel');
-      if (view === 'chart') {
-        side.classList.add('hidden');
-        bot.classList.add('hidden');
-      } else if (view === 'calc') {
-        side.classList.remove('hidden');
-        switchRightTool('calc');
-      } else if (view === 'watchlist') {
-        side.classList.remove('hidden');
-        side.scrollTop = side.scrollHeight;
-      } else if (view === 'journal') {
-        bot.classList.remove('hidden');
-        switchBottomTab('journal', true);
-      } else if (view === 'notes') {
-        bot.classList.remove('hidden');
-        switchBottomTab('notes', true);
-      }
+      if (view === 'chart') { side.classList.add('hidden'); bot.classList.add('hidden'); }
+      else if (view === 'calc') { side.classList.remove('hidden'); switchRightTool('calc'); }
+      else if (view === 'watchlist') { side.classList.remove('hidden'); side.scrollTop = side.scrollHeight; }
+      else if (view === 'journal') { bot.classList.remove('hidden'); switchBottomTab('journal', true); }
+      else if (view === 'notes') { bot.classList.remove('hidden'); switchBottomTab('notes', true); }
       setTimeout(resizeDrawCanvas, 60);
     };
 
@@ -996,16 +1042,14 @@
     window.togglePinWatchlist = function(sym) {
       customWatchlist = customWatchlist.map(w => w.symbol === sym ? Object.assign({}, w, { pinned: !w.pinned }) : w);
       localStorage.setItem('pipscopetrade1_watchlist', JSON.stringify(customWatchlist));
-      renderWatchlist();
-      syncUserToCloud();
+      renderWatchlist(); syncUserToCloud();
     };
 
     window.removeWatchlistItem = function(sym) {
       if (customWatchlist.length <= 1) return;
       customWatchlist = customWatchlist.filter(w => w.symbol !== sym);
       localStorage.setItem('pipscopetrade1_watchlist', JSON.stringify(customWatchlist));
-      renderWatchlist();
-      syncUserToCloud();
+      renderWatchlist(); syncUserToCloud();
     };
 
     document.getElementById('addWatchlistForm').addEventListener('submit', function(e) {
@@ -1015,16 +1059,12 @@
       if (!customWatchlist.some(w => w.symbol === raw)) {
         customWatchlist.push({ symbol: raw, label: raw.split(':').pop(), desc: raw, pinned: false });
         localStorage.setItem('pipscopetrade1_watchlist', JSON.stringify(customWatchlist));
-        renderWatchlist();
-        syncUserToCloud();
+        renderWatchlist(); syncUserToCloud();
       }
       document.getElementById('newWlSymbolInput').value = '';
       setActiveSymbol(raw);
     });
 
-    // =========================================================
-    // QUICK LIVE PRICE AUTO-FILL BUTTONS
-    // =========================================================
     document.getElementById('autoFillLivePriceBtn').addEventListener('click', function() {
       const shortSym = currentSymbol.split(':').pop();
       const base = livePrices[shortSym] || (shortSym.includes('BTC') ? 60500 : shortSym.includes('EUR') || shortSym.includes('GBP') ? 1.09500 : 2650.00);
@@ -1038,17 +1078,8 @@
       updateCalculator();
     });
 
-    document.getElementById('autoFillFibLiveBtn').addEventListener('click', function() {
-      const shortSym = currentSymbol.split(':').pop();
-      const base = livePrices[shortSym] || 2650.00;
-      const swing = shortSym.includes('BTC') ? 800 : (shortSym.includes('EUR') || shortSym.includes('GBP') ? 0.0080 : 25);
-      document.getElementById('fibLow').value = (base - swing).toFixed(2);
-      document.getElementById('fibHigh').value = (base + swing * 0.35).toFixed(2);
-      updateFibGoldenZone();
-    });
-
     // =========================================================
-    // OHLC, BAR COUNTDOWN & REPLAY
+    // OHLC, BAR COUNTDOWN & REPLAY WITH CUT POINT
     // =========================================================
     function updateOhlcBar(price) {
       const dec = currentSymbol.includes('EURUSD') || currentSymbol.includes('GBPUSD') ? 5 : 2;
@@ -1074,33 +1105,60 @@
     }
     setInterval(updateBarCountdown, 1000);
 
+    document.getElementById('replayCutHereBtn').addEventListener('click', function() {
+      const shortSym = currentSymbol.split(':').pop();
+      const inputVal = parseFloat(document.getElementById('replayCutPriceInput').value);
+      const cutP = !isNaN(inputVal) ? inputVal : (livePrices[shortSym] || 2650);
+      replayAnchorPrice = cutP;
+      replayBarIndex = 1;
+      ohlcCandle = { o: cutP, h: cutP, l: cutP, c: cutP };
+      document.getElementById('replayCutPriceInput').value = cutP.toFixed(shortSym.includes('EUR') || shortSym.includes('GBP') ? 5 : 2);
+      document.getElementById('replayStepCounter').textContent = 'Cut @ ' + cutP.toFixed(2) + ' (Bar #1)';
+      updateOhlcBar(cutP);
+    });
+
     function stepReplayBar() {
       replayBarIndex += 1;
-      document.getElementById('replayStepCounter').textContent = 'Bar #' + replayBarIndex;
       const shortSym = currentSymbol.split(':').pop();
-      const base = livePrices[shortSym] || (shortSym.includes('BTC') ? 60000 : shortSym.includes('EUR') || shortSym.includes('GBP') ? 1.09 : 2650);
-      const step = shortSym.includes('BTC') ? 35 : (shortSym.includes('EUR') || shortSym.includes('GBP') ? 0.0008 : 1.5);
-      const nextP = Math.max(0.0001, base + (Math.sin(replayBarIndex * 0.7) + (Math.random() - 0.5)) * step);
-      updatePriceTicker(shortSym, nextP, null, shortSym.includes('EUR') || shortSym.includes('GBP') ? 5 : 2);
+      const isFx = shortSym.includes('EUR') || shortSym.includes('GBP');
+      const base = replayAnchorPrice !== null
+        ? replayAnchorPrice
+        : (livePrices[shortSym] || (shortSym.includes('BTC') ? 60000 : isFx ? 1.09 : 2650));
+      const step = shortSym.includes('BTC') ? 35 : (isFx ? 0.0008 : 1.5);
+      const wave = Math.sin(replayBarIndex * 0.65) * step * 2 + (Math.random() - 0.5) * step;
+      const nextP = Math.max(0.0001, base + wave);
+      if (replayAnchorPrice !== null) replayAnchorPrice = nextP;
+      document.getElementById('replayStepCounter').textContent = 'Bar #' + replayBarIndex;
+      updatePriceTicker(shortSym, nextP, null, isFx ? 5 : 2);
       updateOhlcBar(nextP);
     }
 
     document.getElementById('toggleReplayBtn').addEventListener('click', function() {
       replayActive = !replayActive;
       document.getElementById('replayControlBar').classList.toggle('hidden', !replayActive);
-      if (!replayActive) { replayPlaying = false; clearInterval(replayTimer); document.getElementById('replayPlayPauseBtn').textContent = '▶ Play'; }
+      if (replayActive) {
+        const shortSym = currentSymbol.split(':').pop();
+        const cur = livePrices[shortSym] || 2650;
+        document.getElementById('replayCutPriceInput').value = cur.toFixed(shortSym.includes('EUR') || shortSym.includes('GBP') ? 5 : 2);
+      } else {
+        replayPlaying = false;
+        clearInterval(replayTimer);
+        document.getElementById('replayPlayPauseBtn').textContent = '▶ Play';
+      }
     });
+
     document.getElementById('replayPlayPauseBtn').addEventListener('click', function() {
       replayPlaying = !replayPlaying;
       clearInterval(replayTimer);
       if (replayPlaying) {
         this.textContent = '⏸ Pause';
-        replayTimer = setInterval(stepReplayBar, Number(document.getElementById('replaySpeedSelect').value) || 1200);
+        replayTimer = setInterval(stepReplayBar, Number(document.getElementById('replaySpeedSelect').value) || 1000);
       } else this.textContent = '▶ Play';
     });
+
     document.getElementById('replayStepNextBtn').addEventListener('click', stepReplayBar);
     document.getElementById('exitReplayBtn').addEventListener('click', () => {
-      replayActive = false; replayPlaying = false; clearInterval(replayTimer);
+      replayActive = false; replayPlaying = false; replayAnchorPrice = null; clearInterval(replayTimer);
       document.getElementById('replayControlBar').classList.add('hidden');
       document.getElementById('replayPlayPauseBtn').textContent = '▶ Play';
     });
@@ -1239,6 +1297,7 @@
       const prev = livePrices[symKey];
       livePrices[symKey] = price;
       updateMtfMatrix(symKey, price);
+      updateCustomStrategyOverlay(symKey, price);
       const formatted = price.toFixed(decimals);
       const priceEl = document.getElementById('price-' + symKey);
       const chgEl = document.getElementById('chg-' + symKey);
@@ -1321,7 +1380,7 @@
         } catch (e) {}
       }
       fetchForexRates();
-      setInterval(fetchForexRates, 60000);
+      setInterval(fetchForexRates, 30000);
     }
 
     // =========================================================
@@ -1569,7 +1628,7 @@
         upgradeBtn.className = 'px-2 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 text-black rounded shadow';
         document.getElementById('activeStudiesCount').textContent = activeStudies.length + '/1 Free Study';
       }
-      updateCalculator(); updateFibGoldenZone(); updatePropGuard(); renderJournal(); renderAlerts(); renderWatchlist();
+      updateCalculator(); updatePropGuard(); renderJournal(); renderAlerts(); renderWatchlist();
     }
 
     async function syncUserToCloud() {
@@ -1578,7 +1637,7 @@
       ind.textContent = '☁️ Syncing...';
       const exp = Math.max(Number((proSubscription && proSubscription.expiresAt) || 0), Number((currentUser && currentUser.expiresAt) || 0));
       const plan = isProActive() ? 'PRO' : 'FREE';
-      const syncUrl = `${GOOGLE_SHEET_SCRIPT_URL}?action=sync&email=${encodeURIComponent(currentUser.email)}&plan=${encodeURIComponent(plan)}&expiresAt=${encodeURIComponent(exp)}&trades=${encodeURIComponent(JSON.stringify(trades.slice(0, 30)))}&layouts=${encodeURIComponent(JSON.stringify(savedLayouts.slice(0, 15)))}&watchlist=${encodeURIComponent(JSON.stringify(customWatchlist.slice(0, 20)))}&_t=${Date.now()}`;
+      const syncUrl = `${GOOGLE_SHEET_SCRIPT_URL}?action=sync&email=${encodeURIComponent(currentUser.email)}&plan=${encodeURIComponent(plan)}&expiresAt=${encodeURIComponent(exp)}&trades=${encodeURIComponent(JSON.stringify(trades.slice(0, 30)))}&layouts=${encodeURIComponent(JSON.stringify(savedLayouts.slice(0, 15)))}&watchlist=${encodeURIComponent(JSON.stringify(customWatchlist.slice(0, 20)))}&notes=${encodeURIComponent(scratchpadText.slice(0, 2000))}&_t=${Date.now()}`;
       try { await fetch(syncUrl, { mode: 'no-cors' }); } catch (e) { new Image().src = syncUrl; }
       ind.textContent = '☁️ Synced';
       ind.className = 'hidden md:inline-block text-[10px] text-emerald-400';
@@ -1657,6 +1716,7 @@
           if (Array.isArray(data.user.trades) && data.user.trades.length) { trades = data.user.trades; localStorage.setItem('pipscopetrade1_trades_v1', JSON.stringify(trades)); }
           if (Array.isArray(data.user.layouts) && data.user.layouts.length) { savedLayouts = data.user.layouts; localStorage.setItem('pipscopetrade1_layouts', JSON.stringify(savedLayouts)); }
           if (Array.isArray(data.user.watchlist) && data.user.watchlist.length) { customWatchlist = data.user.watchlist; localStorage.setItem('pipscopetrade1_watchlist', JSON.stringify(customWatchlist)); }
+          if (typeof data.user.notes === 'string' && data.user.notes) { scratchpadText = data.user.notes; scratchpadEl.value = scratchpadText; localStorage.setItem('pipscopetrade1_notes', scratchpadText); }
           updateAuthUI(); refreshAllUI();
           document.getElementById('authModal').classList.add('hidden'); document.getElementById('authModal').classList.remove('flex');
         } else {
@@ -1739,6 +1799,11 @@
       });
     }
 
+    document.getElementById('forceRefreshChartBtn').addEventListener('click', () => {
+      loadChartWidget();
+      startLiveMarketFeeds();
+    });
+
     document.getElementById('chartStyleSelect').addEventListener('change', function() {
       currentChartStyle = this.value;
       loadChartWidget();
@@ -1747,11 +1812,12 @@
     window.setActiveSymbol = function(sym) {
       currentSymbol = sym;
       ohlcCandle = { o: null, h: null, l: null, c: null };
+      replayAnchorPrice = null;
       const shortSym = sym.split(':').pop();
       document.getElementById('headerActiveSym').textContent = shortSym;
       document.getElementById('mtfSymLabel').textContent = shortSym;
       document.getElementById('headerActivePrice').textContent = livePrices[shortSym] ? livePrices[shortSym].toFixed(shortSym === 'EURUSD' || shortSym === 'GBPUSD' ? 5 : 2) : 'Live';
-      if (livePrices[shortSym]) { updateOhlcBar(livePrices[shortSym]); updateMtfMatrix(shortSym, livePrices[shortSym]); }
+      if (livePrices[shortSym]) { updateOhlcBar(livePrices[shortSym]); updateMtfMatrix(shortSym, livePrices[shortSym]); updateCustomStrategyOverlay(shortSym, livePrices[shortSym]); }
       document.querySelectorAll('.sym-btn').forEach(b => {
         const match = b.dataset.symbol === sym;
         b.classList.toggle('bg-tv-blue', match); b.classList.toggle('text-white', match);
@@ -1799,7 +1865,8 @@
     document.getElementById('layoutSplitBtn').addEventListener('click', () => setChartLayout('2x'));
     document.getElementById('layoutQuadBtn').addEventListener('click', () => setChartLayout('4x'));
 
-    document.querySelectorAll('.study-btn').forEach(btn => btn.addEventListener('click', function() {
+    document.querySelectorAll('.study-btn').forEach(btn => btn.addEventListener('click', function(e) {
+      e.preventDefault();
       const id = this.dataset.study;
       if (!isProActive() && activeStudies.length >= 1 && !activeStudies.includes(id)) { showUpgradeModal(); return; }
       if (activeStudies.includes(id)) { activeStudies = activeStudies.filter(s => s !== id); this.classList.remove('active-study'); }
@@ -1813,7 +1880,6 @@
 
     document.querySelectorAll('.tv-left-tool').forEach(btn => btn.addEventListener('click', function() {
       const qt = this.dataset.quicktool;
-      if (qt === 'fib') { document.getElementById('rightSidebar').classList.remove('hidden'); switchRightTool('fib'); }
       if (qt === 'calc') { document.getElementById('rightSidebar').classList.remove('hidden'); switchRightTool('calc'); }
       if (qt === 'prop') { document.getElementById('rightSidebar').classList.remove('hidden'); switchRightTool('prop'); }
       if (qt === 'alert') { document.getElementById('openAlertModalBtn').click(); }
@@ -1828,15 +1894,14 @@
     });
 
     function switchRightTool(toolName) {
-      if ((toolName === 'fib' || toolName === 'prop') && !isProActive()) { showUpgradeModal(); return; }
-      ['Calc', 'Fib', 'Prop'].forEach(t => {
+      if (toolName === 'prop' && !isProActive()) { showUpgradeModal(); return; }
+      ['Calc', 'Prop'].forEach(t => {
         const active = t.toLowerCase() === toolName;
         document.getElementById('toolTab' + t).className = active ? 'py-1.5 rounded bg-tv-blue text-white' : 'py-1.5 rounded bg-tv-panel text-tv-muted hover:text-white';
         document.getElementById('panelTool' + t).classList.toggle('hidden', !active);
       });
     }
     document.getElementById('toolTabCalc').addEventListener('click', () => switchRightTool('calc'));
-    document.getElementById('toolTabFib').addEventListener('click', () => switchRightTool('fib'));
     document.getElementById('toolTabProp').addEventListener('click', () => switchRightTool('prop'));
 
     function updateCalculator() {
@@ -1875,33 +1940,6 @@
     document.getElementById('currUsdBtn').addEventListener('click', () => { currencyMode = 'USD'; updateCalculator(); renderJournal(); });
     document.getElementById('currInrBtn').addEventListener('click', () => { currencyMode = 'INR'; updateCalculator(); renderJournal(); });
 
-    let computedFib = null;
-    function updateFibGoldenZone() {
-      const low = parseFloat(document.getElementById('fibLow').value);
-      const high = parseFloat(document.getElementById('fibHigh').value);
-      const trend = document.getElementById('fibTrend').value;
-      if (isNaN(low) || isNaN(high) || high <= low) return;
-      const d = high - low;
-      const z280 = trend === 'BULL' ? high - d * 0.280 : low + d * 0.280;
-      const z382 = trend === 'BULL' ? high - d * 0.382 : low + d * 0.382;
-      const half = trend === 'BULL' ? high - d * 0.500 : low + d * 0.500;
-      const g618 = trend === 'BULL' ? high - d * 0.618 : low + d * 0.618;
-      const tgt  = trend === 'BULL' ? high + d * 0.272 : low - d * 0.272;
-      document.getElementById('fibSniperZone').textContent = `${z280.toFixed(2)} – ${z382.toFixed(2)}`;
-      document.getElementById('fibHalfLevel').textContent = half.toFixed(2);
-      document.getElementById('fibGoldenLevel').textContent = g618.toFixed(2);
-      document.getElementById('fibTargetLevel').textContent = tgt.toFixed(2);
-      computedFib = { side: trend === 'BULL' ? 'BUY' : 'SELL', entry: +((z280 + z382) / 2).toFixed(2), sl: +(trend === 'BULL' ? g618 - d * 0.08 : g618 + d * 0.08).toFixed(2), tp: +tgt.toFixed(2) };
-    }
-    ['fibLow', 'fibHigh', 'fibTrend'].forEach(id => document.getElementById(id).addEventListener('input', updateFibGoldenZone));
-    document.getElementById('applyFibToCalcBtn').addEventListener('click', function() {
-      if (!computedFib) return;
-      document.getElementById('calcSide').value = computedFib.side; document.getElementById('calcEntry').value = computedFib.entry;
-      document.getElementById('calcSl').value = computedFib.sl; document.getElementById('calcTp').value = computedFib.tp;
-      document.getElementById('calcNote').value = '0.280-0.382 Golden Zone';
-      switchRightTool('calc'); updateCalculator();
-    });
-
     function updatePropGuard() {
       const acc = parseFloat(document.getElementById('propAccSize').value) || 10000;
       const ddPct = parseFloat(document.getElementById('propDailyMax').value) || 5;
@@ -1916,11 +1954,9 @@
 
       const lockTag = document.getElementById('dailyLossStatusTag');
       if (isDailyLossLocked()) {
-        lockTag.textContent = 'LOCKED (DD Hit)';
-        lockTag.className = 'font-mono text-rose-400 font-bold';
+        lockTag.textContent = 'LOCKED (DD Hit)'; lockTag.className = 'font-mono text-rose-400 font-bold';
       } else {
-        lockTag.textContent = 'Session Open';
-        lockTag.className = 'font-mono text-emerald-400';
+        lockTag.textContent = 'Session Open'; lockTag.className = 'font-mono text-emerald-400';
       }
     }
     ['propAccSize', 'propDailyMax', 'propTargetPct', 'dailyLossLockToggle'].forEach(id => document.getElementById(id).addEventListener('input', updatePropGuard));
@@ -2027,7 +2063,7 @@
     document.getElementById('journalSearchInput').addEventListener('input', renderJournal);
 
     function switchBottomTab(tabName, bypassPro) {
-      if (!bypassPro && tabName !== 'notes' && !isProActive()) { showUpgradeModal(); return; }
+      if (!bypassPro && !['notes', 'pine'].includes(tabName) && !isProActive()) { showUpgradeModal(); return; }
       document.querySelectorAll('.btab-btn').forEach(b => {
         b.classList.remove('font-semibold', 'text-white', 'border-b-2', 'border-tv-blue'); b.classList.add('font-medium', 'text-tv-muted');
       });
@@ -2037,7 +2073,11 @@
       document.getElementById('tab-' + tabName).classList.remove('hidden');
     }
     document.querySelectorAll('.btab-btn').forEach(btn => btn.addEventListener('click', () => switchBottomTab(btn.dataset.btab)));
-    document.getElementById('openPineModalBtn').addEventListener('click', () => switchBottomTab('pine'));
+    document.getElementById('openPineModalBtn').addEventListener('click', () => {
+      document.getElementById('bottomPanel').classList.remove('hidden');
+      document.getElementById('footerShowBottomBtn').classList.add('hidden');
+      switchBottomTab('pine', true);
+    });
 
     document.getElementById('toggleBottomPanelBtn').addEventListener('click', () => {
       document.getElementById('bottomPanel').classList.add('hidden');
@@ -2116,8 +2156,6 @@
     }
     document.getElementById('instantBuyBtn').addEventListener('click', () => placePaperOrder('BUY'));
     document.getElementById('instantSellBtn').addEventListener('click', () => placePaperOrder('SELL'));
-
-    document.getElementById('pineEditor').value = '//@version=5\nindicator("pipscopetrade1 0.280-0.382 Golden Zone", overlay=true)\nhi = ta.highest(high, 30)\nlo = ta.lowest(low, 30)\ngzTop = hi - (hi - lo) * 0.280\ngzBot = hi - (hi - lo) * 0.382\nplot(gzTop, "0.280", color=color.amber)\nplot(gzBot, "0.382", color=color.green)';
 
     function updateClock() {
       const now = new Date();
