@@ -62,69 +62,68 @@
   </div>
 
   <!-- TOP BAR -->
-  <header class="h-12 bg-tv-panel border-b border-tv-border px-2.5 flex items-center justify-between gap-2 shrink-0 z-30">
-    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
-      <div class="flex items-center gap-2 pr-2 border-r border-tv-border shrink-0">
-        <div class="w-7 h-7 rounded bg-gradient-to-br from-emerald-500 to-tv-blue flex items-center justify-center font-mono font-bold text-white text-xs">PS</div>
-        <span class="font-bold text-white text-sm">pipscopetrade1</span>
+  <header class="h-12 bg-tv-panel border-b border-tv-border px-2 flex items-center justify-between gap-1.5 shrink-0 z-30">
+    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar min-w-0">
+      <div class="flex items-center gap-1.5 pr-2 border-r border-tv-border shrink-0">
+        <div class="w-6 h-6 rounded bg-gradient-to-br from-emerald-500 to-tv-blue flex items-center justify-center font-mono font-bold text-white text-[11px]">PS</div>
+        <span class="font-bold text-white text-xs sm:text-sm">pipscopetrade1</span>
         <span id="planStatusBadge" class="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded">FREE</span>
       </div>
 
-      <div class="hidden sm:flex items-center gap-2 px-2.5 py-1 bg-tv-deep border border-tv-border rounded font-mono text-xs shrink-0">
+      <!-- LIVE ACTIVE SYMBOL TICKER -->
+      <div class="hidden lg:flex items-center gap-1.5 px-2 py-1 bg-tv-deep border border-tv-border rounded font-mono text-xs shrink-0">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
         <span id="headerActiveSym" class="font-bold text-white">XAUUSD</span>
         <span id="headerActivePrice" class="text-emerald-400 font-semibold">Live</span>
       </div>
 
       <div id="symbolPills" class="flex items-center gap-1 shrink-0">
-        <button type="button" data-symbol="OANDA:XAUUSD" class="sym-btn px-2 py-1 text-xs font-mono font-semibold rounded bg-tv-blue text-white">XAUUSD</button>
-        <button type="button" data-symbol="FX:EURUSD" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">EURUSD</button>
-        <button type="button" data-symbol="FX:GBPUSD" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">GBPUSD</button>
-        <button type="button" data-symbol="FX:USDJPY" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">USDJPY</button>
-        <button type="button" data-symbol="BINANCE:BTCUSDT" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">BTCUSDT</button>
-        <button type="button" data-symbol="NSE:NIFTY" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">NIFTY</button>
-        <button type="button" data-symbol="NSE:BANKNIFTY" class="sym-btn px-2 py-1 text-xs font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">BANKNIFTY</button>
+        <button type="button" data-symbol="OANDA:XAUUSD" class="sym-btn px-1.5 py-1 text-[11px] font-mono font-semibold rounded bg-tv-blue text-white">XAUUSD</button>
+        <button type="button" data-symbol="FX:EURUSD" class="sym-btn px-1.5 py-1 text-[11px] font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">EURUSD</button>
+        <button type="button" data-symbol="FX:GBPUSD" class="sym-btn px-1.5 py-1 text-[11px] font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">GBPUSD</button>
+        <button type="button" data-symbol="BINANCE:BTCUSDT" class="sym-btn px-1.5 py-1 text-[11px] font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">BTCUSDT</button>
+        <button type="button" data-symbol="NSE:NIFTY" class="sym-btn px-1.5 py-1 text-[11px] font-mono font-medium rounded bg-tv-bg hover:bg-tv-hover text-tv-text">NIFTY</button>
       </div>
 
-      <form id="customSymbolForm" class="flex items-center gap-1 shrink-0">
-        <input id="customSymbolInput" type="text" placeholder="FX:USDCHF" class="w-24 bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-2 py-1 text-xs font-mono text-white outline-none" />
-        <button type="submit" class="px-2 py-1 bg-tv-hover hover:bg-tv-blue text-white text-xs font-medium rounded">Go</button>
+      <form id="customSymbolForm" class="hidden xl:flex items-center gap-1 shrink-0">
+        <input id="customSymbolInput" type="text" placeholder="FX:USDJPY" class="w-20 bg-tv-bg border border-tv-border focus:border-tv-blue rounded px-1.5 py-1 text-[11px] font-mono text-white outline-none" />
+        <button type="submit" class="px-1.5 py-1 bg-tv-hover hover:bg-tv-blue text-white text-[11px] font-medium rounded">Go</button>
       </form>
     </div>
 
-    <div class="flex items-center gap-1.5 shrink-0">
+    <div class="flex items-center gap-1 shrink-0">
       <div id="tfPills" class="hidden 2xl:flex items-center gap-0.5 bg-tv-bg p-0.5 rounded border border-tv-border">
-        <button type="button" data-tf="1" class="tf-btn px-2 py-0.5 text-xs font-mono rounded bg-tv-blue text-white">1m</button>
-        <button type="button" data-tf="5" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">5m</button>
-        <button type="button" data-tf="15" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">15m</button>
-        <button type="button" data-tf="60" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">1H</button>
-        <button type="button" data-tf="240" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">4H</button>
-        <button type="button" data-tf="D" class="tf-btn px-2 py-0.5 text-xs font-mono rounded text-tv-muted hover:text-white">1D</button>
+        <button type="button" data-tf="1" class="tf-btn px-1.5 py-0.5 text-[11px] font-mono rounded bg-tv-blue text-white">1m</button>
+        <button type="button" data-tf="5" class="tf-btn px-1.5 py-0.5 text-[11px] font-mono rounded text-tv-muted hover:text-white">5m</button>
+        <button type="button" data-tf="15" class="tf-btn px-1.5 py-0.5 text-[11px] font-mono rounded text-tv-muted hover:text-white">15m</button>
+        <button type="button" data-tf="60" class="tf-btn px-1.5 py-0.5 text-[11px] font-mono rounded text-tv-muted hover:text-white">1H</button>
+        <button type="button" data-tf="240" class="tf-btn px-1.5 py-0.5 text-[11px] font-mono rounded text-tv-muted hover:text-white">4H</button>
+        <button type="button" data-tf="D" class="tf-btn px-1.5 py-0.5 text-[11px] font-mono rounded text-tv-muted hover:text-white">1D</button>
       </div>
 
       <div class="hidden md:flex items-center bg-tv-bg p-0.5 rounded border border-tv-border text-[11px] font-mono">
-        <button type="button" id="layoutSingleBtn" class="px-2 py-0.5 rounded bg-tv-blue text-white font-semibold">1x</button>
-        <button type="button" id="layoutSplitBtn" class="px-2 py-0.5 rounded text-tv-muted hover:text-white">2x</button>
-        <button type="button" id="layoutQuadBtn" class="px-2 py-0.5 rounded text-tv-muted hover:text-white">4x</button>
+        <button type="button" id="layoutSingleBtn" class="px-1.5 py-0.5 rounded bg-tv-blue text-white font-semibold">1x</button>
+        <button type="button" id="layoutSplitBtn" class="px-1.5 py-0.5 rounded text-tv-muted hover:text-white">2x</button>
+        <button type="button" id="layoutQuadBtn" class="px-1.5 py-0.5 rounded text-tv-muted hover:text-white">4x</button>
       </div>
 
-      <!-- TRADINGVIEW-STYLE CHART SETTINGS BUTTON -->
-      <button type="button" id="openSettingsModalBtn" title="Chart Settings" class="px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white flex items-center gap-1">
-        <span>⚙️</span><span class="hidden lg:inline">Settings</span>
+      <!-- ALWAYS VISIBLE SETTINGS BUTTON -->
+      <button type="button" id="openSettingsModalBtn" title="Chart Settings" class="px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-white flex items-center gap-1 shrink-0">
+        <span>⚙️</span><span>Settings</span>
       </button>
 
-      <button type="button" id="openLayoutModalBtn" class="hidden sm:flex items-center gap-1 px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white">☁️ Layouts</button>
-      <button type="button" id="openAlertModalBtn" class="px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white flex items-center gap-1">🔔 <span id="alertCountBadge" class="font-mono text-[10px] text-amber-400">0</span></button>
-      <button type="button" id="togglePaperPanelBtn" class="hidden lg:flex items-center gap-1 px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-emerald-400 font-semibold">⇄ Trade</button>
-      <button type="button" id="toggleIndicatorBarBtn" class="px-2 py-1 text-xs font-medium bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-white"><span class="text-tv-blue font-mono font-bold">fx</span></button>
-      <button type="button" id="openUpgradeBtn" class="px-2.5 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black rounded shadow">⚡ Pro ₹149</button>
+      <button type="button" id="openLayoutModalBtn" class="hidden sm:flex items-center gap-1 px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white shrink-0">☁️ Layouts</button>
+      <button type="button" id="openAlertModalBtn" class="px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white flex items-center gap-1 shrink-0">🔔 <span id="alertCountBadge" class="font-mono text-[10px] text-amber-400">0</span></button>
+      <button type="button" id="togglePaperPanelBtn" class="hidden lg:flex items-center gap-1 px-2 py-1 text-xs bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-emerald-400 font-semibold shrink-0">⇄ Trade</button>
+      <button type="button" id="toggleIndicatorBarBtn" class="px-2 py-1 text-xs font-medium bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-white shrink-0"><span class="text-tv-blue font-mono font-bold">fx</span></button>
+      <button type="button" id="openUpgradeBtn" class="px-2 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black rounded shadow shrink-0">⚡ Pro ₹149</button>
 
-      <button type="button" id="authHeaderBtn" class="px-2.5 py-1 text-xs font-semibold bg-tv-blue hover:bg-tv-blueHover text-white rounded flex items-center gap-1.5">
+      <button type="button" id="authHeaderBtn" class="px-2 py-1 text-xs font-semibold bg-tv-blue hover:bg-tv-blueHover text-white rounded flex items-center gap-1 shrink-0">
         <span id="authHeaderAvatar" class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">👤</span>
         <span id="authHeaderText">Sign In</span>
       </button>
 
-      <button type="button" id="toggleSidebarBtn" title="Toggle Right Sidebar" class="p-1.5 bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white">
+      <button type="button" id="toggleSidebarBtn" title="Toggle Right Sidebar" class="p-1.5 bg-tv-bg hover:bg-tv-hover border border-tv-border rounded text-tv-text hover:text-white shrink-0">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" /><line x1="15" y1="3" x2="15" y2="21" /></svg>
       </button>
     </div>
@@ -493,12 +492,10 @@
       <span>pipscopetrade1 Terminal</span>
       <button type="button" id="footerShowBottomBtn" class="hidden text-tv-blue hover:underline font-semibold">▲ Show Bottom Panel</button>
     </div>
-    <span>pipscopetrade1 Institutional Workspace</span>
+    <span>Tip: Use 15m/1H/4H/1D for 2–3 months history</span>
   </footer>
 
-  <!-- ========================================================= -->
-  <!-- TRADINGVIEW-STYLE CHART SETTINGS MODAL (⚙️)                -->
-  <!-- ========================================================= -->
+  <!-- CHART SETTINGS MODAL -->
   <div id="chartSettingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="bg-tv-panel border border-tv-border rounded-xl max-w-2xl w-full overflow-hidden shadow-2xl">
       <div class="px-5 py-3 border-b border-tv-border flex items-center justify-between bg-tv-deep">
@@ -507,15 +504,13 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-3 min-h-[300px] text-xs">
-        <!-- Left Categories -->
         <div class="bg-tv-deep/70 border-r border-tv-border p-2 space-y-1">
           <button type="button" data-settab="canvas" class="set-tab w-full text-left px-3 py-2 rounded bg-tv-blue text-white font-semibold">🎨 Canvas & Grid</button>
-          <button type="button" data-settab="scales" class="set-tab w-full text-left px-3 py-2 rounded text-tv-muted hover:text-white">📏 Scales & Sessions</button>
+          <button type="button" data-settab="scales" class="set-tab w-full text-left px-3 py-2 rounded text-tv-muted hover:text-white">📏 Scales & History</button>
           <button type="button" data-settab="drawings" class="set-tab w-full text-left px-3 py-2 rounded text-tv-muted hover:text-white">✏️ Drawing Styles</button>
           <button type="button" data-settab="alerts" class="set-tab w-full text-left px-3 py-2 rounded text-tv-muted hover:text-white">🔔 Alerts & Sound</button>
         </div>
 
-        <!-- Right Options -->
         <div class="sm:col-span-2 p-4 space-y-3">
           <div id="set-canvas" class="set-panel space-y-3">
             <div class="font-bold text-white uppercase tracking-wider text-[11px]">Chart Canvas & Appearance</div>
@@ -541,15 +536,16 @@
           </div>
 
           <div id="set-scales" class="set-panel hidden space-y-3">
-            <div class="font-bold text-white uppercase tracking-wider text-[11px]">Scales & Market Sessions</div>
+            <div class="font-bold text-white uppercase tracking-wider text-[11px]">Scales & Multi-Month History</div>
             <div class="flex items-center justify-between">
-              <span class="text-tv-text">Default Timeframe</span>
+              <span class="text-tv-text">Chart Timeframe</span>
               <select id="cfgDefaultTf" class="bg-tv-bg border border-tv-border rounded px-2.5 py-1 font-mono text-white outline-none">
-                <option value="1" selected>1 Minute</option>
-                <option value="5">5 Minutes</option>
-                <option value="15">15 Minutes</option>
-                <option value="60">1 Hour</option>
-                <option value="240">4 Hours</option>
+                <option value="1" selected>1m (Recent Days)</option>
+                <option value="5">5m</option>
+                <option value="15">15m (Multi-Week)</option>
+                <option value="60">1H (2–3 Months)</option>
+                <option value="240">4H (3+ Months)</option>
+                <option value="D">1D (1+ Year)</option>
               </select>
             </div>
             <div class="flex items-center justify-between">
@@ -757,9 +753,6 @@
     let priceAlerts = JSON.parse(localStorage.getItem('pipscopetrade1_alerts') || '[]');
     const livePrices = {};
 
-    // =========================================================
-    // CHART SETTINGS MODAL CONTROLLER
-    // =========================================================
     function applySavedSettingsToUI() {
       document.getElementById('cfgChartTheme').value = chartSettings.theme;
       document.getElementById('cfgShowGrid').checked = !!chartSettings.showGrid;
@@ -799,6 +792,7 @@
 
     document.getElementById('saveSettingsBtn').addEventListener('click', function() {
       const prevTheme = chartSettings.theme;
+      const prevTf = currentInterval;
       chartSettings.theme = document.getElementById('cfgChartTheme').value;
       chartSettings.showGrid = document.getElementById('cfgShowGrid').checked;
       chartSettings.showSessions = document.getElementById('cfgShowSessions').checked;
@@ -815,13 +809,10 @@
       redrawAllShapes();
       updateCalculator();
       renderJournal();
-      if (prevTheme !== chartSettings.theme) loadChartWidget();
+      if (prevTheme !== chartSettings.theme || prevTf !== currentInterval) loadChartWidget();
       closeSettingsModal();
     });
 
-    // =========================================================
-    // LIVE PRICE FEED & SOUND ALERTS
-    // =========================================================
     function playAlertSound() {
       if (!chartSettings.alertSound) return;
       try {
@@ -925,9 +916,6 @@
       setInterval(fetchForexRates, 60000);
     }
 
-    // =========================================================
-    // DRAWING CANVAS
-    // =========================================================
     const canvas = document.getElementById('chartDrawCanvas');
     const ctx = canvas.getContext('2d');
     let drawTool = 'cursor';
@@ -1038,9 +1026,6 @@
       redrawAllShapes();
     });
 
-    // =========================================================
-    // PRO STATE, AUTH, CHARTS & TOOLS
-    // =========================================================
     function isProActive() {
       const now = Date.now();
       if (proSubscription && (proSubscription.isPro === true || now < Number(proSubscription.expiresAt || 0))) return true;
@@ -1086,13 +1071,13 @@
         badge.textContent = 'PRO • ' + expDate;
         badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded';
         upgradeBtn.innerHTML = '<span>★ Pro Active</span>';
-        upgradeBtn.className = 'px-2.5 py-1 text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded';
+        upgradeBtn.className = 'px-2 py-1 text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded';
         document.getElementById('activeStudiesCount').textContent = activeStudies.length + ' Active';
       } else {
         badge.textContent = pendingUtr ? 'VERIFYING...' : 'FREE';
         badge.className = 'px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded';
         upgradeBtn.innerHTML = '<span>⚡ Pro ₹149</span>';
-        upgradeBtn.className = 'px-2.5 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 text-black rounded shadow';
+        upgradeBtn.className = 'px-2 py-1 text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 text-black rounded shadow';
         document.getElementById('activeStudiesCount').textContent = activeStudies.length + '/1 Free Study';
       }
       updateCalculator(); updateFibGoldenZone(); updatePropGuard(); renderJournal(); renderAlerts();
